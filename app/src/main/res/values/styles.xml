@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Application theme. -->
+    <style name="AppTheme" parent="Theme.MaterialComponents.Light.DarkActionBar">
+        <item name="colorPrimary">@color/accent</item>
+        <item name="colorPrimaryDark">@color/icons</item>
+        <item name="colorAccent">@color/primary</item>
+        <item name="popupMenuStyle">@style/MyMenu</item>
+        <item name="android:popupMenuStyle">@style/MyMenu</item>
+
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="ThemeOverlay.MyLightEditText" parent="ThemeOverlay.AppCompat.Dark" />
+    <style name="ThemeOverlay.MyTextDetail" parent="AppTheme">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:fadeScrollbars">true</item>
+        <item name="android:gravity">center</item>
+        <item name="android:maxLines">5</item>
+        <item name="android:padding">4dp</item>
+        <item name="android:scrollbars">vertical</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="menu_button">
+        <item name="android:padding">0dp</item>
+        <item name="android:layout_margin">2dp</item>
+        <item name="android:background">@android:color/transparent</item>
+    </style>
+
+    <style name="header_style">
+        <item name="android:textColor">@color/icons</item>
+        <item name="android:background">@color/primary</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:layout_margin">10dp</item>
+        <item name="android:padding">5dp</item>
+    </style>
+
+    <style name="subheader_style">
+        <item name="android:textColor">@color/icons</item>
+        <item name="android:background">@color/primary</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:layout_margin">5dp</item>
+        <item name="android:padding">3dp</item>
+    </style>
+
+
+    <style name="button_style_main" parent="AppTheme">
+        <item name="android:textColor">@color/icons</item>
+        <item name="android:padding">5dp</item>
+        <item name="android:textSize">13sp</item>
+        <item name="android:layout_margin">2dp</item>
+        <item name="android:minWidth">75dp</item>
+        <item name="android:minHeight">15dp</item>
+        <item name="android:drawablePadding">5dp</item>
+        <item name="android:background">@drawable/buttonselectormain</item>
+        <item name="backgroundTint">@null</item>
+    </style>
+
+    <style name="button_style_alltheclimbs" parent="Widget.MaterialComponents.Button">
+        <item name="android:textColor">@color/icons</item>
+        <item name="android:padding">1dp</item>
+        <item name="android:textSize">13sp</item>
+        <item name="android:layout_margin">2dp</item>
+        <item name="android:minWidth">75dp</item>
+        <item name="android:minHeight">15dp</item>
+        <item name="android:drawablePadding">2dp</item>
+        <item name="android:background">@drawable/buttonselectormain</item>
+    </style>
+
+    <style name="ThemeOverlay.MyLoginSignupButtons" parent="Widget.MaterialComponents.Button">
+        <item name="android:textColor">@color/icons</item>
+        <item name="android:elevation" tools:targetApi="lollipop">10dp</item>
+        <item name="android:minWidth">80dp</item>
+        <item name="android:minHeight">15dp</item>
+        <item name="android:padding">5dp</item>
+        <item name="android:drawablePadding">0dp</item>
+        <item name="android:layout_margin">2dp</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:textAlignment">center</item>
+        <item name="android:background">@drawable/login_signup_button_selector</item>
+    </style>
+
+    <style name="ThemeOverlay.MyTitle" parent="AppTheme">
+        <item name="android:textColor">@color/accent</item>
+        <item name="android:padding">5dp</item>
+        <item name="android:textSize">30sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:layout_margin">10dp</item>
+        <item name="android:textAlignment">center</item>
+    </style>
+
+    <style name="ThemeOverlay.MySubTitle" parent="AppTheme">
+        <item name="android:textColor">@color/accent</item>
+        <item name="android:padding">5dp</item>
+        <item name="android:textSize">25sp</item>
+        <item name="android:layout_margin">10dp</item>
+        <item name="android:textAlignment">center</item>
+    </style>
+
+    <style name="text_style">
+        <item name="android:textColor">@color/colorText</item>
+    </style>
+
+    <style name="ThemeOverlay.MyEditTextSignUpLogin" parent="AppTheme">
+        <item name="android:textColorHint">@color/accent</item>
+        <item name="android:layout_margin">10dp</item>
+        <item name="android:textCursorDrawable">@drawable/color_cursor</item>
+    </style>
+
+    <style name="MyMenu" parent="@android:style/Widget.PopupMenu">
+        <item name="android:textColor">@color/icons</item>
+        <item name="android:elevation" tools:targetApi="lollipop">20dp</item>
+        <item name="android:popupBackground">@drawable/button_shape_main</item>
+        <item name="android:dropDownHorizontalOffset">3dp</item>
+        <item name="android:dropDownVerticalOffset">3dp</item>
+        <item name="android:listPreferredItemHeightSmall">40dp</item>
+    </style>
+
+    <style name="addViewButton">
+        <item name="android:textColor">@color/icons</item>
+        <item name="android:paddingLeft">10dp</item>
+        <item name="android:minWidth">20dp</item>
+        <item name="android:minHeight">20dp</item>
+        <item name="android:background">@drawable/buttonselectorclimb</item>
+        <item name="android:drawablePadding">5dp</item>
+    </style>
+
+    <style name="mySpinnerItemStyle" parent="@android:style/Widget.Holo.DropDownItem.Spinner">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/accent</item>
+    </style>
+    <style name="Widget.App.Spinner" parent="@style/Widget.AppCompat.Spinner">
+        <item name="overlapAnchor">true</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/accent</item>
+    </style>
+</resources>

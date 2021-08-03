@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/one"
+        android:icon="@mipmap/ic_climbs"
+        android:title="Team's climbs" />
+
+    <item
+        android:id="@+id/two"
+        android:title="Options"/>
+
+    <item
+        android:id="@+id/three"
+        android:title="Sign out"/>
+
+</menu>

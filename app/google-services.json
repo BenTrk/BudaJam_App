@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "142125853680",
+    "project_id": "budajam-ea659",
+    "storage_bucket": "budajam-ea659.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:142125853680:android:a66bc53223c2ffda0c4b35",
+        "android_client_info": {
+          "package_name": "com.example.budajam"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "142125853680-f6f2ft629ngj90r5eajtmdghhb554641.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD8x8adpmSK5fnpJWJ96Ic_C9-pXjTaWYY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "142125853680-f6f2ft629ngj90r5eajtmdghhb554641.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
