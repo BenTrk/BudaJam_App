@@ -5,41 +5,27 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Canvas;
-import android.graphics.ColorFilter;
 import android.graphics.drawable.AnimatedVectorDrawable;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.Icon;
-import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.ContactsContract;
-import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.view.Gravity;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.PopupMenu;
-import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserInfo;
@@ -80,10 +66,10 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseDatabase database;
     private FirebaseUser user;
 
-    boolean exist, isEmpty;
+    boolean exist;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState){
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -140,7 +126,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Drawable d = menuButton.getDrawable();
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    if (d instanceof AnimatedVectorDrawable){
+                    if (d instanceof AnimatedVectorDrawable) {
                         animMenu = (AnimatedVectorDrawable) d;
                         animMenu.start();
                     }
@@ -156,13 +142,13 @@ public class MainActivity extends AppCompatActivity {
                 //registering popup with OnMenuItemClickListener
                 popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                     public boolean onMenuItemClick(MenuItem item) {
-                        if (R.id.one == item.getItemId()){
+                        if (R.id.one == item.getItemId()) {
                             startActivity(new Intent(MainActivity.this, CheckOutActivity.class));
                             finish();
-                        } else  if (R.id.two == item.getItemId()){
+                        } else if (R.id.two == item.getItemId()) {
                             startActivity(new Intent(MainActivity.this, OptionsActivity.class));
                             finish();
-                        } else  if (R.id.three == item.getItemId()){
+                        } else if (R.id.three == item.getItemId()) {
                             auth.signOut();
                             startActivity(new Intent(MainActivity.this, LoginActivity.class));
                             finish();
@@ -199,9 +185,9 @@ public class MainActivity extends AppCompatActivity {
                 MainActivity.routeLayout.removeAllViews();
                 emptyScreenLinear.setVisibility(GONE);
 
-                if (rokaRoutes == null){
+                if (rokaRoutes == null) {
                     Toast.makeText(getApplicationContext(), "Sorry, still fetching data from database. Check your internet connection!", Toast.LENGTH_LONG).show();
-                } else if (rokaRoutes.isEmpty()){
+                } else if (rokaRoutes.isEmpty()) {
                     addView(rokaRoutes, user, "roka");
                     roka.setEnabled(false);
                     francia.setEnabled(true);
@@ -223,9 +209,9 @@ public class MainActivity extends AppCompatActivity {
                 MainActivity.routeLayout.removeAllViews();
                 emptyScreenLinear.setVisibility(GONE);
 
-                if (franciaRoutes == null){
+                if (franciaRoutes == null) {
                     Toast.makeText(getApplicationContext(), "Sorry, still fetching data from database. Check your internet connection!", Toast.LENGTH_LONG).show();
-                } else if (franciaRoutes.isEmpty()){
+                } else if (franciaRoutes.isEmpty()) {
                     addView(franciaRoutes, user, "francia");
                     roka.setEnabled(true);
                     francia.setEnabled(false);
@@ -247,9 +233,9 @@ public class MainActivity extends AppCompatActivity {
                 MainActivity.routeLayout.removeAllViews();
                 emptyScreenLinear.setVisibility(GONE);
 
-                if (svabRoutes == null){
+                if (svabRoutes == null) {
                     Toast.makeText(getApplicationContext(), "Sorry, still fetching data from database. Check your internet connection!", Toast.LENGTH_LONG).show();
-                } else if (svabRoutes.isEmpty()){
+                } else if (svabRoutes.isEmpty()) {
                     addView(svabRoutes, user, "svab");
                     roka.setEnabled(true);
                     francia.setEnabled(true);
@@ -271,9 +257,9 @@ public class MainActivity extends AppCompatActivity {
                 MainActivity.routeLayout.removeAllViews();
                 emptyScreenLinear.setVisibility(GONE);
 
-                if (kecskeRoutes == null){
+                if (kecskeRoutes == null) {
                     Toast.makeText(getApplicationContext(), "Sorry, still fetching data from database. Check your internet connection!", Toast.LENGTH_LONG).show();
-                } else if (kecskeRoutes.isEmpty()){
+                } else if (kecskeRoutes.isEmpty()) {
                     addView(kecskeRoutes, user, "kecske");
                     roka.setEnabled(true);
                     francia.setEnabled(true);
@@ -295,7 +281,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @SuppressLint("NewApi")
-    private void addView(List<Routes> route, FirebaseUser user, String name){
+    private void addView(List<Routes> route, FirebaseUser user, String name) {
 
         for (int i = 0; i < route.size(); i++) {
             LinearLayout buttonsDetails = new LinearLayout(MainActivity.this);
@@ -327,24 +313,24 @@ public class MainActivity extends AppCompatActivity {
             textLayout.setBackground(shapeTextClimbs);
 
             routeDetailsName.setLayoutParams(params);
-            routeDetailsName.setPadding(20,0,20,0);
+            routeDetailsName.setPadding(20, 0, 20, 0);
             routeDetailsName.setText("Name: " + route.get(i).name);
             routeDetailsName.setBackgroundColor(getColor(android.R.color.transparent));
             routeDetailsName.setTextColor(getColor(R.color.icons));
             routeDetailsDiff.setLayoutParams(params);
-            routeDetailsDiff.setPadding(20,0,20,0);
+            routeDetailsDiff.setPadding(20, 0, 20, 0);
             routeDetailsDiff.setText("Difficulty: " + route.get(i).difficulty);
             routeDetailsDiff.setBackgroundColor(getColor(android.R.color.transparent));
             routeDetailsDiff.setTextColor(getColor(R.color.icons));
 
             addMeButton.setBackground(shapeClimb);
-            addMeButton.setPadding(10,10,10,10);
+            addMeButton.setPadding(10, 10, 10, 10);
             addMeButton.setImageResource(R.mipmap.muscle);
 
             ImageButton okButton = new ImageButton(MainActivity.this, null, R.style.addViewButton);
             okButton.setImageResource(R.mipmap.ok_sign);
             okButton.setBackground(shapeClimbRight);
-            okButton.setPadding(10,10,10,10);
+            okButton.setPadding(10, 10, 10, 10);
 
             TextView whatClimb = new TextView(MainActivity.this);
             TextView climbedText = new TextView(MainActivity.this);
@@ -393,6 +379,7 @@ public class MainActivity extends AppCompatActivity {
 
             addMeButton.setOnClickListener(new View.OnClickListener() {
                 boolean counterButtonHere = false;
+
                 @Override
                 public void onClick(View v) {
                     textLayout.removeView(climbedText);
@@ -438,7 +425,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void getNamesFromDatabase(String userID){
+    public void getNamesFromDatabase(String userID) {
         database = FirebaseDatabase.getInstance("https://budajam-ea659-default-rtdb.firebaseio.com/");
         DatabaseReference myRef2 = database.getReference(userID + "/");
 
@@ -446,10 +433,10 @@ public class MainActivity extends AppCompatActivity {
         routesQuery2.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                    ClimberNames climberNamesInside = dataSnapshot.getValue(ClimberNames.class);
-                    climberName1 = climberNamesInside.ClimberOne;
-                    climberName2 = climberNamesInside.ClimberTwo;
-                    teamPoints = climberNamesInside.teamPoints;
+                ClimberNames climberNamesInside = dataSnapshot.getValue(ClimberNames.class);
+                climberName1 = climberNamesInside.ClimberOne;
+                climberName2 = climberNamesInside.ClimberTwo;
+                teamPoints = climberNamesInside.teamPoints;
             }
 
             @Override
@@ -459,7 +446,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public void addClimbToDatabase(String userID, String climber, Routes route, String name, String climbStyle){
+    public void addClimbToDatabase(String userID, String climber, Routes route, String name, String climbStyle) {
         database = FirebaseDatabase.getInstance("https://budajam-ea659-default-rtdb.firebaseio.com/");
         DatabaseReference myRef3 = database.getReference(userID + "/" + climber);
         //double pointsToAdd;
@@ -473,7 +460,7 @@ public class MainActivity extends AppCompatActivity {
         pointsCalculator(userID, climber, name, route.name, myRef3, route, climbStyle);
     }
 
-    private void pointsCalculator(String userID, String climberName, String placeName, String routeName, DatabaseReference myRef3, Routes route, String climbStyle){
+    private void pointsCalculator(String userID, String climberName, String placeName, String routeName, DatabaseReference myRef3, Routes route, String climbStyle) {
         String reference = user.getUid() + "/" + climberName + "/" + placeName + "/" + routeName;
 
         DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
@@ -554,7 +541,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
 
-        @Override
+            @Override
             public void onCancelled(DatabaseError error) {
 
             }
@@ -565,11 +552,11 @@ public class MainActivity extends AppCompatActivity {
         //And count them. That's all, easypeasy.
     }
 
-    private void populateRoutesListatStart(String name, List<Routes> routes){
+    private void populateRoutesListatStart(String name, List<Routes> routes) {
         database = FirebaseDatabase.getInstance("https://budajam-ea659-default-rtdb.firebaseio.com/");
         DatabaseReference myRef = database.getReference("Routes/" + name);
 
-        if(routes != null){
+        if (routes != null) {
             routes.clear();
         }
 
@@ -583,11 +570,11 @@ public class MainActivity extends AppCompatActivity {
                     //int key = routesDetails.key;
 
                     //can be removed
-                   // try {
+                    // try {
                     //    saveToDB(routesDetails, name, key);
-                 //   } catch(SQLException ex){
-                 //       Log.i("SQLException", "Duplicate route");
-                 //   }
+                    //   } catch(SQLException ex){
+                    //       Log.i("SQLException", "Duplicate route");
+                    //   }
                 }
             }
 
@@ -713,7 +700,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onRestart(){
+    public void onRestart() {
         super.onRestart();
     }
 
@@ -731,7 +718,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onPause(){
+    public void onPause() {
         super.onPause();
     }
 
@@ -746,7 +733,7 @@ public class MainActivity extends AppCompatActivity {
                 LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
         );
-        paramsText.setMargins(0, 100,0,60);
+        paramsText.setMargins(0, 100, 0, 60);
 
         TextView choosePlace = new TextView(MainActivity.this);
         choosePlace.setBackgroundResource(R.drawable.textview_shape_climb);
@@ -754,7 +741,7 @@ public class MainActivity extends AppCompatActivity {
             choosePlace.setTextColor(getColor(R.color.icons));
         }
         choosePlace.setTextSize(24);
-        choosePlace.setPadding(10,5,10,5);
+        choosePlace.setPadding(10, 5, 10, 5);
         choosePlace.setLayoutParams(paramsText);
         choosePlace.setGravity(Gravity.CENTER_HORIZONTAL);
         choosePlace.setText("Pick a place!");
@@ -843,10 +830,6 @@ public class MainActivity extends AppCompatActivity {
 
             MainActivity.routeLayout.addView(emptyFillerLayout);
         }
-    }
-
-    public void emptyScreenLinear(){
-        emptyScreenLinear.setVisibility(GONE);
     }
 }
 
