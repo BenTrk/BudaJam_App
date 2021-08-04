@@ -61,7 +61,7 @@ import static android.view.View.GONE;
 
 public class MainActivity extends AppCompatActivity {
 
-    private Button roka, kecske, francia, svab;
+    private ImageButton roka, kecske, francia, svab;
     private ImageView menuButton;
     private AnimatedVectorDrawable animMenu;
     private static LinearLayout routeLayout, emptyScreenLinear;
@@ -129,10 +129,10 @@ public class MainActivity extends AppCompatActivity {
         }
 
         routeLayout = (LinearLayout) findViewById(R.id.routeLayout);
-        roka = (Button) findViewById(R.id.roka);
-        francia = (Button) findViewById(R.id.francia);
-        svab = (Button) findViewById(R.id.svab);
-        kecske = (Button) findViewById(R.id.kecske);
+        roka = (ImageButton) findViewById(R.id.roka);
+        francia = (ImageButton) findViewById(R.id.francia);
+        svab = (ImageButton) findViewById(R.id.svab);
+        kecske = (ImageButton) findViewById(R.id.kecske);
         menuButton = (ImageView) findViewById(R.id.menuButton);
 
         menuButton.setOnClickListener(new View.OnClickListener() {

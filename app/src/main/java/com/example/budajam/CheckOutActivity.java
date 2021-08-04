@@ -9,13 +9,16 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -67,7 +70,7 @@ public class CheckOutActivity extends AppCompatActivity {
     private TextView pointsView;
     private static LinearLayout linearLayout;
 
-    private Button roka, kecske, francia, svab;
+    private ImageButton roka, kecskeCheck, francia, svab;
 
     String selectedName;
 
@@ -92,10 +95,10 @@ public class CheckOutActivity extends AppCompatActivity {
         backButton = (Button) findViewById(R.id.backButton);
         linearLayout = (LinearLayout) findViewById(R.id.linearLayout);
 
-        roka = (Button) findViewById(R.id.roka);
-        francia = (Button) findViewById(R.id.francia);
-        svab = (Button) findViewById(R.id.svab);
-        kecske = (Button) findViewById(R.id.kecske);
+        roka = (ImageButton) findViewById(R.id.rokaCheck);
+        francia = (ImageButton) findViewById(R.id.franciaCheck);
+        svab = (ImageButton) findViewById(R.id.svabCheck);
+        kecskeCheck = (ImageButton) findViewById(R.id.kecskeCheck);
         allTheClimbs = (Button) findViewById(R.id.allClimbs);
 
         auth = FirebaseAuth.getInstance();
@@ -212,7 +215,7 @@ public class CheckOutActivity extends AppCompatActivity {
             }
         });
 
-        kecske.setOnClickListener(new View.OnClickListener() {
+        kecskeCheck.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 int selectedID = toggle.getCheckedRadioButtonId();
@@ -269,36 +272,16 @@ public class CheckOutActivity extends AppCompatActivity {
     }
 
     public void addView(List<Routes> route, String place, String name) {
-        LinearLayout placeSeparator = new LinearLayout(CheckOutActivity.this);
-
+        View separatorView = new View(CheckOutActivity.this);
         LinearLayout.LayoutParams separator = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
+                5
         );
-
-        separator.setMargins(15,15,15,15);
-        placeSeparator.setLayoutParams(separator);
-        placeSeparator.setOrientation(LinearLayout.VERTICAL);
-
-        Drawable backgroundDrawable;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            backgroundDrawable = getDrawable(R.drawable.backgrounddrawable);
-            placeSeparator.setBackground(backgroundDrawable);
-        }
-
-        TextView placeNameTextView = new TextView(CheckOutActivity.this);
-        placeNameTextView.setLayoutParams(separator);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            placeNameTextView.setTextColor(getColor(R.color.accent));
-        }
-        placeNameTextView.setTextSize(20);
-        placeNameTextView.setGravity(Gravity.CENTER);
-        placeNameTextView.setText("" + place);
-
-        placeSeparator.addView(placeNameTextView);
+        separator.setMargins(10,10,10,10);
+        separatorView.setLayoutParams(separator);
+        separatorView.setBackgroundResource(R.drawable.separator_checkoutlist);
 
         TextView placeNoClimb = new TextView(CheckOutActivity.this);
-        placeNoClimb.setLayoutParams(separator);
         placeNoClimb.setGravity(Gravity.CENTER);
         placeNoClimb.setTextSize(20);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -307,14 +290,15 @@ public class CheckOutActivity extends AppCompatActivity {
         placeNoClimb.setText(name + " did not climb in " + place + " yet.");
 
         if (route.size() < 1){
-            placeSeparator.addView(placeNoClimb);
-            linearLayout.addView(placeSeparator);
+            linearLayout.addView(placeNoClimb);
+            linearLayout.addView(separatorView);
         } else {
 
             for (int i = 0; i < route.size(); i++) {
                 ImageButton removeMeButton = new ImageButton(CheckOutActivity.this, null, R.style.addViewButton);
-                //TextView teamPointsView = new TextView(CheckOutActivity.this);
+                ImageView placeImage = new ImageView(CheckOutActivity.this);
 
+                LinearLayout justForText = new LinearLayout(CheckOutActivity.this);
                 LinearLayout buttonsDetails = new LinearLayout(CheckOutActivity.this);
                 LinearLayout textLinearLayout = new LinearLayout(CheckOutActivity.this);
                 TextView routeDetails = new TextView(CheckOutActivity.this);
@@ -326,7 +310,7 @@ public class CheckOutActivity extends AppCompatActivity {
                 double routePoints = route.get(counter).points;
 
                 LinearLayout.LayoutParams buttons = new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.WRAP_CONTENT,
+                        LinearLayout.LayoutParams.MATCH_PARENT,
                         LinearLayout.LayoutParams.WRAP_CONTENT
                 );
 
@@ -344,28 +328,55 @@ public class CheckOutActivity extends AppCompatActivity {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     textLinearLayout.setBackgroundColor(getColor(R.color.primary));
                 }
-                textLinearLayout.setOrientation(LinearLayout.VERTICAL);
+                textLinearLayout.setOrientation(LinearLayout.HORIZONTAL);
                 textLinearLayout.setPadding(10,10,10,10);
+
+                LinearLayout.LayoutParams removeButton = new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.WRAP_CONTENT,
+                        LinearLayout.LayoutParams.MATCH_PARENT
+                );
+
+                LinearLayout.LayoutParams textLinearParams = new LinearLayout.LayoutParams(
+                        0,
+                        LinearLayout.LayoutParams.WRAP_CONTENT,
+                        4f
+                );
+
+                justForText.setLayoutParams(textLinearParams);
+
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     textLinearLayout.setBackgroundColor(getColor(R.color.primary));
                 }
+                justForText.setOrientation(LinearLayout.VERTICAL);
 
-                LinearLayout.LayoutParams removeButton = new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT,
+                RelativeLayout imageRelative = new RelativeLayout(CheckOutActivity.this);
+                LinearLayout.LayoutParams imageRelativeParams = new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.WRAP_CONTENT,
                         LinearLayout.LayoutParams.MATCH_PARENT
                 );
+                imageRelative.setLayoutParams(imageRelativeParams);
+                imageRelative.setGravity(Gravity.CENTER);
+
+                placeImage.setLayoutParams(imageRelativeParams);
+                placeImage.setPadding(1,1,1,1);
+                if (place == "roka"){ placeImage.setImageResource(R.mipmap.fox); }
+                else if (place == "kecske"){ placeImage.setImageResource(R.mipmap.goat); }
+                else if (place == "francia"){ placeImage.setImageResource(R.mipmap.french); }
+                else if (place == "svab"){ placeImage.setImageResource(R.mipmap.german); }
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    placeImage.setBackgroundColor(getColor(R.color.primary));
+                }
 
                 removeMeButton.setLayoutParams(removeButton);
                 removeMeButton.setPadding(1, 1, 1, 1);
                 removeMeButton.setImageResource(R.mipmap.trash);
                 removeMeButton.setBackground(removeClimb);
-                removeMeButton.setId(buttonID);
                 removeMeButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View removeMeButton) {
                         //write a safe remove method: should ask if you really want to remove,
                         //then from a spinner, choose yes, then remove.
-                        showAlertDialogButtonClicked(removeMeButton, routeName, name, place, routePoints, buttonsDetails, placeSeparator);
+                        showAlertDialogButtonClicked(removeMeButton, routeName, name, place, routePoints, buttonsDetails);
 
                     }
                 });
@@ -377,7 +388,7 @@ public class CheckOutActivity extends AppCompatActivity {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     routeDetails.setBackgroundColor(getColor(R.color.primary));
                 }
-                routeDetails.setText("Name: " + route.get(counter).name + ", difficulty: " + route.get(counter).difficulty);
+                routeDetails.setText("Name: " + route.get(counter).name);
                 routePointsTextView.setLayoutParams(textLinear);
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     routePointsTextView.setTextColor(getColor(R.color.icons));
@@ -385,7 +396,7 @@ public class CheckOutActivity extends AppCompatActivity {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     routePointsTextView.setBackgroundColor(getColor(R.color.primary));
                 }
-                routePointsTextView.setText("Points: " + route.get(counter).points);
+                routePointsTextView.setText("Points: " + route.get(counter).points  + " Class: " + route.get(counter).difficulty);
                 styleView.setLayoutParams(textLinear);
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     styleView.setTextColor(getColor(R.color.icons));
@@ -394,19 +405,23 @@ public class CheckOutActivity extends AppCompatActivity {
                     styleView.setBackgroundColor(getColor(R.color.primary));
                 }
                 styleView.setText("Last climbed in: " + route.get(counter).climbStyle + " style");
-                textLinearLayout.addView(routeDetails);
-                textLinearLayout.addView(routePointsTextView);
-                textLinearLayout.addView(styleView);
+
+                justForText.addView(routeDetails);
+                justForText.addView(routePointsTextView);
+                justForText.addView(styleView);
+
+                textLinearLayout.addView(justForText);
+                imageRelative.addView(placeImage);
+                textLinearLayout.addView(imageRelative);
 
                 buttonsDetails.removeAllViews();
 
                 buttonsDetails.addView(removeMeButton);
                 buttonsDetails.addView(textLinearLayout);
 
-                //CheckOutActivity.linearLayout.addView(teamPointsView);
-                placeSeparator.addView(buttonsDetails);
+                linearLayout.addView(buttonsDetails);
             }
-            linearLayout.addView(placeSeparator);
+            linearLayout.addView(separatorView);
         }
     }
 
@@ -432,7 +447,7 @@ public class CheckOutActivity extends AppCompatActivity {
         super.onRestart();
     }
 
-    public void showAlertDialogButtonClicked(View view, String routeName, String name, String place, double routePoints, LinearLayout buttonsDetails, LinearLayout placeSeparator) {
+    public void showAlertDialogButtonClicked(View view, String routeName, String name, String place, double routePoints, LinearLayout buttonsDetails) {
 
         // setup the alert builder
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -445,7 +460,7 @@ public class CheckOutActivity extends AppCompatActivity {
             public void onClick(DialogInterface dialog, int which) {
                 removeClimbBool = true;
                 removeClimb(routeName, name, place, routePoints);
-                placeSeparator.removeView(buttonsDetails);
+                linearLayout.removeView(buttonsDetails);
             }
         });
         builder.setNegativeButton("No, abort remove", new DialogInterface.OnClickListener() {

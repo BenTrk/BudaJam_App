@@ -54,9 +54,10 @@
 
     <style name="button_style_main" parent="AppTheme">
         <item name="android:textColor">@color/icons</item>
-        <item name="android:padding">5dp</item>
+        <item name="android:paddingLeft">5dp</item>
+        <item name="android:paddingRight">5dp</item>
         <item name="android:textSize">13sp</item>
-        <item name="android:layout_margin">2dp</item>
+        <item name="android:layout_margin">1dp</item>
         <item name="android:minWidth">75dp</item>
         <item name="android:minHeight">15dp</item>
         <item name="android:drawablePadding">5dp</item>
@@ -66,11 +67,10 @@
 
     <style name="button_style_alltheclimbs" parent="Widget.MaterialComponents.Button">
         <item name="android:textColor">@color/icons</item>
-        <item name="android:padding">1dp</item>
+        <item name="android:padding">5dp</item>
         <item name="android:textSize">13sp</item>
-        <item name="android:layout_margin">2dp</item>
         <item name="android:minWidth">75dp</item>
-        <item name="android:minHeight">15dp</item>
+        <item name="android:minHeight">10dp</item>
         <item name="android:drawablePadding">2dp</item>
         <item name="android:background">@drawable/buttonselectormain</item>
     </style>
