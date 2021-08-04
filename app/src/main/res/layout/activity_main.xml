@@ -51,45 +51,41 @@
             android:layout_gravity="center"
             android:orientation="horizontal">
 
-            <Button
+            <ImageButton
                 android:id="@+id/svab"
-                style="@style/button_style_main"
-                android:drawableLeft="@mipmap/german"
+                android:src="@mipmap/german"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="12sp"
-                android:textAlignment="viewStart"
-                android:text="@string/btn_svab" />
+                android:background="@drawable/buttonselectormain"
+                android:padding="10dp"
+                android:layout_margin="5dp"/>
 
-            <Button
+            <ImageButton
                 android:id="@+id/francia"
-                android:drawableLeft="@mipmap/french"
+                android:src="@mipmap/french"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                style="@style/button_style_main"
-                android:textSize="12sp"
-                android:textAlignment="viewStart"
-                android:text="@string/btn_francia" />
+                android:background="@drawable/buttonselectormain"
+                android:padding="10dp"
+                android:layout_margin="5dp"/>
 
-            <Button
+            <ImageButton
                 android:id="@+id/roka"
-                android:drawableLeft="@mipmap/fox"
+                android:src="@mipmap/fox"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textAlignment="viewStart"
-                style="@style/button_style_main"
-                android:textSize="12sp"
-                android:text="@string/btn_roka" />
+                android:background="@drawable/buttonselectormain"
+                android:padding="10dp"
+                android:layout_margin="5dp"/>
 
-            <Button
+            <ImageButton
                 android:id="@+id/kecske"
-                android:drawableLeft="@mipmap/goat"
+                android:src="@mipmap/goat"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textAlignment="viewStart"
-                style="@style/button_style_main"
-                android:textSize="12sp"
-                android:text="@string/btn_kecske" />
+                android:background="@drawable/buttonselectormain"
+                android:padding="10dp"
+                android:layout_margin="5dp"/>
         </LinearLayout>
         </LinearLayout>
 
