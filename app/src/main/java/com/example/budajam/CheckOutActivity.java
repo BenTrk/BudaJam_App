@@ -1,5 +1,6 @@
 package com.example.budajam;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -8,6 +9,7 @@ import android.media.Image;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -43,6 +45,8 @@ import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static android.view.View.GONE;
 
 public class CheckOutActivity extends AppCompatActivity {
 
@@ -260,7 +264,7 @@ public class CheckOutActivity extends AppCompatActivity {
                         Routes routesDetails = postSnapshot.getValue(Routes.class);
                         routes.add(routesDetails);
                     }
-                    addView(routes, placeName, name);
+                    addCustomRemove(routes, placeName, name);
                     routes.clear();
                 }
 
@@ -269,160 +273,6 @@ public class CheckOutActivity extends AppCompatActivity {
 
                 }
             });
-    }
-
-    public void addView(List<Routes> route, String place, String name) {
-        View separatorView = new View(CheckOutActivity.this);
-        LinearLayout.LayoutParams separator = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                5
-        );
-        separator.setMargins(10,10,10,10);
-        separatorView.setLayoutParams(separator);
-        separatorView.setBackgroundResource(R.drawable.separator_checkoutlist);
-
-        TextView placeNoClimb = new TextView(CheckOutActivity.this);
-        placeNoClimb.setGravity(Gravity.CENTER);
-        placeNoClimb.setTextSize(20);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            placeNoClimb.setTextColor(getColor(R.color.accent));
-        }
-        placeNoClimb.setText(name + " did not climb in " + place + " yet.");
-
-        if (route.size() < 1){
-            linearLayout.addView(placeNoClimb);
-            linearLayout.addView(separatorView);
-        } else {
-
-            for (int i = 0; i < route.size(); i++) {
-                ImageButton removeMeButton = new ImageButton(CheckOutActivity.this, null, R.style.addViewButton);
-                ImageView placeImage = new ImageView(CheckOutActivity.this);
-
-                LinearLayout justForText = new LinearLayout(CheckOutActivity.this);
-                LinearLayout buttonsDetails = new LinearLayout(CheckOutActivity.this);
-                LinearLayout textLinearLayout = new LinearLayout(CheckOutActivity.this);
-                TextView routeDetails = new TextView(CheckOutActivity.this);
-                TextView routePointsTextView = new TextView(CheckOutActivity.this);
-                TextView styleView = new TextView(CheckOutActivity.this);
-
-                int counter = i;
-                String routeName = route.get(counter).name;
-                double routePoints = route.get(counter).points;
-
-                LinearLayout.LayoutParams buttons = new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT
-                );
-
-                buttons.setMargins(10,5,10,5);
-                buttonsDetails.setLayoutParams(buttons);
-                buttonsDetails.setGravity(Gravity.LEFT);
-                buttonsDetails.setOrientation(LinearLayout.HORIZONTAL);
-
-                LinearLayout.LayoutParams textLinear = new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT
-                );
-
-                textLinearLayout.setLayoutParams(textLinear);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    textLinearLayout.setBackgroundColor(getColor(R.color.primary));
-                }
-                textLinearLayout.setOrientation(LinearLayout.HORIZONTAL);
-                textLinearLayout.setPadding(10,10,10,10);
-
-                LinearLayout.LayoutParams removeButton = new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.WRAP_CONTENT,
-                        LinearLayout.LayoutParams.MATCH_PARENT
-                );
-
-                LinearLayout.LayoutParams textLinearParams = new LinearLayout.LayoutParams(
-                        0,
-                        LinearLayout.LayoutParams.WRAP_CONTENT,
-                        4f
-                );
-
-                justForText.setLayoutParams(textLinearParams);
-
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    textLinearLayout.setBackgroundColor(getColor(R.color.primary));
-                }
-                justForText.setOrientation(LinearLayout.VERTICAL);
-
-                RelativeLayout imageRelative = new RelativeLayout(CheckOutActivity.this);
-                LinearLayout.LayoutParams imageRelativeParams = new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.WRAP_CONTENT,
-                        LinearLayout.LayoutParams.MATCH_PARENT
-                );
-                imageRelative.setLayoutParams(imageRelativeParams);
-                imageRelative.setGravity(Gravity.CENTER);
-
-                placeImage.setLayoutParams(imageRelativeParams);
-                placeImage.setPadding(1,1,1,1);
-                if (place == "roka"){ placeImage.setImageResource(R.mipmap.fox); }
-                else if (place == "kecske"){ placeImage.setImageResource(R.mipmap.goat); }
-                else if (place == "francia"){ placeImage.setImageResource(R.mipmap.french); }
-                else if (place == "svab"){ placeImage.setImageResource(R.mipmap.german); }
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    placeImage.setBackgroundColor(getColor(R.color.primary));
-                }
-
-                removeMeButton.setLayoutParams(removeButton);
-                removeMeButton.setPadding(1, 1, 1, 1);
-                removeMeButton.setImageResource(R.mipmap.trash);
-                removeMeButton.setBackground(removeClimb);
-                removeMeButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View removeMeButton) {
-                        //write a safe remove method: should ask if you really want to remove,
-                        //then from a spinner, choose yes, then remove.
-                        showAlertDialogButtonClicked(removeMeButton, routeName, name, place, routePoints, buttonsDetails);
-
-                    }
-                });
-
-                routeDetails.setLayoutParams(textLinear);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    routeDetails.setTextColor(getColor(R.color.icons));
-                }
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    routeDetails.setBackgroundColor(getColor(R.color.primary));
-                }
-                routeDetails.setText("Name: " + route.get(counter).name);
-                routePointsTextView.setLayoutParams(textLinear);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    routePointsTextView.setTextColor(getColor(R.color.icons));
-                }
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    routePointsTextView.setBackgroundColor(getColor(R.color.primary));
-                }
-                routePointsTextView.setText("Points: " + route.get(counter).points  + " Class: " + route.get(counter).difficulty);
-                styleView.setLayoutParams(textLinear);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    styleView.setTextColor(getColor(R.color.icons));
-                }
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    styleView.setBackgroundColor(getColor(R.color.primary));
-                }
-                styleView.setText("Last climbed in: " + route.get(counter).climbStyle + " style");
-
-                justForText.addView(routeDetails);
-                justForText.addView(routePointsTextView);
-                justForText.addView(styleView);
-
-                textLinearLayout.addView(justForText);
-                imageRelative.addView(placeImage);
-                textLinearLayout.addView(imageRelative);
-
-                buttonsDetails.removeAllViews();
-
-                buttonsDetails.addView(removeMeButton);
-                buttonsDetails.addView(textLinearLayout);
-
-                linearLayout.addView(buttonsDetails);
-            }
-            linearLayout.addView(separatorView);
-        }
     }
 
     private void removeClimb(String routes, String name, String place, double points) {
@@ -472,6 +322,79 @@ public class CheckOutActivity extends AppCompatActivity {
         // create and show the alert dialog
         AlertDialog dialog = builder.create();
         dialog.show();
+    }
+
+    @SuppressLint("SetTextI18n")
+    private void addCustomRemove(List<Routes> mRouteItemsToAdd, String placeName, String climberName) {
+
+        View separatorView = new View(CheckOutActivity.this);
+        LinearLayout.LayoutParams separator = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                5
+        );
+        separator.setMargins(10,10,10,10);
+        separatorView.setLayoutParams(separator);
+        separatorView.setBackgroundResource(R.drawable.separator_checkoutlist);
+
+        TextView placeNoClimb = new TextView(CheckOutActivity.this);
+        placeNoClimb.setGravity(Gravity.CENTER);
+        placeNoClimb.setTextSize(20);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            placeNoClimb.setTextColor(getColor(R.color.accent));
+        }
+        placeNoClimb.setText(climberName + " did not climb in " + placeName + " yet.");
+
+        if (mRouteItemsToAdd.size() < 1){
+            linearLayout.addView(placeNoClimb);
+            linearLayout.addView(separatorView);
+        }
+
+        else {
+            for (int i = 0; i < mRouteItemsToAdd.size(); i++) {
+                LinearLayout buttonsDetails = new LinearLayout(CheckOutActivity.this);
+                View customRemoveView = new View(CheckOutActivity.this);
+
+                LinearLayout.LayoutParams customViewParams = new LinearLayout.LayoutParams(
+                        ViewGroup.LayoutParams.WRAP_CONTENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT
+                );
+                customRemoveView.setLayoutParams(customViewParams);
+                buttonsDetails.setLayoutParams(customViewParams);
+
+                //if my custom button is true
+
+                customRemoveView = LayoutInflater.from(this).inflate(
+                        R.layout.custom_remove_layout, linearLayout, false
+                );
+
+                ImageView placeNameImage = customRemoveView.findViewById(R.id.placeNameImage);
+                TextView climbedRouteName = customRemoveView.findViewById(R.id.climbedRouteName);
+                TextView climbedRoutePointsAndClass = customRemoveView.findViewById(R.id.climbedRoutePointsAndClass);
+                TextView climbedRouteStyle = customRemoveView.findViewById(R.id.climbedRouteStyle);
+                ImageButton removeButtonImageButton = customRemoveView.findViewById(R.id.removeButtonImageButton);
+
+                if (placeName.equals("francia")){ placeNameImage.setImageResource(R.mipmap.french); }
+                else if (placeName.equals("svab")){ placeNameImage.setImageResource(R.mipmap.german); }
+                else if (placeName.equals("kecske")){ placeNameImage.setImageResource(R.mipmap.goat); }
+                else if (placeName.equals("roka")){ placeNameImage.setImageResource(R.mipmap.fox); }
+                String routeName = mRouteItemsToAdd.get(i).name;
+                Double routePoints = mRouteItemsToAdd.get(i).points;
+
+                climbedRouteName.setText(routeName);
+                climbedRoutePointsAndClass.setText("Points: " + routePoints + " Class: " + mRouteItemsToAdd.get(i).difficulty);
+                climbedRouteStyle.setText("Last climbed in: " + mRouteItemsToAdd.get(i).climbStyle + " style");
+
+                removeButtonImageButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        showAlertDialogButtonClicked(removeButtonImageButton, routeName, climberName, placeName, routePoints, buttonsDetails);
+                    }
+                });
+                buttonsDetails.addView(customRemoveView);
+                linearLayout.addView(buttonsDetails);
+            }
+            linearLayout.addView(separatorView);
+        }
     }
 
 }

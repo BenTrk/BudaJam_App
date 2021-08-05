@@ -49,4 +49,7 @@
     <string name="all_the_climbs">All the climbs!</string>
     <string name="back">Back</string>
     <string name="climbed_it">Climbed it!</string>
+    <string name="lead">Lead</string>
+    <string name="top_rope">Top-rope</string>
+    <string name="contentDescRemoveButton">Remove climb trash icon</string>
 </resources>

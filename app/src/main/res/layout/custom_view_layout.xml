@@ -60,8 +60,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="10dp"
-        android:layout_below="@+id/routeDetailsRelativeLayout"
-        android:background="@drawable/route_spinner_dropdown_background">
+        android:layout_below="@+id/routeDetailsRelativeLayout">
 
         <RadioGroup
             android:id="@+id/climberNameRadioGroup"
@@ -70,9 +69,11 @@
             android:checkedButton="@id/climberNameOne"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/control_switch_background_border"
+            android:background="@drawable/route_switch_background_border"
             android:orientation="horizontal"
-            android:layout_marginBottom="5dp">
+            android:elevation="25dp"
+            android:layout_marginBottom="5dp"
+            tools:targetApi="lollipop">
 
             <RadioButton
                 android:id="@+id/climberNameOne"
@@ -82,11 +83,11 @@
                 android:layout_marginTop="3dp"
                 android:layout_marginBottom="3dp"
                 android:layout_marginStart="3dp"
-                android:background="@drawable/control_switch_background_selector"
+                android:background="@drawable/route_switch_background_selector"
                 android:button="@null"
                 android:gravity="center"
                 android:textStyle="bold"
-                android:textColor="@drawable/control_switch_color_selector">
+                android:textColor="@drawable/route_switch_color_selector">
             </RadioButton>
 
             <RadioButton
@@ -97,11 +98,11 @@
                 android:layout_marginTop="3dp"
                 android:layout_marginBottom="3dp"
                 android:layout_marginStart="3dp"
-                android:background="@drawable/control_switch_background_selector"
+                android:background="@drawable/route_switch_background_selector"
                 android:button="@null"
                 android:gravity="center"
                 android:textStyle="bold"
-                android:textColor="@drawable/control_switch_color_selector">
+                android:textColor="@drawable/route_switch_color_selector">
             </RadioButton>
 
         </RadioGroup>
@@ -113,9 +114,11 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/climberNameRadioGroup"
             android:layout_centerInParent="true"
-            android:background="@drawable/control_switch_background_border"
+            android:background="@drawable/route_switch_background_border"
             android:orientation="horizontal"
-            android:layout_marginBottom="5dp">
+            android:elevation="25dp"
+            android:layout_marginBottom="5dp"
+            tools:targetApi="lollipop">
 
             <RadioButton
                 android:id="@+id/styleNameOne"
@@ -125,13 +128,13 @@
                 android:layout_marginTop="3dp"
                 android:layout_marginBottom="3dp"
                 android:layout_marginStart="3dp"
-                android:background="@drawable/control_switch_background_selector"
+                android:background="@drawable/route_switch_background_selector"
                 android:button="@null"
                 android:gravity="center"
-                android:text="Top-rope"
+                android:text="@string/top_rope"
                 android:textStyle="bold"
                 android:singleLine="true"
-                android:textColor="@drawable/control_switch_color_selector">
+                android:textColor="@drawable/route_switch_color_selector">
             </RadioButton>
 
             <RadioButton
@@ -142,13 +145,13 @@
                 android:layout_marginTop="3dp"
                 android:layout_marginBottom="3dp"
                 android:layout_marginStart="3dp"
-                android:background="@drawable/control_switch_background_selector"
+                android:background="@drawable/route_switch_background_selector"
                 android:button="@null"
                 android:singleLine="true"
                 android:gravity="center"
-                android:text="Lead"
+                android:text="@string/lead"
                 android:textStyle="bold"
-                android:textColor="@drawable/control_switch_color_selector">
+                android:textColor="@drawable/route_switch_color_selector">
             </RadioButton>
 
             <RadioButton
@@ -159,12 +162,12 @@
                 android:layout_marginTop="3dp"
                 android:layout_marginBottom="3dp"
                 android:layout_marginStart="3dp"
-                android:background="@drawable/control_switch_background_selector"
+                android:background="@drawable/route_switch_background_selector"
                 android:button="@null"
                 android:gravity="center"
                 android:textStyle="bold"
                 android:text="Clean"
-                android:textColor="@drawable/control_switch_color_selector">
+                android:textColor="@drawable/route_switch_color_selector">
             </RadioButton>
 
         </RadioGroup>
@@ -175,6 +178,8 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/styleNameRadioGroup"
             android:layout_alignParentEnd="true"
+            android:textColor="@color/primary"
+            android:backgroundTint="@color/icons"
             android:text="@string/climbed_it" />
 
     </RelativeLayout>

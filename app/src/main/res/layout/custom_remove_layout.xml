@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="5dp"
+    android:gravity="center_horizontal">
+
+    <ImageButton
+        android:id="@+id/removeButtonImageButton"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_alignTop="@+id/climbedRouteTextLinearLayout"
+        android:layout_alignBottom="@+id/climbedRouteTextLinearLayout"
+        android:src="@mipmap/trash"
+        android:background="@drawable/buttonselectorremove"
+        android:contentDescription="@string/contentDescRemoveButton" />
+
+    <LinearLayout
+        android:id="@+id/climbedRouteTextLinearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@+id/removeButtonImageButton"
+        android:background="@color/primary"
+        android:paddingStart="5dp"
+        android:paddingEnd="5dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/climbedRouteName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:theme="@style/removeDetailsStyle" />
+
+        <TextView
+            android:id="@+id/climbedRoutePointsAndClass"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:theme="@style/removeDetailsStyle" />
+
+        <TextView
+            android:id="@+id/climbedRouteStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:theme="@style/removeDetailsStyle" />
+
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/placeNameImage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignTop="@+id/climbedRouteTextLinearLayout"
+        android:layout_alignBottom="@+id/climbedRouteTextLinearLayout"
+        android:background="@color/primary" />
+
+</RelativeLayout>
