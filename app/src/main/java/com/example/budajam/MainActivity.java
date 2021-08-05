@@ -12,12 +12,19 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.ContextThemeWrapper;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -49,10 +56,8 @@ public class MainActivity extends AppCompatActivity {
 
     private ImageButton roka, kecske, francia, svab;
     private ImageView menuButton;
-    private AnimatedVectorDrawable animMenu;
+    private AnimatedVectorDrawable animMenu, animArrowAnim;
     private static LinearLayout routeLayout, emptyScreenLinear;
-
-    private Drawable shapeClimb, shapeTextClimbs, shapeClimbRight;
 
     public static String climberName1;
     public static String climberName2;
@@ -82,18 +87,6 @@ public class MainActivity extends AppCompatActivity {
         franciaRoutes = new ArrayList<>();
         svabRoutes = new ArrayList<>();
         kecskeRoutes = new ArrayList<>();
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            shapeClimb = getDrawable(R.drawable.buttonselectorclimb);
-        }
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            shapeTextClimbs = getDrawable(R.drawable.button_shape_textclimb);
-        }
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            shapeClimbRight = getDrawable(R.drawable.buttonselectorclimbright);
-        }
 
         authListener = new FirebaseAuth.AuthStateListener() {
             @Override
@@ -132,14 +125,12 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
 
-                //Creating the instance of PopupMenu
                 Context wrapper = new ContextThemeWrapper(MainActivity.this, R.style.MyMenu);
                 PopupMenu popup = new PopupMenu(wrapper, menuButton);
-                //Inflating the Popup using xml file
+
                 popup.getMenuInflater()
                         .inflate(R.menu.popup_menu, popup.getMenu());
 
-                //registering popup with OnMenuItemClickListener
                 popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                     public boolean onMenuItemClick(MenuItem item) {
                         if (R.id.one == item.getItemId()) {
@@ -157,9 +148,9 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
 
-                popup.show(); //showing popup menu
+                popup.show();
             }
-        }); //closing the setOnClickListener method
+        });
 
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null) {
@@ -188,13 +179,21 @@ public class MainActivity extends AppCompatActivity {
                 if (rokaRoutes == null) {
                     Toast.makeText(getApplicationContext(), "Sorry, still fetching data from database. Check your internet connection!", Toast.LENGTH_LONG).show();
                 } else if (rokaRoutes.isEmpty()) {
-                    addView(rokaRoutes, user, "roka");
+
+                    for(int i = 0; i < rokaRoutes.size(); i++) {
+                        addCustomSpinner(rokaRoutes.get(i), "roka");
+                    }
+
                     roka.setEnabled(false);
                     francia.setEnabled(true);
                     svab.setEnabled(true);
                     kecske.setEnabled(true);
                 } else {
-                    addView(rokaRoutes, user, "roka");
+
+                    for(int i = 0; i < rokaRoutes.size(); i++) {
+                        addCustomSpinner(rokaRoutes.get(i), "roka");
+                    }
+
                     roka.setEnabled(false);
                     francia.setEnabled(true);
                     svab.setEnabled(true);
@@ -212,13 +211,21 @@ public class MainActivity extends AppCompatActivity {
                 if (franciaRoutes == null) {
                     Toast.makeText(getApplicationContext(), "Sorry, still fetching data from database. Check your internet connection!", Toast.LENGTH_LONG).show();
                 } else if (franciaRoutes.isEmpty()) {
-                    addView(franciaRoutes, user, "francia");
+
+                    for(int i = 0; i < franciaRoutes.size(); i++) {
+                        addCustomSpinner(franciaRoutes.get(i), "francia");
+                    }
+
                     roka.setEnabled(true);
                     francia.setEnabled(false);
                     svab.setEnabled(true);
                     kecske.setEnabled(true);
                 } else {
-                    addView(franciaRoutes, user, "francia");
+
+                    for(int i = 0; i < franciaRoutes.size(); i++) {
+                        addCustomSpinner(franciaRoutes.get(i), "francia");
+                    }
+
                     roka.setEnabled(true);
                     francia.setEnabled(false);
                     svab.setEnabled(true);
@@ -236,13 +243,21 @@ public class MainActivity extends AppCompatActivity {
                 if (svabRoutes == null) {
                     Toast.makeText(getApplicationContext(), "Sorry, still fetching data from database. Check your internet connection!", Toast.LENGTH_LONG).show();
                 } else if (svabRoutes.isEmpty()) {
-                    addView(svabRoutes, user, "svab");
+
+                    for(int i = 0; i < svabRoutes.size(); i++) {
+                        addCustomSpinner(svabRoutes.get(i), "svab");
+                    }
+
                     roka.setEnabled(true);
                     francia.setEnabled(true);
                     svab.setEnabled(false);
                     kecske.setEnabled(true);
                 } else {
-                    addView(svabRoutes, user, "svab");
+
+                    for(int i = 0; i < svabRoutes.size(); i++) {
+                        addCustomSpinner(svabRoutes.get(i), "svab");
+                    }
+
                     roka.setEnabled(true);
                     francia.setEnabled(true);
                     svab.setEnabled(false);
@@ -260,13 +275,21 @@ public class MainActivity extends AppCompatActivity {
                 if (kecskeRoutes == null) {
                     Toast.makeText(getApplicationContext(), "Sorry, still fetching data from database. Check your internet connection!", Toast.LENGTH_LONG).show();
                 } else if (kecskeRoutes.isEmpty()) {
-                    addView(kecskeRoutes, user, "kecske");
+
+                    for(int i = 0; i < kecskeRoutes.size(); i++) {
+                        addCustomSpinner(kecskeRoutes.get(i), "kecske");
+                    }
+
                     roka.setEnabled(true);
                     francia.setEnabled(true);
                     svab.setEnabled(true);
                     kecske.setEnabled(false);
                 } else {
-                    addView(kecskeRoutes, user, "kecske");
+
+                    for(int i = 0; i < kecskeRoutes.size(); i++) {
+                        addCustomSpinner(kecskeRoutes.get(i), "kecske");
+                    }
+
                     roka.setEnabled(true);
                     francia.setEnabled(true);
                     svab.setEnabled(true);
@@ -276,153 +299,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
         place = new String[]{"roka", "kecske", "francia", "svab"};
-
-
-    }
-
-    @SuppressLint("NewApi")
-    private void addView(List<Routes> route, FirebaseUser user, String name) {
-
-        for (int i = 0; i < route.size(); i++) {
-            LinearLayout buttonsDetails = new LinearLayout(MainActivity.this);
-            ImageButton addMeButton = new ImageButton(MainActivity.this, null, R.style.addViewButton);
-
-            TextView routeDetailsName = new TextView(MainActivity.this);
-            TextView routeDetailsDiff = new TextView(MainActivity.this);
-
-            int counter = i;
-
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.WRAP_CONTENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT
-            );
-
-            params.topMargin = 5;
-            buttonsDetails.setLayoutParams(params);
-            buttonsDetails.setOrientation(LinearLayout.HORIZONTAL);
-
-            LinearLayout.LayoutParams paramsText = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    LinearLayout.LayoutParams.MATCH_PARENT
-            );
-
-            LinearLayout textLayout = new LinearLayout(MainActivity.this);
-            textLayout.setLayoutParams(paramsText);
-            textLayout.setOrientation(LinearLayout.VERTICAL);
-            textLayout.setGravity(Gravity.CENTER_VERTICAL);
-            textLayout.setBackground(shapeTextClimbs);
-
-            routeDetailsName.setLayoutParams(params);
-            routeDetailsName.setPadding(20, 0, 20, 0);
-            routeDetailsName.setText("Name: " + route.get(i).name);
-            routeDetailsName.setBackgroundColor(getColor(android.R.color.transparent));
-            routeDetailsName.setTextColor(getColor(R.color.icons));
-            routeDetailsDiff.setLayoutParams(params);
-            routeDetailsDiff.setPadding(20, 0, 20, 0);
-            routeDetailsDiff.setText("Difficulty: " + route.get(i).difficulty);
-            routeDetailsDiff.setBackgroundColor(getColor(android.R.color.transparent));
-            routeDetailsDiff.setTextColor(getColor(R.color.icons));
-
-            addMeButton.setBackground(shapeClimb);
-            addMeButton.setPadding(10, 10, 10, 10);
-            addMeButton.setImageResource(R.mipmap.muscle);
-
-            ImageButton okButton = new ImageButton(MainActivity.this, null, R.style.addViewButton);
-            okButton.setImageResource(R.mipmap.ok_sign);
-            okButton.setBackground(shapeClimbRight);
-            okButton.setPadding(10, 10, 10, 10);
-
-            TextView whatClimb = new TextView(MainActivity.this);
-            TextView climbedText = new TextView(MainActivity.this);
-
-            LinearLayout climbingData = new LinearLayout(MainActivity.this);
-
-            LinearLayout.LayoutParams params2 = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.WRAP_CONTENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT
-            );
-
-            params2.gravity = Gravity.CENTER;
-            params2.leftMargin = 5;
-            params2.rightMargin = 5;
-
-            whatClimb.setLayoutParams(params2);
-            whatClimb.setTextSize(14);
-            whatClimb.setText("Route: " + route.get(counter).name);
-            whatClimb.setBackgroundColor(getColor(android.R.color.transparent));
-            whatClimb.setTextColor(getColor(R.color.icons));
-
-            climbedText.setLayoutParams(params2);
-            climbedText.setTextSize(12);
-            climbedText.setBackgroundColor(getColor(android.R.color.transparent));
-            climbedText.setTextColor(getColor(R.color.icons));
-
-            climbingData.setLayoutParams(params2);
-            climbingData.setBackgroundColor(getColor(android.R.color.transparent));
-            climbingData.setOrientation(LinearLayout.HORIZONTAL);
-
-            Spinner climberName = new Spinner(MainActivity.this);
-            climberName.setLayoutParams(params2);
-            String[] names = new String[]{climberName1, climberName2};
-            ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.spinner, names);
-            adapter.setDropDownViewResource(R.layout.spinner_dropdown);
-            climberName.setAdapter(adapter);
-            climbingData.addView(climberName);
-
-            Spinner climbingStyle = new Spinner(MainActivity.this);
-            climbingStyle.setLayoutParams(params2);
-            String[] styles = new String[]{"Top-Rope", "Front", "Clean"};
-            ArrayAdapter<String> adapter2 = new ArrayAdapter<>(this, R.layout.spinner, styles);
-            adapter2.setDropDownViewResource(R.layout.spinner_dropdown);
-            climbingStyle.setAdapter(adapter2);
-            climbingData.addView(climbingStyle);
-
-            addMeButton.setOnClickListener(new View.OnClickListener() {
-                boolean counterButtonHere = false;
-
-                @Override
-                public void onClick(View v) {
-                    textLayout.removeView(climbedText);
-
-                    if (!counterButtonHere) {
-                        textLayout.removeView(routeDetailsName);
-                        textLayout.removeView(routeDetailsDiff);
-                        textLayout.addView(whatClimb);
-                        textLayout.addView(climbingData);
-                        buttonsDetails.addView(okButton);
-
-                        okButton.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                //count the score
-                                addClimbToDatabase(user.getUid(), climberName.getSelectedItem().toString(), route.get(counter), name, climbingStyle.getSelectedItem().toString());
-                                climbedText.setText(climberName.getSelectedItem().toString() + " climbed it, " + climbingStyle.getSelectedItem().toString() + " style!");
-                                textLayout.removeView(climbingData);
-                                buttonsDetails.removeView(okButton);
-                                textLayout.addView(climbedText);
-                            }
-                        });
-
-                        counterButtonHere = true;
-
-                    } else {
-                        textLayout.addView(routeDetailsName);
-                        textLayout.addView(routeDetailsDiff);
-                        textLayout.removeView(whatClimb);
-                        textLayout.removeView(climbingData);
-                        buttonsDetails.removeView(okButton);
-                        counterButtonHere = false;
-                    }
-                }
-            });
-
-            textLayout.addView(routeDetailsName);
-            textLayout.addView(routeDetailsDiff);
-
-            buttonsDetails.addView(addMeButton);
-            buttonsDetails.addView(textLayout);
-            MainActivity.routeLayout.addView(buttonsDetails);
-        }
     }
 
     public void getNamesFromDatabase(String userID) {
@@ -449,13 +325,6 @@ public class MainActivity extends AppCompatActivity {
     public void addClimbToDatabase(String userID, String climber, Routes route, String name, String climbStyle) {
         database = FirebaseDatabase.getInstance("https://budajam-ea659-default-rtdb.firebaseio.com/");
         DatabaseReference myRef3 = database.getReference(userID + "/" + climber);
-        //double pointsToAdd;
-
-        //get a list of the climbed routes here, important is routes.style and routes.points
-        //count the correct points depending on style
-        //write back to database
-
-        //Count on the other activity! There it works.
 
         pointsCalculator(userID, climber, name, route.name, myRef3, route, climbStyle);
     }
@@ -487,10 +356,10 @@ public class MainActivity extends AppCompatActivity {
                             double pointsToRemove = routePoints;
                             double pointsToAdd;
 
-                            if (climbStyle == "Top-Rope") {
+                            if (climbStyle.equals("Top-rope")) {
                                 //myRef3.child(name).child(route.name).child("points").setValue(route.points * 0.5);
                                 pointsToAdd = route.points * 0.5;
-                            } else if (climbStyle == "Clean") {
+                            } else if (climbStyle.equals("Clean")) {
                                 //myRef3.child(name).child(route.name).child("points").setValue(route.points * 2);
                                 pointsToAdd = route.points * 2;
                             } else {
@@ -522,9 +391,9 @@ public class MainActivity extends AppCompatActivity {
                 } else {
                     double pointsToAddNotExist;
 
-                    if (climbStyle == "Top-Rope") {
+                    if (climbStyle.equals("Top-rope")) {
                         pointsToAddNotExist = route.points * 0.5;
-                    } else if (climbStyle == "Clean") {
+                    } else if (climbStyle.equals("Clean")) {
                         pointsToAddNotExist = route.points * 2;
                     } else {
                         pointsToAddNotExist = route.points;
@@ -722,114 +591,73 @@ public class MainActivity extends AppCompatActivity {
         super.onPause();
     }
 
-    private void emptyFiller() {
+    @SuppressLint("SetTextI18n")
+    private void addCustomSpinner(Routes mRouteItemToAdd, String placeName) {
 
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
+        View customRoutesView = new View(this);
+        LinearLayout.LayoutParams customViewParams = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+        );
+        customRoutesView.setLayoutParams(customViewParams);
+
+        //if my custom button is true
+
+        customRoutesView = LayoutInflater.from(this).inflate(
+                R.layout.custom_view_layout, routeLayout, false
         );
 
-        LinearLayout.LayoutParams paramsText = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-        );
-        paramsText.setMargins(0, 100, 0, 60);
+        ImageView imageViewDiffImage = customRoutesView.findViewById(R.id.routeDiffImageView);
+        TextView textViewRouteName = customRoutesView.findViewById(R.id.routeNameTextView);
+        TextView textViewRouteDiff = customRoutesView.findViewById(R.id.routeDiffTextView);
+        ImageButton customButton = customRoutesView.findViewById(R.id.customButton);
+        RadioButton climberNameOne = customRoutesView.findViewById(R.id.climberNameOne);
+        RadioButton climberNameTwo = customRoutesView.findViewById(R.id.climberNameTwo);
+        Button climbedItButton = customRoutesView.findViewById(R.id.climbed_it_button);
+        RadioGroup climberNameRadioGroup = customRoutesView.findViewById(R.id.climberNameRadioGroup);
+        RadioGroup climbingStyleRadioGroup = customRoutesView.findViewById(R.id.styleNameRadioGroup);
+        RelativeLayout routeWhoClimbed = customRoutesView.findViewById(R.id.routeWhoClimbedRelativeLayout);
 
-        TextView choosePlace = new TextView(MainActivity.this);
-        choosePlace.setBackgroundResource(R.drawable.textview_shape_climb);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            choosePlace.setTextColor(getColor(R.color.icons));
-        }
-        choosePlace.setTextSize(24);
-        choosePlace.setPadding(10, 5, 10, 5);
-        choosePlace.setLayoutParams(paramsText);
-        choosePlace.setGravity(Gravity.CENTER_HORIZONTAL);
-        choosePlace.setText("Pick a place!");
+        imageViewDiffImage.setImageResource(R.mipmap.muscle);
+        textViewRouteName.setText(mRouteItemToAdd.name);
+        textViewRouteDiff.setText("Difficulty: " + (int) mRouteItemToAdd.difficulty);
 
-        MainActivity.routeLayout.setGravity(Gravity.CENTER);
-        MainActivity.routeLayout.addView(choosePlace);
+        climberNameOne.setText(climberName1);
+        climberNameTwo.setText(climberName2);
 
-        for (int i = 0; i < place.length; i++) {
-            LinearLayout emptyFillerLayout = new LinearLayout(MainActivity.this);
-            ImageView placeImageView = new ImageView(MainActivity.this);
-            TextView placeNameTextView = new TextView(MainActivity.this);
+        routeWhoClimbed.setVisibility(GONE);
 
-            params.setMargins(0, 20, 0, 0);
-            emptyFillerLayout.setPadding(10, 0, 10, 0);
-            emptyFillerLayout.setLayoutParams(params);
-            emptyFillerLayout.setOrientation(LinearLayout.HORIZONTAL);
-            emptyFillerLayout.setBackgroundResource(R.drawable.button_shape_main);
-            emptyFillerLayout.setGravity(Gravity.CENTER_VERTICAL);
+        customButton.setOnClickListener(new View.OnClickListener() {
+            boolean isCustomButtonClicked = true;
 
-            placeNameTextView.setPadding(10, 20, 10, 20);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                placeNameTextView.setBackgroundColor(getColor(android.R.color.transparent));
+            @Override
+            public void onClick(View v) {
+                if (isCustomButtonClicked) {
+                    routeWhoClimbed.setVisibility(View.VISIBLE);
+                    isCustomButtonClicked = false;
+                } else if (!isCustomButtonClicked) {
+                    routeWhoClimbed.setVisibility(GONE);
+                    isCustomButtonClicked = true;
+                }
             }
+        });
 
+        climbedItButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
 
-            placeImageView.setMinimumHeight(50);
-            placeImageView.setPadding(10, 25, 10, 25);
+                int checkedNameButton = climberNameRadioGroup.getCheckedRadioButtonId();
+                int checkedStyleButton = climbingStyleRadioGroup.getCheckedRadioButtonId();
+                RadioButton checkedNameRadioButton = (RadioButton) findViewById(checkedNameButton);
+                RadioButton checkedStyleRadioButton = (RadioButton) findViewById(checkedStyleButton);
+                String checkedName = (String) checkedNameRadioButton.getText();
+                String checkedStyle = (String) checkedStyleRadioButton.getText();
 
-            if (place[i] == "roka") {
-                placeImageView.setBackgroundResource(R.mipmap.fox);
-                placeNameTextView.setText("Róka Hegy");
-                emptyFillerLayout.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        MainActivity.routeLayout.removeAllViews();
-                        MainActivity.routeLayout.setGravity(Gravity.NO_GRAVITY);
-                        addView(rokaRoutes, user, "roka");
-                        roka.setEnabled(false);
-                    }
-                });
-            } else if (place[i] == "svab") {
-                placeImageView.setBackgroundResource(R.mipmap.german);
-                placeNameTextView.setText("Sváb Hegy");
-                emptyFillerLayout.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        MainActivity.routeLayout.removeAllViews();
-                        MainActivity.routeLayout.setGravity(Gravity.NO_GRAVITY);
-                        addView(svabRoutes, user, "svab");
-                        svab.setEnabled(false);
-                    }
-                });
-            } else if (place[i] == "francia") {
-                placeImageView.setBackgroundResource(R.mipmap.french);
-                placeNameTextView.setText("Francia Bánya");
-                emptyFillerLayout.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        MainActivity.routeLayout.removeAllViews();
-                        MainActivity.routeLayout.setGravity(Gravity.NO_GRAVITY);
-                        addView(franciaRoutes, user, "francia");
-                        francia.setEnabled(false);
-                    }
-                });
-            } else if (place[i] == "kecske") {
-                placeImageView.setBackgroundResource(R.mipmap.goat);
-                placeNameTextView.setText("Kecske Hegy");
-                emptyFillerLayout.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        MainActivity.routeLayout.removeAllViews();
-                        MainActivity.routeLayout.setGravity(Gravity.NO_GRAVITY);
-                        addView(kecskeRoutes, user, "kecske");
-                        kecske.setEnabled(false);
-                    }
-                });
+                addClimbToDatabase(user.getUid(), checkedName, mRouteItemToAdd, placeName, checkedStyle);
             }
+        });
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                placeNameTextView.setTextColor(getColor(R.color.icons));
-            }
-            placeNameTextView.setTextSize(20);
-
-            emptyFillerLayout.addView(placeImageView);
-            emptyFillerLayout.addView(placeNameTextView);
-
-            MainActivity.routeLayout.addView(emptyFillerLayout);
-        }
+        routeLayout.addView(customRoutesView);
     }
 }
 

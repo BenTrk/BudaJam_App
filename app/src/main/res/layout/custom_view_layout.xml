@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="10dp"
+    android:background="@drawable/route_spinner_background">
+
+    <RelativeLayout
+        android:id="@+id/routeDetailsRelativeLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp">
+
+    <ImageView
+        android:id="@+id/routeDiffImageView"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:src="@mipmap/muscle"
+        android:paddingEnd="5dp"
+        tools:ignore="RtlSymmetry" />
+
+    <LinearLayout
+        android:id="@+id/textContainerLinearLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_toEndOf="@+id/routeDiffImageView"
+        android:orientation="vertical"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp">
+
+        <TextView
+            android:id="@+id/routeNameTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:theme="@style/routeDetailsStyle"
+            android:text="Test"/>
+
+        <TextView
+            android:id="@+id/routeDiffTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:theme="@style/routeDetailsStyle"
+            android:text="Test"/>
+    </LinearLayout>
+
+        <ImageButton
+            android:id="@+id/customButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            style="@style/menu_button"
+            android:src="@mipmap/custombutton" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/routeWhoClimbedRelativeLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:layout_below="@+id/routeDetailsRelativeLayout"
+        android:background="@drawable/route_spinner_dropdown_background">
+
+        <RadioGroup
+            android:id="@+id/climberNameRadioGroup"
+            android:layout_centerInParent="true"
+            android:layout_alignParentTop="true"
+            android:checkedButton="@id/climberNameOne"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/control_switch_background_border"
+            android:orientation="horizontal"
+            android:layout_marginBottom="5dp">
+
+            <RadioButton
+                android:id="@+id/climberNameOne"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginTop="3dp"
+                android:layout_marginBottom="3dp"
+                android:layout_marginStart="3dp"
+                android:background="@drawable/control_switch_background_selector"
+                android:button="@null"
+                android:gravity="center"
+                android:textStyle="bold"
+                android:textColor="@drawable/control_switch_color_selector">
+            </RadioButton>
+
+            <RadioButton
+                android:id="@+id/climberNameTwo"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginTop="3dp"
+                android:layout_marginBottom="3dp"
+                android:layout_marginStart="3dp"
+                android:background="@drawable/control_switch_background_selector"
+                android:button="@null"
+                android:gravity="center"
+                android:textStyle="bold"
+                android:textColor="@drawable/control_switch_color_selector">
+            </RadioButton>
+
+        </RadioGroup>
+
+        <RadioGroup
+            android:id="@+id/styleNameRadioGroup"
+            android:checkedButton="@id/styleNameOne"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/climberNameRadioGroup"
+            android:layout_centerInParent="true"
+            android:background="@drawable/control_switch_background_border"
+            android:orientation="horizontal"
+            android:layout_marginBottom="5dp">
+
+            <RadioButton
+                android:id="@+id/styleNameOne"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginTop="3dp"
+                android:layout_marginBottom="3dp"
+                android:layout_marginStart="3dp"
+                android:background="@drawable/control_switch_background_selector"
+                android:button="@null"
+                android:gravity="center"
+                android:text="Top-rope"
+                android:textStyle="bold"
+                android:singleLine="true"
+                android:textColor="@drawable/control_switch_color_selector">
+            </RadioButton>
+
+            <RadioButton
+                android:id="@+id/styleNameTwo"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginTop="3dp"
+                android:layout_marginBottom="3dp"
+                android:layout_marginStart="3dp"
+                android:background="@drawable/control_switch_background_selector"
+                android:button="@null"
+                android:singleLine="true"
+                android:gravity="center"
+                android:text="Lead"
+                android:textStyle="bold"
+                android:textColor="@drawable/control_switch_color_selector">
+            </RadioButton>
+
+            <RadioButton
+                android:id="@+id/styleNameThree"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginTop="3dp"
+                android:layout_marginBottom="3dp"
+                android:layout_marginStart="3dp"
+                android:background="@drawable/control_switch_background_selector"
+                android:button="@null"
+                android:gravity="center"
+                android:textStyle="bold"
+                android:text="Clean"
+                android:textColor="@drawable/control_switch_color_selector">
+            </RadioButton>
+
+        </RadioGroup>
+
+        <Button
+            android:id="@+id/climbed_it_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/styleNameRadioGroup"
+            android:layout_alignParentEnd="true"
+            android:text="@string/climbed_it" />
+
+    </RelativeLayout>
+
+</RelativeLayout>

@@ -48,4 +48,5 @@
     <string name="list_climbs">Pick a place to see the list of climbs!</string>
     <string name="all_the_climbs">All the climbs!</string>
     <string name="back">Back</string>
+    <string name="climbed_it">Climbed it!</string>
 </resources>
