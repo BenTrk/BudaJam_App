@@ -27,8 +27,9 @@
 
     <style name="menu_button">
         <item name="android:padding">0dp</item>
-        <item name="android:layout_margin">2dp</item>
-        <item name="android:background">@android:color/transparent</item>
+        <item name="android:layout_margin">0dp</item>
+        <item name="android:background">@null</item>
+        <item name="android:backgroundTint" tools:targetApi="lollipop">@null</item>
     </style>
 
     <style name="header_style">
@@ -146,7 +147,7 @@
     <style name="routeDetailsStyle">
         <item name="android:textStyle">bold</item>
         <item name="android:textColor">@color/icons</item>
-        <item name="android:textSize">20sp</item>
+        <item name="android:textSize">15sp</item>
     </style>
 
     <style name="removeDetailsStyle">

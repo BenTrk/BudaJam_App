@@ -10,14 +10,16 @@
         android:id="@+id/routeDetailsRelativeLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="10dp">
+        android:paddingLeft="5dp"
+        android:paddingTop="5dp">
 
     <ImageView
         android:id="@+id/routeDiffImageView"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:src="@mipmap/muscle"
         android:paddingEnd="5dp"
+        android:layout_centerVertical="true"
         tools:ignore="RtlSymmetry" />
 
     <LinearLayout
@@ -50,8 +52,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
+            android:layout_alignTop="@+id/textContainerLinearLayout"
+            android:layout_alignBottom="@+id/textContainerLinearLayout"
             style="@style/menu_button"
-            android:src="@mipmap/custombutton" />
+            android:src="@drawable/avd_anim_arrow_blue_back" />
 
     </RelativeLayout>
 
@@ -178,7 +182,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/styleNameRadioGroup"
             android:layout_alignParentEnd="true"
-            android:textColor="@color/primary"
+            android:textColor="@color/accent"
             android:backgroundTint="@color/icons"
             android:text="@string/climbed_it" />
 

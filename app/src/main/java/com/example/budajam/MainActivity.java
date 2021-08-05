@@ -633,9 +633,25 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (isCustomButtonClicked) {
+                    customButton.setImageResource(R.drawable.avd_anim_arrow_blue_back);
+                    Drawable d = customButton.getDrawable();
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        if (d instanceof AnimatedVectorDrawable) {
+                            animArrowAnim = (AnimatedVectorDrawable) d;
+                            animArrowAnim.start();
+                        }
+                    }
                     routeWhoClimbed.setVisibility(View.VISIBLE);
                     isCustomButtonClicked = false;
                 } else if (!isCustomButtonClicked) {
+                    customButton.setImageResource(R.drawable.avd_anim_arrow_blue);
+                    Drawable d = customButton.getDrawable();
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        if (d instanceof AnimatedVectorDrawable) {
+                            animArrowAnim = (AnimatedVectorDrawable) d;
+                            animArrowAnim.start();
+                        }
+                    }
                     routeWhoClimbed.setVisibility(GONE);
                     isCustomButtonClicked = true;
                 }
