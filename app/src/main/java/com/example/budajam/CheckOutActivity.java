@@ -50,7 +50,6 @@ import static android.view.View.GONE;
 
 public class CheckOutActivity extends AppCompatActivity {
 
-    //Spinner nameSpinner;
     Button backButton, allTheClimbs;
 
     int buttonID = 0;
@@ -64,7 +63,6 @@ public class CheckOutActivity extends AppCompatActivity {
     String[] places;
 
     double teamPointsCheckOut;
-    private Drawable removeClimb, removeTextClimbs, removeClimbRight;
 
     private FirebaseAuth.AuthStateListener authListener;
     private FirebaseAuth auth;
@@ -95,7 +93,6 @@ public class CheckOutActivity extends AppCompatActivity {
 
         pointsView = (TextView) findViewById(R.id.teamPointsView);
 
-        //nameSpinner = (Spinner) findViewById(R.id.nameSpinner);
         backButton = (Button) findViewById(R.id.backButton);
         linearLayout = (LinearLayout) findViewById(R.id.linearLayout);
 
@@ -107,18 +104,6 @@ public class CheckOutActivity extends AppCompatActivity {
 
         auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            removeClimb = getDrawable(R.drawable.buttonselectorclimb);
-        }
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            removeTextClimbs = getDrawable(R.drawable.button_shape_textclimb);
-        }
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            removeClimbRight = getDrawable(R.drawable.buttonselectorclimbright);
-        }
 
         authListener = new FirebaseAuth.AuthStateListener() {
             @Override
@@ -150,8 +135,6 @@ public class CheckOutActivity extends AppCompatActivity {
             finish();
         }
 
-        //Just call the working method 4 times, without adding views, counting the points. That will work.
-
         pointsView.setText("Your Team's Points: " + teamPointsCheckOut);
 
         backButton.setOnClickListener(new View.OnClickListener() {
@@ -161,11 +144,6 @@ public class CheckOutActivity extends AppCompatActivity {
                 finish();
             }
         });
-
-        //String[] names = new String[]{MainActivity.climberName1, MainActivity.climberName2};
-        //ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.spinner_checkout, names);
-        //adapter.setDropDownViewResource(R.layout.spinner_dropdown);
-        //nameSpinner.setAdapter(adapter);
 
         allTheClimbs.setOnClickListener(new View.OnClickListener() {
             @Override
