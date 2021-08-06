@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    tools:context="com.example.budajam.LoginActivity">
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="@dimen/activity_horizontal_margin">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:id="@+id/logoLinear"
+            android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:theme="@style/ThemeOverlay.MyTitle"
+            android:id="@+id/titleOnLogin"
+            android:text="@string/title" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/titleOnLogin"
+            android:theme="@style/ThemeOverlay.MySubTitle"
+            android:id="@+id/subTitleOnLogin"
+            android:text="@string/subtitle" />
+
+        <ImageView
+            android:layout_width="@dimen/logo_w_h"
+            android:layout_height="@dimen/logo_w_h"
+            android:layout_below="@id/subTitleOnLogin"
+            android:layout_gravity="center_horizontal"
+            android:layout_margin="30dp"
+            android:src="@mipmap/climbing_icon" />
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:paddingStart="10dp"
+            android:layout_toEndOf="@id/logoLinear">
+
+            <EditText
+                android:id="@+id/email"
+                android:theme="@style/ThemeOverlay.MyEditTextSignUpLogin"
+                android:background="@drawable/edittext_underline"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/hint_email"
+                android:textColor="@color/accent"
+                android:layout_margin="5dp"
+                android:inputType="textEmailAddress"/>
+
+            <EditText
+                android:id="@+id/password"
+                android:theme="@style/ThemeOverlay.MyEditTextSignUpLogin"
+                android:background="@drawable/edittext_underline"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:textColor="@color/accent"
+                android:hint="@string/hint_password"
+                android:inputType="textPassword"/>
+         <!-- Login Button -->
+
+        <Button
+            android:id="@+id/btn_login"
+            android:theme="@style/ThemeOverlay.MyLoginSignupButtons"            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dip"
+            android:text="@string/btn_login" />
+
+        <Button
+            android:id="@+id/btn_reset_password"
+            android:theme="@style/ThemeOverlay.MyLoginSignupButtons"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textStyle="normal"
+            android:textSize="12sp"
+            android:text="@string/btn_forgot_password" />
+
+        <!-- Link to Login Screen -->
+
+        <Button
+            android:id="@+id/btn_signup"
+            android:theme="@style/ThemeOverlay.MyLoginSignupButtons"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/btn_link_to_register"
+            android:textStyle="normal"
+            android:textSize="12sp" />
+        </LinearLayout>
+    </RelativeLayout>
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_gravity="center|bottom"
+        android:layout_marginBottom="20dp"
+        android:visibility="gone" />
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
