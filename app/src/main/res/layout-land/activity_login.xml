@@ -19,30 +19,23 @@
             android:layout_height="match_parent"
             android:gravity="center"
             android:id="@+id/logoLinear"
+            android:layout_margin="10dp"
             android:orientation="vertical">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:theme="@style/ThemeOverlay.MyTitle"
-            android:id="@+id/titleOnLogin"
-            android:text="@string/title" />
+            <ImageView
+                android:layout_width="@dimen/logo_w_h"
+                android:layout_height="@dimen/logo_w_h"
+                android:layout_gravity="center_horizontal"
+                android:layout_margin="10dp"
+                android:src="@drawable/budajam_icon" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/titleOnLogin"
             android:theme="@style/ThemeOverlay.MySubTitle"
             android:id="@+id/subTitleOnLogin"
             android:text="@string/subtitle" />
 
-        <ImageView
-            android:layout_width="@dimen/logo_w_h"
-            android:layout_height="@dimen/logo_w_h"
-            android:layout_below="@id/subTitleOnLogin"
-            android:layout_gravity="center_horizontal"
-            android:layout_margin="30dp"
-            android:src="@mipmap/climbing_icon" />
         </LinearLayout>
 
 

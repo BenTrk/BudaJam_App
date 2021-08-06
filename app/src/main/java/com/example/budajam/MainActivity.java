@@ -52,6 +52,8 @@ import static android.view.View.GONE;
 //Use it for a save as xml activity - let the user add the days when the app should save the climbed routes
 //to an xml as a backup.
 
+//Important: Before launch, make sure climbers cannot add climbs to the database outside of the given dates!
+
 public class MainActivity extends AppCompatActivity {
 
     private ImageButton roka, kecske, francia, svab;
