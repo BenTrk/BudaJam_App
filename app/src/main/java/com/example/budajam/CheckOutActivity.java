@@ -314,16 +314,29 @@ public class CheckOutActivity extends AppCompatActivity {
         separatorView.setLayoutParams(separator);
         separatorView.setBackgroundResource(R.drawable.separator_checkoutlist);
 
-        TextView placeNoClimb = new TextView(CheckOutActivity.this);
-        placeNoClimb.setGravity(Gravity.CENTER);
-        placeNoClimb.setTextSize(20);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            placeNoClimb.setTextColor(getColor(R.color.accent));
-        }
-        placeNoClimb.setText(climberName + " did not climb in " + placeName + " yet.");
+        LinearLayout.LayoutParams customViewParams = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+        );
+
+        View customNoClimbView = new LinearLayout(CheckOutActivity.this);
+        customNoClimbView.setLayoutParams(customViewParams);
+        customNoClimbView = LayoutInflater.from(this).inflate(
+                R.layout.custom_remove_layout, linearLayout, false
+        );
+        TextView placeNoClimb = customNoClimbView.findViewById(R.id.climbedRoutePointsAndClass);
+        ImageView noClimbPlaceNameImage = customNoClimbView.findViewById(R.id.placeNameImage);
+        ImageButton noClimbRemoveButtonImageButton = customNoClimbView.findViewById(R.id.removeButtonImageButton);
+        if (placeName.equals("francia")){ noClimbPlaceNameImage.setImageResource(R.mipmap.french); }
+        else if (placeName.equals("svab")){ noClimbPlaceNameImage.setImageResource(R.mipmap.german); }
+        else if (placeName.equals("kecske")){ noClimbPlaceNameImage.setImageResource(R.mipmap.goat); }
+        else if (placeName.equals("roka")){ noClimbPlaceNameImage.setImageResource(R.mipmap.fox); }
+        placeNoClimb.setText(climberName + " did not climb here yet.");
+        noClimbRemoveButtonImageButton.setImageResource(R.mipmap.no_image);
+        noClimbRemoveButtonImageButton.setEnabled(false);
 
         if (mRouteItemsToAdd.size() < 1){
-            linearLayout.addView(placeNoClimb);
+            linearLayout.addView(customNoClimbView);
             linearLayout.addView(separatorView);
         }
 
@@ -332,14 +345,8 @@ public class CheckOutActivity extends AppCompatActivity {
                 LinearLayout buttonsDetails = new LinearLayout(CheckOutActivity.this);
                 View customRemoveView = new View(CheckOutActivity.this);
 
-                LinearLayout.LayoutParams customViewParams = new LinearLayout.LayoutParams(
-                        ViewGroup.LayoutParams.WRAP_CONTENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT
-                );
                 customRemoveView.setLayoutParams(customViewParams);
                 buttonsDetails.setLayoutParams(customViewParams);
-
-                //if my custom button is true
 
                 customRemoveView = LayoutInflater.from(this).inflate(
                         R.layout.custom_remove_layout, linearLayout, false
