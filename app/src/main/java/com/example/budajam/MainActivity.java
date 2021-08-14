@@ -629,6 +629,7 @@ public class MainActivity extends AppCompatActivity {
 
         routeWhoClimbed.setVisibility(GONE);
 
+        customButton.setImageResource(R.drawable.arrow_anim_start);
         customButton.setOnClickListener(new View.OnClickListener() {
             boolean isCustomButtonClicked = true;
 
