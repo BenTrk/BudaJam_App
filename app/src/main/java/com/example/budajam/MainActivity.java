@@ -8,6 +8,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.drawable.AnimatedVectorDrawable;
 import android.graphics.drawable.Drawable;
+import android.media.Image;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.ContextThemeWrapper;
@@ -44,6 +45,8 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import static android.view.View.GONE;
@@ -172,6 +175,8 @@ public class MainActivity extends AppCompatActivity {
             finish();
         }
 
+        //dateChecker(roka, kecske, francia, svab);
+
         roka.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -186,6 +191,9 @@ public class MainActivity extends AppCompatActivity {
                         addCustomSpinner(rokaRoutes.get(i), "roka");
                     }
 
+                    //dateChecker(roka, kecske, francia, svab);
+                    //then set the clicked to false
+
                     roka.setEnabled(false);
                     francia.setEnabled(true);
                     svab.setEnabled(true);
@@ -195,6 +203,9 @@ public class MainActivity extends AppCompatActivity {
                     for(int i = 0; i < rokaRoutes.size(); i++) {
                         addCustomSpinner(rokaRoutes.get(i), "roka");
                     }
+
+                    //dateChecker(roka, kecske, francia, svab);
+                    //then set the clicked to false
 
                     roka.setEnabled(false);
                     francia.setEnabled(true);
@@ -218,6 +229,9 @@ public class MainActivity extends AppCompatActivity {
                         addCustomSpinner(franciaRoutes.get(i), "francia");
                     }
 
+                    //dateChecker(roka, kecske, francia, svab);
+                    //then set the clicked to false
+
                     roka.setEnabled(true);
                     francia.setEnabled(false);
                     svab.setEnabled(true);
@@ -227,6 +241,9 @@ public class MainActivity extends AppCompatActivity {
                     for(int i = 0; i < franciaRoutes.size(); i++) {
                         addCustomSpinner(franciaRoutes.get(i), "francia");
                     }
+
+                    //dateChecker(roka, kecske, francia, svab);
+                    //then set the clicked to false
 
                     roka.setEnabled(true);
                     francia.setEnabled(false);
@@ -677,6 +694,34 @@ public class MainActivity extends AppCompatActivity {
         });
 
         routeLayout.addView(customRoutesView);
+    }
+
+    private void dateChecker(ImageButton roka, ImageButton kecske, ImageButton francia, ImageButton svab){
+        Calendar currentDateCalendar = Calendar.getInstance();
+        Calendar startFirstDateCalendar = Calendar.getInstance();
+        startFirstDateCalendar.set(2021, 8, 24, 0, 0);
+        Calendar endFirstDateCalendar = Calendar.getInstance();
+        endFirstDateCalendar.set(2021, 9, 3, 23, 59);
+        Calendar startSecondDateCalendar = Calendar.getInstance();
+        startSecondDateCalendar.set(2021, 9, 2, 0,0);
+        Calendar endSecondDateCalendar = Calendar.getInstance();
+        endSecondDateCalendar.set(2021, 9, 10, 20, 00);
+
+        if (currentDateCalendar.before(startFirstDateCalendar) || currentDateCalendar.after(endFirstDateCalendar)){
+            francia.setEnabled(false);
+            svab.setEnabled(false);
+        } else {
+            francia.setEnabled(true);
+            svab.setEnabled(true);
+        }
+
+        if (currentDateCalendar.before(startSecondDateCalendar) || currentDateCalendar.after(endSecondDateCalendar)) {
+            kecske.setEnabled(false);
+            roka.setEnabled(false);
+        } else {
+            kecske.setEnabled(true);
+            roka.setEnabled(true);
+        }
     }
 }
 
