@@ -1,0 +1,64 @@
+Handles climbing activities and points
+
+Functions:
+    - OnCreate - overwritten
+        - Sets up the user interface based on the saved instance state
+        - authListener - onAuthStateChanged -> shows the login screen if the authentication changes
+        - if the user is logged in, routes and user data is kept synced
+        - menuButton: Shows the menu in the upper left corner
+            - CheckOutActivity -> check the current data of the team
+            - OptionsActivity -> open the options menu
+            - LoginActivity -> Sign Out of the application
+
+        - FirebaseUser user -> current user authenticated in Firebase. Data is displayed according to this.
+            - if exist -> show climber names and route icons
+            - if not -> show the login screen
+
+        - Buttons are set up with two methods:
+            - setAllClimbPlaceButtonsDefault()
+            - climbPlaceButtonHandler(List<Routes>, ImageButton, String)
+
+    - setAllClimbPlaceButtonsDefault() -> sets all buttons as enabled
+
+    - climbPlaceButtonHandler(List<Routes>, ImageButton, String) -> sets the appropriate button as disabled, lists the appropriate routes
+
+    - getNamesFromDatabase(String) -> Gets the names of the climbers in the team from the database and the points of the team
+        - Queries the user data from the database
+        - With a value event listener it updates the data if it changes in the database
+        - Overwrites onDataChange and onCancelled
+            - No error handling in onCancelled!
+
+    //Might be something that needs refactoring, it is almost useless
+    - addClimbToDatabase(String, String, Routes, String, String) -> gets the database and calls pointsCalculator(String, String, String, String, DatabaseReference, Routes, String)
+
+    - pointsCalculator(String, String, String, String, DatabaseReference, Routes, String) -> Checks the database if the climber has climbed the route, if so, it will replace the old values
+        - According to a comment I made it handles duplicate climbs, more point-climbs, less point-climbs too - i don't trust myself, this has to be tested
+        - Queries the database, then checks for updates with an eventListener
+        - Overwrites onDataChange
+            - if route exists for the team:
+                - Gets the route points from database
+                - Counts actual points according to the style by calling pointsAccordingToStyles(String, Routes)
+                - Compares if the value is higher than the one in the database
+                    - if higher, it informs the user that the current climb earned more points and saves it to the database
+                    - if lower, it informs the user that the current climb earned less points
+                -  Overwrites onCancelled
+                    - No error handling!
+            - if route does not exist for the team:
+                - Counts actual points according to the style by calling pointsAccordingToStyles(String, Routes)
+                - Saves the climb to the database
+
+    - pointsAccordingToStyles(String, Routes) -> Counts points according to styles
+        - Takes the point value from Routes provided
+        - Multiplies it as necessary
+
+    - populateRoutesListatStart(String, List<Routes>)
+        - Gets the routes from the database - basically thats it. Firebase.
+
+    - saveToDB, readFromDB -> backup functions left for local database saves. Could be useful later to be 100% sure
+
+    - addCustomSpinner() -> sets up the layout of the dropdown-route register
+        - calls addClimbToDatabase()
+
+    - dateChecker -> Currently not in use. Start and End dates can be set for registering climbs.
+        - Enables or disables the buttons used to list the routes, hence register a climb.
+        - I know, it is easy to hack it. But this is a friendly climbing competition, i can take a look to the firebase database before the race. If somebody cheats, they are out. :)

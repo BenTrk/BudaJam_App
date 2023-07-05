@@ -1,0 +1,28 @@
+Check out climbs and points of the team
+
+Functions:
+    - OnCreate - Overwritten
+        - Creates the screen
+        - Shows th login screen if user is not authenticated
+        - Keeps data of users and team synced
+        - Calls onClickForPlaces(String) to set the correct UI and list the necessary routes by calling populateClimbedRoutesList(String, String)
+
+    - onClickForPlaces(String) -> sets the correct UI, calls populateClimbedRoutesList(String, String)
+
+    - populateClimbedRoutesList(String, String) -> populates the routes climbed
+        - Gets the routes climbed for the climber from the database for the place given
+        - lists them, sets the correct UI
+
+    - removeClimb(String, String, String, double) -> removes the given climb from the database from the climber
+
+    - showAlertDialogButtonClicked(View, String, String, String, double, LinearLayout)
+        - Shows a warning to the user if they want to remove the climb
+        - calls removeClimb if positive
+
+    - addCustomRemove()
+        - Creates a fancy UI for removing stuff. I guess, it was long time ago.
+        - calls showAlertDialogButtonClicked()
+
+Would be great:
+    - When using the name selector, it would be great to set the screen default
+    - Would be great to show the points for the team on the main screen too

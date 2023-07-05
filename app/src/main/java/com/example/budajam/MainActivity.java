@@ -8,17 +8,13 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.drawable.AnimatedVectorDrawable;
 import android.graphics.drawable.Drawable;
-import android.media.Image;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.ContextThemeWrapper;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -26,7 +22,6 @@ import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -46,7 +41,6 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 import static android.view.View.GONE;
@@ -119,6 +113,7 @@ public class MainActivity extends AppCompatActivity {
         kecske = (ImageButton) findViewById(R.id.kecske);
         menuButton = (ImageView) findViewById(R.id.menuButton);
 
+        //Show the menu, upper left corner
         menuButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -180,155 +175,70 @@ public class MainActivity extends AppCompatActivity {
         roka.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                MainActivity.routeLayout.removeAllViews();
-                emptyScreenLinear.setVisibility(GONE);
-
-                if (rokaRoutes == null) {
-                    Toast.makeText(getApplicationContext(), "Sorry, still fetching data from database. Check your internet connection!", Toast.LENGTH_LONG).show();
-                } else if (rokaRoutes.isEmpty()) {
-
-                    for(int i = 0; i < rokaRoutes.size(); i++) {
-                        addCustomSpinner(rokaRoutes.get(i), "roka");
-                    }
-
-                    //dateChecker(roka, kecske, francia, svab);
-                    //then set the clicked to false
-
-                    roka.setEnabled(false);
-                    francia.setEnabled(true);
-                    svab.setEnabled(true);
-                    kecske.setEnabled(true);
-                } else {
-
-                    for(int i = 0; i < rokaRoutes.size(); i++) {
-                        addCustomSpinner(rokaRoutes.get(i), "roka");
-                    }
-
-                    //dateChecker(roka, kecske, francia, svab);
-                    //then set the clicked to false
-
-                    roka.setEnabled(false);
-                    francia.setEnabled(true);
-                    svab.setEnabled(true);
-                    kecske.setEnabled(true);
-                }
+                setAllClimbPlaceButtonsDefault();
+                climbPlaceButtonHandler(rokaRoutes, roka, "roka");
             }
         });
 
         francia.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                MainActivity.routeLayout.removeAllViews();
-                emptyScreenLinear.setVisibility(GONE);
-
-                if (franciaRoutes == null) {
-                    Toast.makeText(getApplicationContext(), "Sorry, still fetching data from database. Check your internet connection!", Toast.LENGTH_LONG).show();
-                } else if (franciaRoutes.isEmpty()) {
-
-                    for(int i = 0; i < franciaRoutes.size(); i++) {
-                        addCustomSpinner(franciaRoutes.get(i), "francia");
-                    }
-
-                    //dateChecker(roka, kecske, francia, svab);
-                    //then set the clicked to false
-
-                    roka.setEnabled(true);
-                    francia.setEnabled(false);
-                    svab.setEnabled(true);
-                    kecske.setEnabled(true);
-                } else {
-
-                    for(int i = 0; i < franciaRoutes.size(); i++) {
-                        addCustomSpinner(franciaRoutes.get(i), "francia");
-                    }
-
-                    //dateChecker(roka, kecske, francia, svab);
-                    //then set the clicked to false
-
-                    roka.setEnabled(true);
-                    francia.setEnabled(false);
-                    svab.setEnabled(true);
-                    kecske.setEnabled(true);
-                }
+                setAllClimbPlaceButtonsDefault();
+                climbPlaceButtonHandler(franciaRoutes, francia, "francia");
             }
         });
 
         svab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                MainActivity.routeLayout.removeAllViews();
-                emptyScreenLinear.setVisibility(GONE);
-
-                if (svabRoutes == null) {
-                    Toast.makeText(getApplicationContext(), "Sorry, still fetching data from database. Check your internet connection!", Toast.LENGTH_LONG).show();
-                } else if (svabRoutes.isEmpty()) {
-
-                    for(int i = 0; i < svabRoutes.size(); i++) {
-                        addCustomSpinner(svabRoutes.get(i), "svab");
-                    }
-
-                    roka.setEnabled(true);
-                    francia.setEnabled(true);
-                    svab.setEnabled(false);
-                    kecske.setEnabled(true);
-                } else {
-
-                    for(int i = 0; i < svabRoutes.size(); i++) {
-                        addCustomSpinner(svabRoutes.get(i), "svab");
-                    }
-
-                    roka.setEnabled(true);
-                    francia.setEnabled(true);
-                    svab.setEnabled(false);
-                    kecske.setEnabled(true);
-                }
+                setAllClimbPlaceButtonsDefault();
+                climbPlaceButtonHandler(svabRoutes, svab, "svab");
             }
         });
 
         kecske.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                MainActivity.routeLayout.removeAllViews();
-                emptyScreenLinear.setVisibility(GONE);
-
-                if (kecskeRoutes == null) {
-                    Toast.makeText(getApplicationContext(), "Sorry, still fetching data from database. Check your internet connection!", Toast.LENGTH_LONG).show();
-                } else if (kecskeRoutes.isEmpty()) {
-
-                    for(int i = 0; i < kecskeRoutes.size(); i++) {
-                        addCustomSpinner(kecskeRoutes.get(i), "kecske");
-                    }
-
-                    roka.setEnabled(true);
-                    francia.setEnabled(true);
-                    svab.setEnabled(true);
-                    kecske.setEnabled(false);
-                } else {
-
-                    for(int i = 0; i < kecskeRoutes.size(); i++) {
-                        addCustomSpinner(kecskeRoutes.get(i), "kecske");
-                    }
-
-                    roka.setEnabled(true);
-                    francia.setEnabled(true);
-                    svab.setEnabled(true);
-                    kecske.setEnabled(false);
-                }
+                setAllClimbPlaceButtonsDefault();
+                climbPlaceButtonHandler(kecskeRoutes, kecske, "kecske");
             }
         });
 
         place = new String[]{"roka", "kecske", "francia", "svab"};
     }
 
+    public void climbPlaceButtonHandler(List<Routes> routes, ImageButton placeButton, String placeName){
+        MainActivity.routeLayout.removeAllViews();
+        emptyScreenLinear.setVisibility(GONE);
+
+        if (routes == null) {
+            Toast.makeText(getApplicationContext(), "Sorry, still fetching data from database. Check your internet connection!", Toast.LENGTH_LONG).show();
+        } else if (routes.isEmpty()) {
+            Toast.makeText(getApplicationContext(), "Sorry, there are no routes in the database for this place!", Toast.LENGTH_LONG).show();
+            placeButton.setEnabled(false);
+        } else {
+            for(int i = 0; i < routes.size(); i++) {
+                addCustomSpinner(routes.get(i), placeName);
+            }
+            placeButton.setEnabled(false);
+        }
+    }
+
+    public void setAllClimbPlaceButtonsDefault(){
+        roka.setEnabled(true);
+        svab.setEnabled(true);
+        kecske.setEnabled(true);
+        francia.setEnabled(true);
+    }
+
     public void getNamesFromDatabase(String userID) {
         database = FirebaseDatabase.getInstance("https://budajam-ea659-default-rtdb.firebaseio.com/");
-        DatabaseReference myRef2 = database.getReference(userID + "/");
-
-        Query routesQuery2 = myRef2;
-        routesQuery2.addValueEventListener(new ValueEventListener() {
+        Query routesQuery = database.getReference(userID + "/");
+        routesQuery.addValueEventListener(new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 ClimberNames climberNamesInside = dataSnapshot.getValue(ClimberNames.class);
+                assert climberNamesInside != null;
                 climberName1 = climberNamesInside.ClimberOne;
                 climberName2 = climberNamesInside.ClimberTwo;
                 teamPoints = climberNamesInside.teamPoints;
@@ -350,12 +260,10 @@ public class MainActivity extends AppCompatActivity {
 
     private void pointsCalculator(String userID, String climberName, String placeName, String routeName, DatabaseReference myRef3, Routes route, String climbStyle) {
         String reference = user.getUid() + "/" + climberName + "/" + placeName + "/" + routeName;
-
-        DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
-        Query boolReference = rootRef;
+        Query boolReference = FirebaseDatabase.getInstance().getReference();
         boolReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot snapshot) {
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.hasChild("/" + user.getUid() + "/" + climberName + "/" + placeName + "/" + routeName)) {
                     myRef3.child(placeName).child(routeName).child("name").setValue(route.name);
                     myRef3.child(placeName).child(routeName).child("difficulty").setValue(route.difficulty);
@@ -364,42 +272,27 @@ public class MainActivity extends AppCompatActivity {
                     myRef3.child(placeName).child(routeName).child("climbStyle").setValue(climbStyle);
 
                     database = FirebaseDatabase.getInstance("https://budajam-ea659-default-rtdb.firebaseio.com/");
-                    DatabaseReference myRef2 = database.getReference(reference);
-
-                    Query routesQuery2 = myRef2;
+                    Query routesQuery2 = database.getReference(reference);
                     routesQuery2.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
                             Routes climberPointsInside = dataSnapshot.getValue(Routes.class);
+                            assert climberPointsInside != null;
                             double routePoints = climberPointsInside.points;
-                            double pointsToRemove = routePoints;
-                            double pointsToAdd;
-
-                            if (climbStyle.equals("Top-rope")) {
-                                //myRef3.child(name).child(route.name).child("points").setValue(route.points * 0.5);
-                                pointsToAdd = route.points * 0.5;
-                            } else if (climbStyle.equals("Clean")) {
-                                //myRef3.child(name).child(route.name).child("points").setValue(route.points * 2);
-                                pointsToAdd = route.points * 2;
-                            } else {
-                                //myRef3.child(name).child(route.name).child("points").setValue(route.points);
-                                pointsToAdd = route.points;
-                            }
+                            double pointsToAdd = pointsAccordingToStyles(climbStyle, route);
 
                             int isMoreOrLess = Double.compare(routePoints, pointsToAdd);
-
 
                             if (isMoreOrLess < 0) {
                                 Toast.makeText(getApplicationContext(), "Exist, but " + climberName + " earned more points!", Toast.LENGTH_LONG).show();
 
                                 myRef3.child(placeName).child(routeName).child("points").setValue(pointsToAdd);
                                 DatabaseReference myRefPoints = database.getReference(userID + "/teamPoints");
-                                myRefPoints.setValue((teamPoints - pointsToRemove) + pointsToAdd);
+                                myRefPoints.setValue((teamPoints - routePoints) + pointsToAdd);
 
                             } else {
                                 Toast.makeText(getApplicationContext(), "Exist, and " + climberName + " earned less points!", Toast.LENGTH_LONG).show();
                             }
-
                         }
 
                         @Override
@@ -408,15 +301,7 @@ public class MainActivity extends AppCompatActivity {
                         }
                     });
                 } else {
-                    double pointsToAddNotExist;
-
-                    if (climbStyle.equals("Top-rope")) {
-                        pointsToAddNotExist = route.points * 0.5;
-                    } else if (climbStyle.equals("Clean")) {
-                        pointsToAddNotExist = route.points * 2;
-                    } else {
-                        pointsToAddNotExist = route.points;
-                    }
+                    double pointsToAddNotExist = pointsAccordingToStyles(climbStyle, route);
 
                     Toast.makeText(getApplicationContext(), "Added climb to database.", Toast.LENGTH_LONG).show();
                     myRef3.child(placeName).child(routeName).child("name").setValue(route.name);
@@ -440,6 +325,18 @@ public class MainActivity extends AppCompatActivity {
         //And count them. That's all, easypeasy.
     }
 
+    private double pointsAccordingToStyles(String climbStyle, Routes route){
+        double points;
+        if (climbStyle.equals("Top-rope")) {
+            points = route.points * 0.5;
+        } else if (climbStyle.equals("Clean")) {
+            points = route.points * 2;
+        } else {
+            points = route.points;
+        }
+        return points;
+    }
+
     private void populateRoutesListatStart(String name, List<Routes> routes) {
         database = FirebaseDatabase.getInstance("https://budajam-ea659-default-rtdb.firebaseio.com/");
         DatabaseReference myRef = database.getReference("Routes/" + name);
@@ -455,14 +352,6 @@ public class MainActivity extends AppCompatActivity {
                 for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
                     Routes routesDetails = postSnapshot.getValue(Routes.class);
                     routes.add(routesDetails);
-                    //int key = routesDetails.key;
-
-                    //can be removed
-                    // try {
-                    //    saveToDB(routesDetails, name, key);
-                    //   } catch(SQLException ex){
-                    //       Log.i("SQLException", "Duplicate route");
-                    //   }
                 }
             }
 
@@ -621,7 +510,6 @@ public class MainActivity extends AppCompatActivity {
         customRoutesView.setLayoutParams(customViewParams);
 
         //if my custom button is true
-
         customRoutesView = LayoutInflater.from(this).inflate(
                 R.layout.custom_view_layout, routeLayout, false
         );

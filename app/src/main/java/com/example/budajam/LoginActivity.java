@@ -1,11 +1,9 @@
 package com.example.budajam;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
@@ -54,8 +52,10 @@ public class LoginActivity extends AppCompatActivity {
         btnReset = (Button) findViewById(R.id.btn_reset_password);
 
         //Get Firebase auth instance
+        //It is a duplicate? Have to check.
         auth = FirebaseAuth.getInstance();
 
+        //Setting up Buttons with functions
         btnSignup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

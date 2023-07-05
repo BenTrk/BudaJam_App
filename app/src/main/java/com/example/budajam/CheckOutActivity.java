@@ -119,11 +119,6 @@ public class CheckOutActivity extends AppCompatActivity {
         database = FirebaseDatabase.getInstance("https://budajam-ea659-default-rtdb.firebaseio.com/");
 
         if (user != null) {
-            for (UserInfo profile : user.getProviderData()) {
-                String uid = profile.getUid();
-                String email = profile.getEmail();
-            }
-
             DatabaseReference myKeepSyncClimberOne = FirebaseDatabase.getInstance().getReference(user.getUid() + "/" + MainActivity.climberName1);
             myKeepSyncClimberOne.keepSynced(true);
 
@@ -164,50 +159,39 @@ public class CheckOutActivity extends AppCompatActivity {
         roka.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int selectedID = toggle.getCheckedRadioButtonId();
-                RadioButton radioButton = (RadioButton) findViewById(selectedID);
-                selectedName = (String) radioButton.getText();
-
-                CheckOutActivity.linearLayout.removeAllViews();
-                populateClimbedRoutesList(selectedName, "roka");
+                onClickForPlaces("roka");
             }
         });
 
         francia.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int selectedID = toggle.getCheckedRadioButtonId();
-                RadioButton radioButton = (RadioButton) findViewById(selectedID);
-                selectedName = (String) radioButton.getText();
-
-                CheckOutActivity.linearLayout.removeAllViews();
-                populateClimbedRoutesList(selectedName, "francia");
+                onClickForPlaces("francia");
             }
         });
 
         svab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int selectedID = toggle.getCheckedRadioButtonId();
-                RadioButton radioButton = (RadioButton) findViewById(selectedID);
-                selectedName = (String) radioButton.getText();
-
-                CheckOutActivity.linearLayout.removeAllViews();
-                populateClimbedRoutesList(selectedName, "svab");
+                onClickForPlaces("svab");
             }
         });
 
         kecskeCheck.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int selectedID = toggle.getCheckedRadioButtonId();
-                RadioButton radioButton = (RadioButton) findViewById(selectedID);
-                selectedName = (String) radioButton.getText();
-
-                CheckOutActivity.linearLayout.removeAllViews();
-                populateClimbedRoutesList(selectedName, "kecske");
+                onClickForPlaces("kecske");
             }
         });
+    }
+
+    private void onClickForPlaces(String placeName){
+        int selectedID = toggle.getCheckedRadioButtonId();
+        RadioButton radioButton = (RadioButton) findViewById(selectedID);
+        selectedName = (String) radioButton.getText();
+
+        CheckOutActivity.linearLayout.removeAllViews();
+        populateClimbedRoutesList(selectedName, placeName);
     }
 
     private void populateClimbedRoutesList(String name, String place){
