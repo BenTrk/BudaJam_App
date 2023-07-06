@@ -60,8 +60,8 @@ public class MainActivity extends AppCompatActivity {
 
     public static String climberName1;
     public static String climberName2;
-    private String[] place;
     public static double teamPoints;
+    public boolean isPaid;
 
     private List<Routes> rokaRoutes, franciaRoutes, svabRoutes, kecskeRoutes;
 
@@ -97,6 +97,9 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         };
+
+        //Check if team has paid the entrance fee - ugly but works.
+        //Refactor getting team information. You make queries for the same thing over and over again.
 
         if (user != null) {
             DatabaseReference myKeepSync = FirebaseDatabase.getInstance().getReference(user.getUid() + "/");
@@ -203,8 +206,6 @@ public class MainActivity extends AppCompatActivity {
                 climbPlaceButtonHandler(kecskeRoutes, kecske, "kecske");
             }
         });
-
-        place = new String[]{"roka", "kecske", "francia", "svab"};
     }
 
     public void climbPlaceButtonHandler(List<Routes> routes, ImageButton placeButton, String placeName){

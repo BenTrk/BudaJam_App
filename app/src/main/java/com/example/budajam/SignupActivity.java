@@ -1,4 +1,6 @@
 package com.example.budajam;
+import static java.lang.Boolean.FALSE;
+
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -6,9 +8,11 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -26,6 +30,7 @@ public class SignupActivity extends AppCompatActivity {
 
     private EditText inputEmail, inputPassword, teamName, climber1Name, climber2Name;
     private Button btnSignIn, btnSignUp, btnResetPassword, verify_email_button;
+    private Spinner category;
     private ProgressBar progressBar;
     private FirebaseAuth auth;
     private FirebaseUser user;
@@ -44,10 +49,15 @@ public class SignupActivity extends AppCompatActivity {
         inputEmail = (EditText) findViewById(R.id.email);
         inputPassword = (EditText) findViewById(R.id.password);
         teamName = (EditText) findViewById(R.id.teamname);
+        category = (Spinner) findViewById(R.id.category);
         climber1Name = (EditText) findViewById(R.id.climber1);
         climber2Name = (EditText) findViewById(R.id.climber2);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
         btnResetPassword = (Button) findViewById(R.id.btn_reset_password);
+
+        ArrayAdapter<CharSequence> adapter=ArrayAdapter.createFromResource(this, R.array.category, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_item);
+        category.setAdapter(adapter);
 
         btnResetPassword.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -70,6 +80,7 @@ public class SignupActivity extends AppCompatActivity {
                 String email = inputEmail.getText().toString().trim();
                 String password = inputPassword.getText().toString().trim();
                 String teamNameString = teamName.getText().toString();
+                String categoryString = category.getSelectedItem().toString();
                 String climber1NameString = climber1Name.getText().toString();
                 String climber2NameString = climber2Name.getText().toString();
 
@@ -93,6 +104,11 @@ public class SignupActivity extends AppCompatActivity {
                     return;
                 }
 
+                if (TextUtils.isEmpty(categoryString)) {
+                    Toast.makeText(getApplicationContext(), "Select a category!", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
                 if (TextUtils.isEmpty(climber1NameString)) {
                     Toast.makeText(getApplicationContext(), "Enter climber #1 name!", Toast.LENGTH_SHORT).show();
                     return;
@@ -106,7 +122,7 @@ public class SignupActivity extends AppCompatActivity {
                 progressBar.setVisibility(View.VISIBLE);
 
                 //create user
-                createUser(email, password, teamNameString, climber1NameString, climber2NameString);
+                createUser(email, password, teamNameString, categoryString, climber1NameString, climber2NameString);
 
             }
         });
@@ -153,7 +169,7 @@ public class SignupActivity extends AppCompatActivity {
                 });
     }
 
-    private void createUser(String email, String password, String teamNameString, String climber1NameString, String climber2NameString){
+    private void createUser(String email, String password, String teamNameString, String category, String climber1NameString, String climber2NameString){
             auth.createUserWithEmailAndPassword(email, password)
                     .addOnCompleteListener(SignupActivity.this, new OnCompleteListener<AuthResult>() {
                         @Override
@@ -176,9 +192,11 @@ public class SignupActivity extends AppCompatActivity {
 
                                 myRef.child(userID).setValue(user.getUid());
                                 myRef.child(userID).child("TeamName").setValue(teamNameString);
+                                myRef.child(userID).child("Category").setValue(category);
                                 myRef.child(userID).child("ClimberOne").setValue(climber1NameString);
                                 myRef.child(userID).child("ClimberTwo").setValue(climber2NameString);
                                 myRef.child(userID).child("teamPoints").setValue(0.0);
+                                myRef.child(userID).child("Paid").setValue(FALSE);
 
                                 //startActivity(new Intent(SignupActivity.this, MainActivity.class));
                                 //finish();

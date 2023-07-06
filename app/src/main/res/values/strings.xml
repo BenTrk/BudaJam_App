@@ -53,4 +53,10 @@
     <string name="top_rope">Top-rope</string>
     <string name="contentDescRemoveButton">Remove climb trash icon</string>
     <string name="menu_button">Menu button</string>
+    <string name="category">Category</string>
+    <string-array name="category">
+        <item>6 hours</item>
+        <item>12 hours</item>
+        <item>24 hours</item>
+    </string-array>
 </resources>
