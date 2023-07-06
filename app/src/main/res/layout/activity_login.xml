@@ -19,7 +19,7 @@
             android:layout_height="@dimen/logo_w_h"
             android:layout_gravity="center_horizontal"
             android:layout_margin="5dp"
-            android:src="@drawable/budajam_icon" />
+            android:src="@drawable/kisgeri24_icon" />
 
         <TextView
             android:layout_width="wrap_content"

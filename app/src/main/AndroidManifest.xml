@@ -7,9 +7,9 @@
     <application
         android:name=".FirebaseHandler"
         android:allowBackup="true"
-        android:icon="@mipmap/budajam_icon"
+        android:icon="@mipmap/kisgeri24_logo"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/budajam_icon"
+        android:roundIcon="@mipmap/kisgeri24_logo"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".MainActivity">

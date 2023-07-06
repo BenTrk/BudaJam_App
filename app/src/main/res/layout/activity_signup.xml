@@ -20,7 +20,7 @@
             android:layout_height="@dimen/logo_w_h"
             android:layout_gravity="center_horizontal"
             android:layout_marginBottom="30dp"
-            android:src="@drawable/budajam_icon" />
+            android:src="@drawable/kisgeri24_icon" />
 
             <EditText
                 android:id="@+id/email"

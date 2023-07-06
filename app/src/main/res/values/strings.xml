@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">BudaJam Manager</string>
+    <string name="app_name">Kisgeri24 Manager</string>
     <string name="action_sign_in_short">Register</string>
     <string name="email">Email</string>
     <string name="minimum_password">Password too short, enter minimum 6 characters!</string>
@@ -41,7 +41,7 @@
     <string name="manageClimbs">We did some climbing. Let\'s document it!</string>
     <string name="check_out_our_climbs">Check Out Our Climbs</string>
     <string name="menu">Menu</string>
-    <string name="subtitle">Climb Around the City!</string>
+    <string name="subtitle">24 órás sziklamászó verseny</string>
     <string name="title">BudaJam</string>
     <string name="verified_string">Click Here If Verified!</string>
     <string name="whos_climbs">Who\'s climbs do you want to see?</string>

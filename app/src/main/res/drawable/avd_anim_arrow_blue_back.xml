@@ -33,21 +33,21 @@
                     android:propertyName="fillColor"
                     android:duration="300"
                     android:valueFrom="#ffffff"
-                    android:valueTo="#03a9f4"
+                    android:valueTo="#fcb913"
                     android:valueType="colorType"
                     android:interpolator="@android:interpolator/fast_out_slow_in"/>
                 <objectAnimator
                     android:propertyName="strokeColor"
                     android:duration="300"
                     android:valueFrom="#ffffff"
-                    android:valueTo="#03a9f4"
+                    android:valueTo="#fcb913"
                     android:valueType="colorType"
                     android:interpolator="@android:interpolator/fast_out_slow_in"/>
                 <objectAnimator
                     android:propertyName="fillColor"
                     android:startOffset="300"
                     android:duration="300"
-                    android:valueFrom="#03a9f4"
+                    android:valueFrom="#fcb913"
                     android:valueTo="#ffffff"
                     android:valueType="colorType"
                     android:interpolator="@android:interpolator/fast_out_slow_in"/>
@@ -55,7 +55,7 @@
                     android:propertyName="strokeColor"
                     android:startOffset="300"
                     android:duration="300"
-                    android:valueFrom="#03a9f4"
+                    android:valueFrom="#fcb913"
                     android:valueTo="#ffffff"
                     android:valueType="colorType"
                     android:interpolator="@android:interpolator/fast_out_slow_in"/>
