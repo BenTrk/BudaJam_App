@@ -39,9 +39,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Objects;
 
 import static android.view.View.GONE;
 
@@ -52,18 +52,14 @@ import static android.view.View.GONE;
 //Important: Before launch, make sure climbers cannot add climbs to the database outside of the given dates!
 
 public class MainActivity extends AppCompatActivity {
-
-    private ImageButton roka, kecske, francia, svab;
     private ImageView menuButton;
     private AnimatedVectorDrawable animMenu, animArrowAnim;
+    @SuppressLint("StaticFieldLeak")
     private static LinearLayout routeLayout, emptyScreenLinear;
 
     public static String climberName1;
     public static String climberName2;
     public static double teamPoints;
-    public boolean isPaid;
-
-    private List<Routes> rokaRoutes, franciaRoutes, svabRoutes, kecskeRoutes;
 
     private FirebaseAuth.AuthStateListener authListener;
     private FirebaseAuth auth;
@@ -81,11 +77,6 @@ public class MainActivity extends AppCompatActivity {
         auth = FirebaseAuth.getInstance();
 
         emptyScreenLinear = (LinearLayout) findViewById(R.id.emptyScreenLinear);
-
-        rokaRoutes = new ArrayList<>();
-        franciaRoutes = new ArrayList<>();
-        svabRoutes = new ArrayList<>();
-        kecskeRoutes = new ArrayList<>();
 
         authListener = new FirebaseAuth.AuthStateListener() {
             @Override
@@ -110,10 +101,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
         routeLayout = (LinearLayout) findViewById(R.id.routeLayout);
-        roka = (ImageButton) findViewById(R.id.roka);
-        francia = (ImageButton) findViewById(R.id.francia);
-        svab = (ImageButton) findViewById(R.id.svab);
-        kecske = (ImageButton) findViewById(R.id.kecske);
         menuButton = (ImageView) findViewById(R.id.menuButton);
 
         //Show the menu, upper left corner
@@ -157,55 +144,15 @@ public class MainActivity extends AppCompatActivity {
 
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null) {
-            for (UserInfo profile : user.getProviderData()) {
-                String uid = profile.getUid();
-                String email = profile.getEmail();
-            }
             getNamesFromDatabase(user.getUid());
-
-            populateRoutesListatStart("roka", rokaRoutes);
-            populateRoutesListatStart("kecske", kecskeRoutes);
-            populateRoutesListatStart("francia", franciaRoutes);
-            populateRoutesListatStart("svab", svabRoutes);
+            //populateRouteListAtStart() -> rewrite to use the climbSpinner
 
         } else {
             startActivity(new Intent(MainActivity.this, LoginActivity.class));
             finish();
         }
 
-        //dateChecker(roka, kecske, francia, svab);
-
-        roka.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setAllClimbPlaceButtonsDefault();
-                climbPlaceButtonHandler(rokaRoutes, roka, "roka");
-            }
-        });
-
-        francia.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setAllClimbPlaceButtonsDefault();
-                climbPlaceButtonHandler(franciaRoutes, francia, "francia");
-            }
-        });
-
-        svab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setAllClimbPlaceButtonsDefault();
-                climbPlaceButtonHandler(svabRoutes, svab, "svab");
-            }
-        });
-
-        kecske.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setAllClimbPlaceButtonsDefault();
-                climbPlaceButtonHandler(kecskeRoutes, kecske, "kecske");
-            }
-        });
+        //dateChecker(roka, kecske, francia, svab); - if necessary
     }
 
     public void climbPlaceButtonHandler(List<Routes> routes, ImageButton placeButton, String placeName){
@@ -225,13 +172,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void setAllClimbPlaceButtonsDefault(){
-        roka.setEnabled(true);
-        svab.setEnabled(true);
-        kecske.setEnabled(true);
-        francia.setEnabled(true);
-    }
-
     public void getNamesFromDatabase(String userID) {
         database = FirebaseDatabase.getInstance("https://budajam-ea659-default-rtdb.firebaseio.com/");
         Query routesQuery = database.getReference(userID + "/");
@@ -246,7 +186,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onCancelled(DatabaseError error) {
+            public void onCancelled(@NonNull DatabaseError error) {
                 //
             }
         });
@@ -276,7 +216,7 @@ public class MainActivity extends AppCompatActivity {
                     Query routesQuery2 = database.getReference(reference);
                     routesQuery2.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                             Routes climberPointsInside = dataSnapshot.getValue(Routes.class);
                             assert climberPointsInside != null;
                             double routePoints = climberPointsInside.points;
@@ -297,7 +237,7 @@ public class MainActivity extends AppCompatActivity {
                         }
 
                         @Override
-                        public void onCancelled(DatabaseError error) {
+                        public void onCancelled(@NonNull DatabaseError error) {
                             //
                         }
                     });
@@ -316,7 +256,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onCancelled(DatabaseError error) {
+            public void onCancelled(@NonNull DatabaseError error) {
 
             }
         });
@@ -346,12 +286,12 @@ public class MainActivity extends AppCompatActivity {
             routes.clear();
         }
 
-        Query routesQuery = myRef;
-        routesQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+        myRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
                     Routes routesDetails = postSnapshot.getValue(Routes.class);
+                    assert routes != null;
                     routes.add(routesDetails);
                 }
             }
@@ -403,11 +343,10 @@ public class MainActivity extends AppCompatActivity {
         );
 
         while (cursor.moveToNext()) {
-            if (placeName == "roka") {
+            if (Objects.equals(placeName, "roka")) {
                 Routes rokaRoute = new Routes();
 
-                String itemName = cursor.getString(cursor.getColumnIndexOrThrow(RoutesSQLiteDBHelper.ROUTES_COLUMN_NAME));
-                rokaRoute.name = itemName;
+                rokaRoute.name = cursor.getString(cursor.getColumnIndexOrThrow(RoutesSQLiteDBHelper.ROUTES_COLUMN_NAME));
 
                 String itemDifficulty = cursor.getString(cursor.getColumnIndexOrThrow(RoutesSQLiteDBHelper.ROUTES_COLUMN_DIFFICULTY));
                 rokaRoute.difficulty = Long.parseLong(itemDifficulty);
@@ -415,15 +354,13 @@ public class MainActivity extends AppCompatActivity {
                 String itemLength = cursor.getString(cursor.getColumnIndexOrThrow(RoutesSQLiteDBHelper.ROUTES_COLUMN_LENGTH));
                 rokaRoute.length = Long.parseLong(itemLength);
 
-                String itemDiffChanger = cursor.getString(cursor.getColumnIndexOrThrow(RoutesSQLiteDBHelper.ROUTES_COLUMN_DIFFCHANGER));
-                rokaRoute.diffchanger = itemDiffChanger;
+                rokaRoute.diffchanger = cursor.getString(cursor.getColumnIndexOrThrow(RoutesSQLiteDBHelper.ROUTES_COLUMN_DIFFCHANGER));
 
-                rokaRoutes.add(rokaRoute);
-            } else if (placeName == "kecske") {
+                //rokaRoutes.add(rokaRoute);
+            } else if (Objects.equals(placeName, "kecske")) {
                 Routes kecskeRoute = new Routes();
 
-                String itemName = cursor.getString(cursor.getColumnIndexOrThrow(RoutesSQLiteDBHelper.ROUTES_COLUMN_NAME));
-                kecskeRoute.name = itemName;
+                kecskeRoute.name = cursor.getString(cursor.getColumnIndexOrThrow(RoutesSQLiteDBHelper.ROUTES_COLUMN_NAME));
 
                 String itemDifficulty = cursor.getString(cursor.getColumnIndexOrThrow(RoutesSQLiteDBHelper.ROUTES_COLUMN_DIFFICULTY));
                 kecskeRoute.difficulty = Long.parseLong(itemDifficulty);
@@ -431,15 +368,13 @@ public class MainActivity extends AppCompatActivity {
                 String itemLength = cursor.getString(cursor.getColumnIndexOrThrow(RoutesSQLiteDBHelper.ROUTES_COLUMN_LENGTH));
                 kecskeRoute.length = Long.parseLong(itemLength);
 
-                String itemDiffChanger = cursor.getString(cursor.getColumnIndexOrThrow(RoutesSQLiteDBHelper.ROUTES_COLUMN_DIFFCHANGER));
-                kecskeRoute.diffchanger = itemDiffChanger;
+                kecskeRoute.diffchanger = cursor.getString(cursor.getColumnIndexOrThrow(RoutesSQLiteDBHelper.ROUTES_COLUMN_DIFFCHANGER));
 
-                kecskeRoutes.add(kecskeRoute);
-            } else if (placeName == "francia") {
+                //kecskeRoutes.add(kecskeRoute);
+            } else if (Objects.equals(placeName, "francia")) {
                 Routes franciaRoute = new Routes();
 
-                String itemName = cursor.getString(cursor.getColumnIndexOrThrow(RoutesSQLiteDBHelper.ROUTES_COLUMN_NAME));
-                franciaRoute.name = itemName;
+                franciaRoute.name = cursor.getString(cursor.getColumnIndexOrThrow(RoutesSQLiteDBHelper.ROUTES_COLUMN_NAME));
 
                 String itemDifficulty = cursor.getString(cursor.getColumnIndexOrThrow(RoutesSQLiteDBHelper.ROUTES_COLUMN_DIFFICULTY));
                 franciaRoute.difficulty = Long.parseLong(itemDifficulty);
@@ -447,15 +382,13 @@ public class MainActivity extends AppCompatActivity {
                 String itemLength = cursor.getString(cursor.getColumnIndexOrThrow(RoutesSQLiteDBHelper.ROUTES_COLUMN_LENGTH));
                 franciaRoute.length = Long.parseLong(itemLength);
 
-                String itemDiffChanger = cursor.getString(cursor.getColumnIndexOrThrow(RoutesSQLiteDBHelper.ROUTES_COLUMN_DIFFCHANGER));
-                franciaRoute.diffchanger = itemDiffChanger;
+                franciaRoute.diffchanger = cursor.getString(cursor.getColumnIndexOrThrow(RoutesSQLiteDBHelper.ROUTES_COLUMN_DIFFCHANGER));
 
-                franciaRoutes.add(franciaRoute);
-            } else if (placeName == "svab") {
+                //franciaRoutes.add(franciaRoute);
+            } else if (Objects.equals(placeName, "svab")) {
                 Routes svabRoute = new Routes();
 
-                String itemName = cursor.getString(cursor.getColumnIndexOrThrow(RoutesSQLiteDBHelper.ROUTES_COLUMN_NAME));
-                svabRoute.name = itemName;
+                svabRoute.name = cursor.getString(cursor.getColumnIndexOrThrow(RoutesSQLiteDBHelper.ROUTES_COLUMN_NAME));
 
                 String itemDifficulty = cursor.getString(cursor.getColumnIndexOrThrow(RoutesSQLiteDBHelper.ROUTES_COLUMN_DIFFICULTY));
                 svabRoute.difficulty = Long.parseLong(itemDifficulty);
@@ -463,10 +396,9 @@ public class MainActivity extends AppCompatActivity {
                 String itemLength = cursor.getString(cursor.getColumnIndexOrThrow(RoutesSQLiteDBHelper.ROUTES_COLUMN_LENGTH));
                 svabRoute.length = Long.parseLong(itemLength);
 
-                String itemDiffChanger = cursor.getString(cursor.getColumnIndexOrThrow(RoutesSQLiteDBHelper.ROUTES_COLUMN_DIFFCHANGER));
-                svabRoute.diffchanger = itemDiffChanger;
+                svabRoute.diffchanger = cursor.getString(cursor.getColumnIndexOrThrow(RoutesSQLiteDBHelper.ROUTES_COLUMN_DIFFCHANGER));
 
-                svabRoutes.add(svabRoute);
+                //svabRoutes.add(svabRoute);
             }
         }
     }
@@ -552,7 +484,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                     routeWhoClimbed.setVisibility(View.VISIBLE);
                     isCustomButtonClicked = false;
-                } else if (!isCustomButtonClicked) {
+                } else {
                     customButton.setImageResource(R.drawable.avd_anim_arrow_blue);
                     Drawable d = customButton.getDrawable();
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -594,7 +526,7 @@ public class MainActivity extends AppCompatActivity {
         Calendar startSecondDateCalendar = Calendar.getInstance();
         startSecondDateCalendar.set(2021, 9, 2, 0,0);
         Calendar endSecondDateCalendar = Calendar.getInstance();
-        endSecondDateCalendar.set(2021, 9, 10, 20, 00);
+        endSecondDateCalendar.set(2021, 9, 10, 20, 0);
 
         if (currentDateCalendar.before(startFirstDateCalendar) || currentDateCalendar.after(endFirstDateCalendar)){
             francia.setEnabled(false);

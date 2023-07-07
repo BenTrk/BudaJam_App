@@ -41,51 +41,17 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:theme="@style/ThemeOverlay.MySubTitle"
-            android:text="Place of climb:"
+            android:text="@string/place_of_climb"
             android:gravity="center" />
 
         <LinearLayout
-            android:id="@+id/climbButtons2"
+            android:id="@+id/climbSpinner"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:orientation="horizontal">
 
-            <ImageButton
-                android:id="@+id/svab"
-                android:src="@mipmap/german"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/buttonselectormain"
-                android:padding="10dp"
-                android:layout_margin="5dp"/>
 
-            <ImageButton
-                android:id="@+id/francia"
-                android:src="@mipmap/french"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/buttonselectormain"
-                android:padding="10dp"
-                android:layout_margin="5dp"/>
-
-            <ImageButton
-                android:id="@+id/roka"
-                android:src="@mipmap/fox"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/buttonselectormain"
-                android:padding="10dp"
-                android:layout_margin="5dp"/>
-
-            <ImageButton
-                android:id="@+id/kecske"
-                android:src="@mipmap/goat"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/buttonselectormain"
-                android:padding="10dp"
-                android:layout_margin="5dp"/>
         </LinearLayout>
         </LinearLayout>
 
