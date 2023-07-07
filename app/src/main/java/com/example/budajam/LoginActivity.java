@@ -18,6 +18,11 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -25,6 +30,7 @@ public class LoginActivity extends AppCompatActivity {
     private FirebaseAuth auth;
     private ProgressBar progressBar;
     private Button btnSignup, btnLogin, btnReset;
+    boolean isPaid;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,9 +46,6 @@ public class LoginActivity extends AppCompatActivity {
 
         // set the view now
         setContentView(R.layout.activity_login);
-
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
 
         inputEmail = (EditText) findViewById(R.id.email);
         inputPassword = (EditText) findViewById(R.id.password);
@@ -106,16 +109,37 @@ public class LoginActivity extends AppCompatActivity {
                                     }
                                 } else {
                                     FirebaseUser user = auth.getCurrentUser();
-                                    if (user.isEmailVerified()) {
-                                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                                        startActivity(intent);
-                                        finish();
-                                    } else {
-                                        Toast.makeText(LoginActivity.this, "Please verify your email!", Toast.LENGTH_LONG).show();
-                                    }
+                                    checkIfPaid(user);
                                 }
                             }
                         });
+            }
+        });
+    }
+    //Check if team paid the entry fee
+    private void checkIfPaid(FirebaseUser user){
+        FirebaseDatabase database = FirebaseDatabase.getInstance("https://budajam-ea659-default-rtdb.firebaseio.com/");
+        DatabaseReference ref = database.getReference(user.getUid()+"/");
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                ClimberNames team = dataSnapshot.getValue(ClimberNames.class);
+                isPaid = team.Paid;
+                if (user.isEmailVerified() && isPaid) {
+                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                    startActivity(intent);
+                    finish();
+                } else if (!user.isEmailVerified()) {
+                    Toast.makeText(LoginActivity.this, "Please verify your email!", Toast.LENGTH_LONG).show();
+                } else if (!isPaid) {
+                    Toast.makeText(LoginActivity.this, "Looks like you did not pay the entry fee.", Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                isPaid = false;
+                Toast.makeText(LoginActivity.this, "Something went wrong. Try again later!", Toast.LENGTH_LONG).show();
             }
         });
     }
