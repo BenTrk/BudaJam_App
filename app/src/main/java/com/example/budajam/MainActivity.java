@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
 import android.graphics.drawable.AnimatedVectorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
@@ -15,6 +16,8 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -22,6 +25,7 @@ import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -39,6 +43,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Objects;
@@ -60,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
     public static String climberName1;
     public static String climberName2;
     public static double teamPoints;
+    public List<Routes> routes;
 
     private FirebaseAuth.AuthStateListener authListener;
     private FirebaseAuth auth;
@@ -88,9 +94,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         };
-
-        //Check if team has paid the entrance fee - ugly but works.
-        //Refactor getting team information. You make queries for the same thing over and over again.
 
         if (user != null) {
             DatabaseReference myKeepSync = FirebaseDatabase.getInstance().getReference(user.getUid() + "/");
@@ -142,11 +145,35 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        //Set up the dropdown spinner
+        ArrayList<String> places = new ArrayList<>();
+        getPlacesFromDB(places);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.spinner_item, places);
+        adapter.setDropDownViewResource(R.layout.spinner_item);
+        new Spinner(getApplicationContext());
+        Spinner placeSpinner;
+        placeSpinner = findViewById(R.id.placeSpinner);
+        placeSpinner.setAdapter(adapter);
+
+        //Somehow nothing happens
+        placeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+                populateRoutesListAtStart(placeSpinner.getItemAtPosition(position).toString(), routes);
+                climbPlaceButtonHandler(routes, placeSpinner.getItemAtPosition(position).toString());
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parentView) {
+                // your code here
+            }
+
+        });
+
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null) {
             getNamesFromDatabase(user.getUid());
             //populateRouteListAtStart() -> rewrite to use the climbSpinner
-
         } else {
             startActivity(new Intent(MainActivity.this, LoginActivity.class));
             finish();
@@ -155,7 +182,26 @@ public class MainActivity extends AppCompatActivity {
         //dateChecker(roka, kecske, francia, svab); - if necessary
     }
 
-    public void climbPlaceButtonHandler(List<Routes> routes, ImageButton placeButton, String placeName){
+    private void getPlacesFromDB(ArrayList<String> places) {
+        database = FirebaseDatabase.getInstance("https://budajam-ea659-default-rtdb.firebaseio.com/");
+        Query routesQuery = database.getReference("Routes/");
+        routesQuery.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
+                    String routeName = postSnapshot.getKey();
+                    places.add(routeName);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(getApplicationContext(), "DB Error", Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    public void climbPlaceButtonHandler(List<Routes> routes, String placeName){
         MainActivity.routeLayout.removeAllViews();
         emptyScreenLinear.setVisibility(GONE);
 
@@ -163,12 +209,11 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), "Sorry, still fetching data from database. Check your internet connection!", Toast.LENGTH_LONG).show();
         } else if (routes.isEmpty()) {
             Toast.makeText(getApplicationContext(), "Sorry, there are no routes in the database for this place!", Toast.LENGTH_LONG).show();
-            placeButton.setEnabled(false);
         } else {
             for(int i = 0; i < routes.size(); i++) {
+                Toast.makeText(getApplicationContext(), "Someting", Toast.LENGTH_LONG).show();
                 addCustomSpinner(routes.get(i), placeName);
             }
-            placeButton.setEnabled(false);
         }
     }
 
@@ -278,10 +323,10 @@ public class MainActivity extends AppCompatActivity {
         return points;
     }
 
-    private void populateRoutesListatStart(String name, List<Routes> routes) {
+    private void populateRoutesListAtStart(String name, List<Routes> routes) {
         database = FirebaseDatabase.getInstance("https://budajam-ea659-default-rtdb.firebaseio.com/");
         DatabaseReference myRef = database.getReference("Routes/" + name);
-
+        Toast.makeText(getApplicationContext(), "Fetching Data", Toast.LENGTH_LONG).show();
         if (routes != null) {
             routes.clear();
         }

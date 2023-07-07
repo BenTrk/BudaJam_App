@@ -51,6 +51,12 @@
             android:layout_gravity="center"
             android:orientation="horizontal">
 
+            <Spinner
+                android:id="@+id/placeSpinner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:backgroundTint="@color/primary"/>
 
         </LinearLayout>
         </LinearLayout>
