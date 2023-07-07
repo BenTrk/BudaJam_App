@@ -56,8 +56,8 @@
     <string name="category">Category</string>
     <string name="place_of_climb">Place of climb:</string>
     <string-array name="category">
-        <item>6 hours</item>
-        <item>12 hours</item>
-        <item>24 hours</item>
+        <item>6H</item>
+        <item>12H</item>
+        <item>24H</item>
     </string-array>
 </resources>
