@@ -6,36 +6,44 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.ColorFilter;
 import android.graphics.drawable.AnimatedVectorDrawable;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.ContextThemeWrapper;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.PopupWindow;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.content.res.AppCompatResources;
 import androidx.appcompat.widget.PopupMenu;
+import androidx.core.content.res.ResourcesCompat;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.UserInfo;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -65,7 +73,8 @@ public class MainActivity extends AppCompatActivity {
     public static String climberName1;
     public static String climberName2;
     public static double teamPoints;
-    public List<Routes> routes;
+    public DataStorage routes = new DataStorage();
+    public List<String> places = new ArrayList<>();
 
     private FirebaseAuth.AuthStateListener authListener;
     private FirebaseAuth auth;
@@ -73,6 +82,9 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseUser user;
 
     boolean exist;
+    String[] popUpContents;
+    PopupWindow popupWindowPlaces;
+    Button buttonShowDropDown;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -146,29 +158,8 @@ public class MainActivity extends AppCompatActivity {
         });
 
         //Set up the dropdown spinner
-        ArrayList<String> places = new ArrayList<>();
+        //Just leave spinner, it sucks ass. Create your own with ListView
         getPlacesFromDB(places);
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.spinner_item, places);
-        adapter.setDropDownViewResource(R.layout.spinner_item);
-        new Spinner(getApplicationContext());
-        Spinner placeSpinner;
-        placeSpinner = findViewById(R.id.placeSpinner);
-        placeSpinner.setAdapter(adapter);
-
-        //Somehow nothing happens
-        placeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-                populateRoutesListAtStart(placeSpinner.getItemAtPosition(position).toString(), routes);
-                climbPlaceButtonHandler(routes, placeSpinner.getItemAtPosition(position).toString());
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parentView) {
-                // your code here
-            }
-
-        });
 
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null) {
@@ -181,17 +172,67 @@ public class MainActivity extends AppCompatActivity {
 
         //dateChecker(roka, kecske, francia, svab); - if necessary
     }
+    private void setCustomSpinner(){
+        popUpContents = new String[places.size()];
+        places.toArray(popUpContents);
+        popupWindowPlaces = popupWindowPlaces();
+        buttonShowDropDown = (Button) findViewById(R.id.buttonShowDropDown);
+        View.OnClickListener handler = new View.OnClickListener() {
+            public void onClick(View v) {
+                switch (v.getId()) {
 
-    private void getPlacesFromDB(ArrayList<String> places) {
+                    case R.id.buttonShowDropDown:
+                        // show the list view as dropdown
+                        popupWindowPlaces.showAsDropDown(v, -5, 0);
+                        break;
+                }
+            }
+        };
+        buttonShowDropDown.setOnClickListener(handler);
+    }
+    public PopupWindow popupWindowPlaces() {
+        // initialize a pop up window type
+        PopupWindow popupWindow = new PopupWindow(this);
+        popupWindow.setBackgroundDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.popup_background, getTheme()));
+        // the drop down list is a list view
+        ListView listViewPlaces;
+        // set our adapter and pass our pop up window contents
+        listViewPlaces = placesAdapter(popUpContents);
+        // set the item click listener
+        listViewPlaces.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Toast.makeText(getApplicationContext(),
+                        "You select in popup menu" + adapterView.getAdapter().getItem(i).toString(), Toast.LENGTH_LONG).show();
+                String name = adapterView.getAdapter().getItem(i).toString();
+                populateRoutesListAtStart(name, routes);
+                popupWindow.dismiss();
+            }
+        });
+        // some other visual settings
+        popupWindow.setFocusable(true);// set the list view as pop up window content
+        popupWindow.setContentView(listViewPlaces);
+        return popupWindow;
+    }
+    private ListView placesAdapter(String[] placesArray) {
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(getApplicationContext(), R.layout.popup_layout, R.id.list_content,
+                placesArray);
+        ListView listViewSort = new ListView(getApplicationContext());
+        listViewSort.setAdapter(adapter);
+        return listViewSort;
+    }
+
+    private void getPlacesFromDB(List<String> places) {
         database = FirebaseDatabase.getInstance("https://budajam-ea659-default-rtdb.firebaseio.com/");
         Query routesQuery = database.getReference("Routes/");
-        routesQuery.addValueEventListener(new ValueEventListener() {
+        routesQuery.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
                     String routeName = postSnapshot.getKey();
                     places.add(routeName);
                 }
+                setCustomSpinner();
             }
 
             @Override
@@ -323,13 +364,10 @@ public class MainActivity extends AppCompatActivity {
         return points;
     }
 
-    private void populateRoutesListAtStart(String name, List<Routes> routes) {
+    private void populateRoutesListAtStart(String name, DataStorage routes) {
         database = FirebaseDatabase.getInstance("https://budajam-ea659-default-rtdb.firebaseio.com/");
         DatabaseReference myRef = database.getReference("Routes/" + name);
         Toast.makeText(getApplicationContext(), "Fetching Data", Toast.LENGTH_LONG).show();
-        if (routes != null) {
-            routes.clear();
-        }
 
         myRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -337,7 +375,11 @@ public class MainActivity extends AppCompatActivity {
                 for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
                     Routes routesDetails = postSnapshot.getValue(Routes.class);
                     assert routes != null;
-                    routes.add(routesDetails);
+                    routes.addItem(name, routesDetails);
+                }
+                //Remove default background and its finally working!
+                for (Routes routesIn : routes.getItems(name)) {
+                    addCustomSpinner(routesIn, name);
                 }
             }
 

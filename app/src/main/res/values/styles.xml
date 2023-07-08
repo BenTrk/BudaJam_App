@@ -8,7 +8,6 @@
         <item name="colorAccent">@color/primary</item>
         <item name="popupMenuStyle">@style/MyMenu</item>
         <item name="android:popupMenuStyle">@style/MyMenu</item>
-        <item name="android:spinnerDropDownItemStyle">@style/mySpinnerItemStyle</item>
 
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
@@ -126,10 +125,6 @@
         <item name="android:listPreferredItemHeightSmall">40dp</item>
     </style>
 
-    <style name="mySpinnerItemStyle" parent="@android:style/Widget.Holo.DropDownItem.Spinner">
-        <item name="android:textSize">12sp</item>
-        <item name="android:textColor">@color/primary</item>
-    </style>
     <style name="Widget.App.Spinner" parent="@style/Widget.AppCompat.Spinner">
         <item name="overlapAnchor">true</item>
         <item name="android:textSize">12sp</item>
