@@ -15,11 +15,23 @@ public class DataStorage {
 
     public void addItem(String category, Routes item) {
         List<Routes> items = dataMap.get(category);
+        boolean isThere = false;
         if (items == null) {
             items = new ArrayList<>();
+            items.add(item);
             dataMap.put(category, items);
         }
-        items.add(item);
+        else {
+            for (Routes route : items) {
+                if (route.key == item.key) {
+                    isThere = true;
+                    break;
+                }
+            }
+            if (!isThere){
+                items.add(item);
+            }
+        }
     }
 
     public List<Routes> getItems(String category) {

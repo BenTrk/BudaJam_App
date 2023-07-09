@@ -29,6 +29,7 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListPopupWindow;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.RadioButton;
@@ -99,14 +100,11 @@ public class MainActivity extends AppCompatActivity {
 
         emptyScreenLinear = (LinearLayout) findViewById(R.id.emptyScreenLinear);
 
-        authListener = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                user = firebaseAuth.getCurrentUser();
-                if (user == null) {
-                    startActivity(new Intent(MainActivity.this, LoginActivity.class));
-                    finish();
-                }
+        authListener = firebaseAuth -> {
+            user = firebaseAuth.getCurrentUser();
+            if (user == null) {
+                startActivity(new Intent(MainActivity.this, LoginActivity.class));
+                finish();
             }
         };
 
@@ -122,42 +120,35 @@ public class MainActivity extends AppCompatActivity {
         menuButton = (ImageView) findViewById(R.id.menuButton);
 
         //Show the menu, upper left corner
-        menuButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Drawable d = menuButton.getDrawable();
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    if (d instanceof AnimatedVectorDrawable) {
-                        animMenu = (AnimatedVectorDrawable) d;
-                        animMenu.start();
-                    }
-                }
-
-                Context wrapper = new ContextThemeWrapper(MainActivity.this, R.style.MyMenu);
-                PopupMenu popup = new PopupMenu(wrapper, menuButton);
-
-                popup.getMenuInflater()
-                        .inflate(R.menu.popup_menu, popup.getMenu());
-
-                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                    public boolean onMenuItemClick(MenuItem item) {
-                        if (R.id.one == item.getItemId()) {
-                            startActivity(new Intent(MainActivity.this, CheckOutActivity.class));
-                            finish();
-                        } else if (R.id.two == item.getItemId()) {
-                            startActivity(new Intent(MainActivity.this, OptionsActivity.class));
-                            finish();
-                        } else if (R.id.three == item.getItemId()) {
-                            auth.signOut();
-                            startActivity(new Intent(MainActivity.this, LoginActivity.class));
-                            finish();
-                        }
-                        return true;
-                    }
-                });
-
-                popup.show();
+        menuButton.setOnClickListener(v -> {
+            Drawable d = menuButton.getDrawable();
+            if (d instanceof AnimatedVectorDrawable) {
+                animMenu = (AnimatedVectorDrawable) d;
+                animMenu.start();
             }
+
+            Context wrapper = new ContextThemeWrapper(MainActivity.this, R.style.MyMenu);
+            PopupMenu popup = new PopupMenu(wrapper, menuButton);
+
+            popup.getMenuInflater()
+                    .inflate(R.menu.popup_menu, popup.getMenu());
+
+            popup.setOnMenuItemClickListener(item -> {
+                if (R.id.one == item.getItemId()) {
+                    startActivity(new Intent(MainActivity.this, CheckOutActivity.class));
+                    finish();
+                } else if (R.id.two == item.getItemId()) {
+                    startActivity(new Intent(MainActivity.this, OptionsActivity.class));
+                    finish();
+                } else if (R.id.three == item.getItemId()) {
+                    auth.signOut();
+                    startActivity(new Intent(MainActivity.this, LoginActivity.class));
+                    finish();
+                }
+                return true;
+            });
+
+            popup.show();
         });
 
         //Set up the dropdown spinner
@@ -180,15 +171,12 @@ public class MainActivity extends AppCompatActivity {
         places.toArray(popUpContents);
         popupWindowPlaces = popupWindowPlaces();
         buttonShowDropDown = (Button) findViewById(R.id.buttonShowDropDown);
-        View.OnClickListener handler = new View.OnClickListener() {
-            public void onClick(View v) {
-                switch (v.getId()) {
-
-                    case R.id.buttonShowDropDown:
-                        // show the list view as dropdown
-                        popupWindowPlaces.showAsDropDown(v, -5, 0);
-                        break;
-                }
+        RelativeLayout popupRelative = findViewById(R.id.popupRelative);
+        View.OnClickListener handler = v -> {
+            if (v.getId() == R.id.buttonShowDropDown) {
+                // show the list view as dropdown
+                popupWindowPlaces.showAtLocation(popupRelative, Gravity.CENTER_HORIZONTAL, 0,-220);
+                //popupWindowPlaces.showAsDropDown(v, -5, 0);
             }
         };
         buttonShowDropDown.setOnClickListener(handler);
@@ -205,9 +193,8 @@ public class MainActivity extends AppCompatActivity {
         listViewPlaces.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Toast.makeText(getApplicationContext(),
-                        "You select in popup menu" + adapterView.getAdapter().getItem(i).toString(), Toast.LENGTH_LONG).show();
                 String name = adapterView.getAdapter().getItem(i).toString();
+                routeLayout.removeAllViews();
                 populateRoutesListAtStart(name, routes);
                 popupWindow.dismiss();
             }
@@ -215,6 +202,7 @@ public class MainActivity extends AppCompatActivity {
         // some other visual settings
         popupWindow.setFocusable(true);// set the list view as pop up window content
         popupWindow.setContentView(listViewPlaces);
+        popupWindow.setWidth(300);
         return popupWindow;
     }
     private ListView placesAdapter(String[] placesArray) {
@@ -396,7 +384,6 @@ public class MainActivity extends AppCompatActivity {
     private void populateRoutesListAtStart(String name, DataStorage routes) {
         database = FirebaseDatabase.getInstance("https://budajam-ea659-default-rtdb.firebaseio.com/");
         DatabaseReference myRef = database.getReference("Routes/" + name);
-        Toast.makeText(getApplicationContext(), "Fetching Data", Toast.LENGTH_LONG).show();
 
         myRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
