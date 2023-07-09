@@ -187,5 +187,10 @@
             android:text="@string/climbed_it" />
 
     </RelativeLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height= "10dp"
+        android:layout_below="@+id/routeWhoClimbedRelativeLayout"
+        android:background="@android:color/white" />
 
 </RelativeLayout>
