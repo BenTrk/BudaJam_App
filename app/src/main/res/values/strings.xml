@@ -55,6 +55,11 @@
     <string name="menu_button">Menu button</string>
     <string name="category">Category</string>
     <string name="place_of_climb">Place of climb:</string>
+    <string name="dialog_climbed_message">Nice climb, added to the database!</string>
+    <string name="dialog_climbed_title">Way to go!</string>
+    <string name="dialog_climbed_neutral">Gotcha, thanks!</string>
+    <string name="dialog_climbedmorepoints_message">Team had this route, but you earned more points!</string>
+    <string name="dialog_climbedalready_message">Team had this climb with more points!</string>
     <string-array name="category">
         <item>6H</item>
         <item>12H</item>

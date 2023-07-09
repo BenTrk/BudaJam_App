@@ -1,8 +1,10 @@
 package com.example.budajam;
 
 import android.annotation.SuppressLint;
+import android.app.Dialog;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -37,6 +39,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.appcompat.widget.PopupMenu;
@@ -242,22 +245,6 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public void climbPlaceButtonHandler(List<Routes> routes, String placeName){
-        MainActivity.routeLayout.removeAllViews();
-        emptyScreenLinear.setVisibility(GONE);
-
-        if (routes == null) {
-            Toast.makeText(getApplicationContext(), "Sorry, still fetching data from database. Check your internet connection!", Toast.LENGTH_LONG).show();
-        } else if (routes.isEmpty()) {
-            Toast.makeText(getApplicationContext(), "Sorry, there are no routes in the database for this place!", Toast.LENGTH_LONG).show();
-        } else {
-            for(int i = 0; i < routes.size(); i++) {
-                Toast.makeText(getApplicationContext(), "Someting", Toast.LENGTH_LONG).show();
-                addCustomSpinner(routes.get(i), placeName);
-            }
-        }
-    }
-
     public void getNamesFromDatabase(String userID) {
         database = FirebaseDatabase.getInstance("https://budajam-ea659-default-rtdb.firebaseio.com/");
         Query routesQuery = database.getReference(userID + "/");
@@ -311,14 +298,15 @@ public class MainActivity extends AppCompatActivity {
                             int isMoreOrLess = Double.compare(routePoints, pointsToAdd);
 
                             if (isMoreOrLess < 0) {
-                                Toast.makeText(getApplicationContext(), "Exist, but " + climberName + " earned more points!", Toast.LENGTH_LONG).show();
-
+                                Dialog dialog = dialogBuilderFunc(true, true);
+                                dialog.show();
                                 myRef3.child(placeName).child(routeName).child("points").setValue(pointsToAdd);
                                 DatabaseReference myRefPoints = database.getReference(userID + "/teamPoints");
                                 myRefPoints.setValue((teamPoints - routePoints) + pointsToAdd);
 
                             } else {
-                                Toast.makeText(getApplicationContext(), "Exist, and " + climberName + " earned less points!", Toast.LENGTH_LONG).show();
+                                Dialog dialog = dialogBuilderFunc(true, false);
+                                dialog.show();
                             }
                         }
 
@@ -330,7 +318,9 @@ public class MainActivity extends AppCompatActivity {
                 } else {
                     double pointsToAddNotExist = pointsAccordingToStyles(climbStyle, route);
 
-                    Toast.makeText(getApplicationContext(), "Added climb to database.", Toast.LENGTH_LONG).show();
+                    Dialog dialog = dialogBuilderFunc(false, false);
+                    dialog.show();
+
                     myRef3.child(placeName).child(routeName).child("name").setValue(route.name);
                     myRef3.child(placeName).child(routeName).child("difficulty").setValue(route.difficulty);
                     myRef3.child(placeName).child(routeName).child("climbStyle").setValue(climbStyle);
@@ -352,6 +342,45 @@ public class MainActivity extends AppCompatActivity {
         //And count them. That's all, easypeasy.
     }
 
+    public Dialog dialogBuilderFunc(boolean exists, boolean isMore){
+        AlertDialog dialog;
+        if (!exists) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+            builder.setMessage(R.string.dialog_climbed_message)
+                    .setTitle(R.string.dialog_climbed_title);
+            builder.setNeutralButton(R.string.dialog_climbed_neutral, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    dialog.dismiss();
+                }
+            });
+            dialog = builder.create();
+        }
+        else {
+            if (isMore){
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setMessage(R.string.dialog_climbedmorepoints_message)
+                        .setTitle(R.string.dialog_climbed_title);
+                builder.setNeutralButton(R.string.dialog_climbed_neutral, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.dismiss();
+                    }
+                });
+                dialog = builder.create();
+            }
+            else {
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setMessage(R.string.dialog_climbedalready_message)
+                        .setTitle(R.string.dialog_climbed_title);
+                builder.setNeutralButton(R.string.dialog_climbed_neutral, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.dismiss();
+                    }
+                });
+                dialog = builder.create();
+            }
+        }
+        return dialog;
+    }
     private double pointsAccordingToStyles(String climbStyle, Routes route){
         double points;
         if (climbStyle.equals("Top-rope")) {
@@ -378,6 +407,7 @@ public class MainActivity extends AppCompatActivity {
                     routes.addItem(name, routesDetails);
                 }
                 //Remove default background and its finally working!
+                emptyScreenLinear.setVisibility(GONE);
                 for (Routes routesIn : routes.getItems(name)) {
                     addCustomSpinner(routesIn, name);
                 }
@@ -388,6 +418,130 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    @SuppressLint("SetTextI18n")
+    private void addCustomSpinner(Routes mRouteItemToAdd, String placeName) {
+
+        final View customRoutesView = LayoutInflater.from(this).inflate(
+                R.layout.custom_view_layout, routeLayout, false
+        );
+        LinearLayout.LayoutParams customViewParams = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+        );
+        customRoutesView.setLayoutParams(customViewParams);
+
+        ImageView imageViewDiffImage = customRoutesView.findViewById(R.id.routeDiffImageView);
+        TextView textViewRouteName = customRoutesView.findViewById(R.id.routeNameTextView);
+        TextView textViewRouteDiff = customRoutesView.findViewById(R.id.routeDiffTextView);
+        ImageButton customButton = customRoutesView.findViewById(R.id.customButton);
+        RadioButton climberNameOne = customRoutesView.findViewById(R.id.climberNameOne);
+        RadioButton climberNameTwo = customRoutesView.findViewById(R.id.climberNameTwo);
+        Button climbedItButton = customRoutesView.findViewById(R.id.climbed_it_button);
+        RadioGroup climberNameRadioGroup = customRoutesView.findViewById(R.id.climberNameRadioGroup);
+        RadioGroup climbingStyleRadioGroup = customRoutesView.findViewById(R.id.styleNameRadioGroup);
+        RelativeLayout routeWhoClimbed = customRoutesView.findViewById(R.id.routeWhoClimbedRelativeLayout);
+
+        imageViewDiffImage.setImageResource(R.mipmap.muscle);
+        textViewRouteName.setText(mRouteItemToAdd.name);
+        textViewRouteDiff.setText("Difficulty: " + (int) mRouteItemToAdd.difficulty);
+
+        climberNameOne.setText(climberName1);
+        climberNameTwo.setText(climberName2);
+
+        routeWhoClimbed.setVisibility(GONE);
+
+        customButton.setImageResource(R.drawable.arrow_anim_start);
+        customButton.setOnClickListener(new View.OnClickListener() {
+            boolean isCustomButtonClicked = true;
+
+            @Override
+            public void onClick(View v) {
+                if (isCustomButtonClicked) {
+                    customButton.setImageResource(R.drawable.avd_anim_arrow_blue_back);
+                    Drawable d = customButton.getDrawable();
+                    if (d instanceof AnimatedVectorDrawable) {
+                        animArrowAnim = (AnimatedVectorDrawable) d;
+                        animArrowAnim.start();
+                    }
+                    routeWhoClimbed.setVisibility(View.VISIBLE);
+                    isCustomButtonClicked = false;
+                } else {
+                    customButton.setImageResource(R.drawable.avd_anim_arrow_blue);
+                    Drawable d = customButton.getDrawable();
+                    if (d instanceof AnimatedVectorDrawable) {
+                        animArrowAnim = (AnimatedVectorDrawable) d;
+                        animArrowAnim.start();
+                    }
+                    routeWhoClimbed.setVisibility(GONE);
+                    isCustomButtonClicked = true;
+                }
+            }
+        });
+
+        climbedItButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                int checkedNameButton = climberNameRadioGroup.getCheckedRadioButtonId();
+                int checkedStyleButton = climbingStyleRadioGroup.getCheckedRadioButtonId();
+                RadioButton checkedNameRadioButton = (RadioButton) findViewById(checkedNameButton);
+                RadioButton checkedStyleRadioButton = (RadioButton) findViewById(checkedStyleButton);
+                String checkedName = (String) checkedNameRadioButton.getText();
+                String checkedStyle = (String) checkedStyleRadioButton.getText();
+
+                addClimbToDatabase(user.getUid(), checkedName, mRouteItemToAdd, placeName, checkedStyle);
+                routeLayout.removeAllViews();
+                routeLayout.addView(emptyScreenLinear);
+            }
+        });
+
+        routeLayout.addView(customRoutesView);
+    }
+
+    private void dateChecker(ImageButton roka, ImageButton kecske, ImageButton francia, ImageButton svab){
+        Calendar currentDateCalendar = Calendar.getInstance();
+        Calendar startFirstDateCalendar = Calendar.getInstance();
+        startFirstDateCalendar.set(2021, 8, 24, 0, 0);
+        Calendar endFirstDateCalendar = Calendar.getInstance();
+        endFirstDateCalendar.set(2021, 9, 3, 23, 59);
+        Calendar startSecondDateCalendar = Calendar.getInstance();
+        startSecondDateCalendar.set(2021, 9, 2, 0,0);
+        Calendar endSecondDateCalendar = Calendar.getInstance();
+        endSecondDateCalendar.set(2021, 9, 10, 20, 0);
+
+        if (currentDateCalendar.before(startFirstDateCalendar) || currentDateCalendar.after(endFirstDateCalendar)){
+            francia.setEnabled(false);
+            svab.setEnabled(false);
+        } else {
+            francia.setEnabled(true);
+            svab.setEnabled(true);
+        }
+
+        if (currentDateCalendar.before(startSecondDateCalendar) || currentDateCalendar.after(endSecondDateCalendar)) {
+            kecske.setEnabled(false);
+            roka.setEnabled(false);
+        } else {
+            kecske.setEnabled(true);
+            roka.setEnabled(true);
+        }
+    }
+
+    public void climbPlaceButtonHandler(List<Routes> routes, String placeName){
+        MainActivity.routeLayout.removeAllViews();
+        emptyScreenLinear.setVisibility(GONE);
+
+        if (routes == null) {
+            Toast.makeText(getApplicationContext(), "Sorry, still fetching data from database. Check your internet connection!", Toast.LENGTH_LONG).show();
+        } else if (routes.isEmpty()) {
+            Toast.makeText(getApplicationContext(), "Sorry, there are no routes in the database for this place!", Toast.LENGTH_LONG).show();
+        } else {
+            for(int i = 0; i < routes.size(); i++) {
+                Toast.makeText(getApplicationContext(), "Someting", Toast.LENGTH_LONG).show();
+                addCustomSpinner(routes.get(i), placeName);
+            }
+        }
     }
 
     private void saveToDB(Routes route, String place, int key) {
@@ -517,119 +671,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onPause() {
         super.onPause();
-    }
-
-    @SuppressLint("SetTextI18n")
-    private void addCustomSpinner(Routes mRouteItemToAdd, String placeName) {
-
-        View customRoutesView = new View(this);
-        LinearLayout.LayoutParams customViewParams = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-        );
-        customRoutesView.setLayoutParams(customViewParams);
-
-        //if my custom button is true
-        customRoutesView = LayoutInflater.from(this).inflate(
-                R.layout.custom_view_layout, routeLayout, false
-        );
-
-        ImageView imageViewDiffImage = customRoutesView.findViewById(R.id.routeDiffImageView);
-        TextView textViewRouteName = customRoutesView.findViewById(R.id.routeNameTextView);
-        TextView textViewRouteDiff = customRoutesView.findViewById(R.id.routeDiffTextView);
-        ImageButton customButton = customRoutesView.findViewById(R.id.customButton);
-        RadioButton climberNameOne = customRoutesView.findViewById(R.id.climberNameOne);
-        RadioButton climberNameTwo = customRoutesView.findViewById(R.id.climberNameTwo);
-        Button climbedItButton = customRoutesView.findViewById(R.id.climbed_it_button);
-        RadioGroup climberNameRadioGroup = customRoutesView.findViewById(R.id.climberNameRadioGroup);
-        RadioGroup climbingStyleRadioGroup = customRoutesView.findViewById(R.id.styleNameRadioGroup);
-        RelativeLayout routeWhoClimbed = customRoutesView.findViewById(R.id.routeWhoClimbedRelativeLayout);
-
-        imageViewDiffImage.setImageResource(R.mipmap.muscle);
-        textViewRouteName.setText(mRouteItemToAdd.name);
-        textViewRouteDiff.setText("Difficulty: " + (int) mRouteItemToAdd.difficulty);
-
-        climberNameOne.setText(climberName1);
-        climberNameTwo.setText(climberName2);
-
-        routeWhoClimbed.setVisibility(GONE);
-
-        customButton.setImageResource(R.drawable.arrow_anim_start);
-        customButton.setOnClickListener(new View.OnClickListener() {
-            boolean isCustomButtonClicked = true;
-
-            @Override
-            public void onClick(View v) {
-                if (isCustomButtonClicked) {
-                    customButton.setImageResource(R.drawable.avd_anim_arrow_blue_back);
-                    Drawable d = customButton.getDrawable();
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                        if (d instanceof AnimatedVectorDrawable) {
-                            animArrowAnim = (AnimatedVectorDrawable) d;
-                            animArrowAnim.start();
-                        }
-                    }
-                    routeWhoClimbed.setVisibility(View.VISIBLE);
-                    isCustomButtonClicked = false;
-                } else {
-                    customButton.setImageResource(R.drawable.avd_anim_arrow_blue);
-                    Drawable d = customButton.getDrawable();
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                        if (d instanceof AnimatedVectorDrawable) {
-                            animArrowAnim = (AnimatedVectorDrawable) d;
-                            animArrowAnim.start();
-                        }
-                    }
-                    routeWhoClimbed.setVisibility(GONE);
-                    isCustomButtonClicked = true;
-                }
-            }
-        });
-
-        climbedItButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                int checkedNameButton = climberNameRadioGroup.getCheckedRadioButtonId();
-                int checkedStyleButton = climbingStyleRadioGroup.getCheckedRadioButtonId();
-                RadioButton checkedNameRadioButton = (RadioButton) findViewById(checkedNameButton);
-                RadioButton checkedStyleRadioButton = (RadioButton) findViewById(checkedStyleButton);
-                String checkedName = (String) checkedNameRadioButton.getText();
-                String checkedStyle = (String) checkedStyleRadioButton.getText();
-
-                addClimbToDatabase(user.getUid(), checkedName, mRouteItemToAdd, placeName, checkedStyle);
-            }
-        });
-
-        routeLayout.addView(customRoutesView);
-    }
-
-    private void dateChecker(ImageButton roka, ImageButton kecske, ImageButton francia, ImageButton svab){
-        Calendar currentDateCalendar = Calendar.getInstance();
-        Calendar startFirstDateCalendar = Calendar.getInstance();
-        startFirstDateCalendar.set(2021, 8, 24, 0, 0);
-        Calendar endFirstDateCalendar = Calendar.getInstance();
-        endFirstDateCalendar.set(2021, 9, 3, 23, 59);
-        Calendar startSecondDateCalendar = Calendar.getInstance();
-        startSecondDateCalendar.set(2021, 9, 2, 0,0);
-        Calendar endSecondDateCalendar = Calendar.getInstance();
-        endSecondDateCalendar.set(2021, 9, 10, 20, 0);
-
-        if (currentDateCalendar.before(startFirstDateCalendar) || currentDateCalendar.after(endFirstDateCalendar)){
-            francia.setEnabled(false);
-            svab.setEnabled(false);
-        } else {
-            francia.setEnabled(true);
-            svab.setEnabled(true);
-        }
-
-        if (currentDateCalendar.before(startSecondDateCalendar) || currentDateCalendar.after(endSecondDateCalendar)) {
-            kecske.setEnabled(false);
-            roka.setEnabled(false);
-        } else {
-            kecske.setEnabled(true);
-            roka.setEnabled(true);
-        }
     }
 }
 
