@@ -65,6 +65,7 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/buttonShowDropDown"
                     android:id="@+id/popupRelative"
+                    android:layout_centerHorizontal="true"
                     android:orientation="horizontal" />
 
             </RelativeLayout>

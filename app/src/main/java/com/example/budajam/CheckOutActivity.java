@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.media.Image;
 import android.os.Build;
@@ -187,16 +188,35 @@ public class CheckOutActivity extends AppCompatActivity {
         places.toArray(popUpContents);
         popupWindowPlaces = popupWindowPlaces();
         buttonShowDropDown = (Button) findViewById(R.id.buttonShowDropDown);
-        RelativeLayout popupRelative = findViewById(R.id.popupRelative);
+        LinearLayout popupLinear = findViewById(R.id.popupLinear);
         View.OnClickListener handler = v -> {
             if (v.getId() == R.id.buttonShowDropDown) {
                 // show the list view as dropdown
                 pointsView.setVisibility(GONE);
-                popupWindowPlaces.showAtLocation(popupRelative, Gravity.CENTER_HORIZONTAL, 0,-30);
+                Rect locationToShow = locateView(popupLinear);
+                popupWindowPlaces.showAtLocation(popupLinear, Gravity.TOP, locationToShow.left,locationToShow.bottom);
                 //popupWindowPlaces.showAsDropDown(v, -5, 0);
             }
         };
         buttonShowDropDown.setOnClickListener(handler);
+    }
+    public static Rect locateView(View v){
+        int[] loc_int = new int[2];
+        if (v == null) return null;
+        try
+        {
+            v.getLocationOnScreen(loc_int);
+        } catch (NullPointerException npe)
+        {
+            //Happens when the view doesn't exist on screen anymore.
+            return null;
+        }
+        Rect location = new Rect();
+        location.left = loc_int[0];
+        location.top = loc_int[1];
+        location.right = location.left + v.getWidth();
+        location.bottom = location.top + v.getHeight();
+        return location;
     }
 
     public PopupWindow popupWindowPlaces() {
