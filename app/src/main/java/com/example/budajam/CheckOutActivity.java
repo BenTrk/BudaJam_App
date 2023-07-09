@@ -18,6 +18,8 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.PopupWindow;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
@@ -28,6 +30,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.res.ResourcesCompat;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -60,7 +63,6 @@ public class CheckOutActivity extends AppCompatActivity {
     RadioButton climber1OnSwitch, climber2OnSwitch;
 
     List<Routes> routes = new ArrayList<>();
-    String[] places;
 
     double teamPointsCheckOut;
 
@@ -72,7 +74,13 @@ public class CheckOutActivity extends AppCompatActivity {
     private TextView pointsView;
     private static LinearLayout linearLayout;
 
-    private ImageButton roka, kecskeCheck, francia, svab;
+    RadioGroup radioGroup;
+    private RadioButton radioButton;
+
+    List<String> places = new ArrayList<>();
+    String[] popUpContents;
+    PopupWindow popupWindowPlaces;
+    Button buttonShowDropDown;
 
     String selectedName;
 
@@ -86,6 +94,7 @@ public class CheckOutActivity extends AppCompatActivity {
         climber2OnSwitch = (RadioButton) findViewById(R.id.climber2onswitch);
         climber1OnSwitch.setText(MainActivity.climberName1);
         climber2OnSwitch.setText(MainActivity.climberName2);
+        radioGroup = (RadioGroup) findViewById(R.id.toggle);
 
         removeClimbBool = false;
 
@@ -96,10 +105,6 @@ public class CheckOutActivity extends AppCompatActivity {
         backButton = (Button) findViewById(R.id.backButton);
         linearLayout = (LinearLayout) findViewById(R.id.linearLayout);
 
-        roka = (ImageButton) findViewById(R.id.rokaCheck);
-        francia = (ImageButton) findViewById(R.id.franciaCheck);
-        svab = (ImageButton) findViewById(R.id.svabCheck);
-        kecskeCheck = (ImageButton) findViewById(R.id.kecskeCheck);
         allTheClimbs = (Button) findViewById(R.id.allClimbs);
 
         auth = FirebaseAuth.getInstance();
@@ -140,58 +145,101 @@ public class CheckOutActivity extends AppCompatActivity {
             }
         });
 
+        getPlacesFromDB(places);
         allTheClimbs.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int selectedID = toggle.getCheckedRadioButtonId();
-                RadioButton radioButton = (RadioButton) findViewById(selectedID);
+                int selectedId = radioGroup.getCheckedRadioButtonId();
+                radioButton = (RadioButton) findViewById(selectedId);
                 selectedName = (String) radioButton.getText();
 
                 CheckOutActivity.linearLayout.removeAllViews();
-                places = new String[]{"roka", "kecske", "francia", "svab"};
-                populateClimbedRoutesList(selectedName, "roka");
-                populateClimbedRoutesList(selectedName, "francia");
-                populateClimbedRoutesList(selectedName, "kecske");
-                populateClimbedRoutesList(selectedName, "svab");
-            }
-        });
+                for (String place : places) {
+                    populateClimbedRoutesList(selectedName, place);
+                }
 
-        roka.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onClickForPlaces("roka");
-            }
-        });
-
-        francia.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onClickForPlaces("francia");
-            }
-        });
-
-        svab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onClickForPlaces("svab");
-            }
-        });
-
-        kecskeCheck.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onClickForPlaces("kecske");
             }
         });
     }
 
-    private void onClickForPlaces(String placeName){
-        int selectedID = toggle.getCheckedRadioButtonId();
-        RadioButton radioButton = (RadioButton) findViewById(selectedID);
-        selectedName = (String) radioButton.getText();
+    private void getPlacesFromDB(List<String> places) {
+        database = FirebaseDatabase.getInstance("https://budajam-ea659-default-rtdb.firebaseio.com/");
+        Query routesQuery = database.getReference("Routes/");
+        routesQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
+                    String routeName = postSnapshot.getKey();
+                    places.add(routeName);
+                }
+                setCustomSpinner();
+            }
 
-        CheckOutActivity.linearLayout.removeAllViews();
-        populateClimbedRoutesList(selectedName, placeName);
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(getApplicationContext(), "DB Error", Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    private void setCustomSpinner(){
+        popUpContents = new String[places.size()];
+        places.toArray(popUpContents);
+        popupWindowPlaces = popupWindowPlaces();
+        buttonShowDropDown = (Button) findViewById(R.id.buttonShowDropDown);
+        RelativeLayout popupRelative = findViewById(R.id.popupRelative);
+        View.OnClickListener handler = v -> {
+            if (v.getId() == R.id.buttonShowDropDown) {
+                // show the list view as dropdown
+                pointsView.setVisibility(GONE);
+                popupWindowPlaces.showAtLocation(popupRelative, Gravity.CENTER_HORIZONTAL, 0,-30);
+                //popupWindowPlaces.showAsDropDown(v, -5, 0);
+            }
+        };
+        buttonShowDropDown.setOnClickListener(handler);
+    }
+
+    public PopupWindow popupWindowPlaces() {
+        // initialize a pop up window type
+        PopupWindow popupWindow = new PopupWindow(this);
+        popupWindow.setBackgroundDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.popup_background, getTheme()));
+        // the drop down list is a list view
+        ListView listViewPlaces;
+        // set our adapter and pass our pop up window contents
+        listViewPlaces = placesAdapter(popUpContents);
+        // set the item click listener
+        listViewPlaces.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                String name = adapterView.getAdapter().getItem(i).toString();
+                //routeLayout.removeAllViews();
+                int selectedId = radioGroup.getCheckedRadioButtonId();
+                radioButton = (RadioButton) findViewById(selectedId);
+                selectedName = (String) radioButton.getText();
+                CheckOutActivity.linearLayout.removeAllViews();
+                populateClimbedRoutesList(selectedName, name);
+                popupWindow.dismiss();
+            }
+        });
+        popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
+            @Override
+            public void onDismiss() {
+                pointsView.setVisibility(View.VISIBLE);
+            }
+        });
+        // some other visual settings
+        popupWindow.setFocusable(true);// set the list view as pop up window content
+        popupWindow.setContentView(listViewPlaces);
+        popupWindow.setWidth(300);
+        return popupWindow;
+    }
+
+    private ListView placesAdapter(String[] placesArray) {
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(getApplicationContext(), R.layout.popup_layout, R.id.list_content,
+                placesArray);
+        ListView listViewSort = new ListView(getApplicationContext());
+        listViewSort.setAdapter(adapter);
+        return listViewSort;
     }
 
     private void populateClimbedRoutesList(String name, String place){
@@ -309,12 +357,9 @@ public class CheckOutActivity extends AppCompatActivity {
                 R.layout.custom_remove_layout, linearLayout, false
         );
         TextView placeNoClimb = customNoClimbView.findViewById(R.id.climbedRoutePointsAndClass);
-        ImageView noClimbPlaceNameImage = customNoClimbView.findViewById(R.id.placeNameImage);
+        TextView noClimbPlaceNameTextView = customNoClimbView.findViewById(R.id.placeNameView);
+        noClimbPlaceNameTextView.setText(placeName);
         ImageButton noClimbRemoveButtonImageButton = customNoClimbView.findViewById(R.id.removeButtonImageButton);
-        if (placeName.equals("francia")){ noClimbPlaceNameImage.setImageResource(R.mipmap.french); }
-        else if (placeName.equals("svab")){ noClimbPlaceNameImage.setImageResource(R.mipmap.german); }
-        else if (placeName.equals("kecske")){ noClimbPlaceNameImage.setImageResource(R.mipmap.goat); }
-        else if (placeName.equals("roka")){ noClimbPlaceNameImage.setImageResource(R.mipmap.fox); }
         placeNoClimb.setText(climberName + " did not climb here yet.");
         noClimbRemoveButtonImageButton.setImageResource(R.mipmap.no_image);
         noClimbRemoveButtonImageButton.setEnabled(false);
@@ -336,16 +381,13 @@ public class CheckOutActivity extends AppCompatActivity {
                         R.layout.custom_remove_layout, linearLayout, false
                 );
 
-                ImageView placeNameImage = customRemoveView.findViewById(R.id.placeNameImage);
+                TextView placeNameTextView = customRemoveView.findViewById(R.id.placeNameView);
+                placeNameTextView.setText(placeName);
                 TextView climbedRouteName = customRemoveView.findViewById(R.id.climbedRouteName);
                 TextView climbedRoutePointsAndClass = customRemoveView.findViewById(R.id.climbedRoutePointsAndClass);
                 TextView climbedRouteStyle = customRemoveView.findViewById(R.id.climbedRouteStyle);
                 ImageButton removeButtonImageButton = customRemoveView.findViewById(R.id.removeButtonImageButton);
 
-                if (placeName.equals("francia")){ placeNameImage.setImageResource(R.mipmap.french); }
-                else if (placeName.equals("svab")){ placeNameImage.setImageResource(R.mipmap.german); }
-                else if (placeName.equals("kecske")){ placeNameImage.setImageResource(R.mipmap.goat); }
-                else if (placeName.equals("roka")){ placeNameImage.setImageResource(R.mipmap.fox); }
                 String routeName = mRouteItemsToAdd.get(i).name;
                 Double routePoints = mRouteItemsToAdd.get(i).points;
 

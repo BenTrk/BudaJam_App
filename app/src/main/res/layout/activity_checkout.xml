@@ -113,51 +113,44 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/all_the_climbs" />
-        <LinearLayout
-            android:id="@+id/climbButtons1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="10dp"
-            android:layout_gravity="center">
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingBottom="@dimen/activity_vertical_margin"
+                android:paddingLeft="@dimen/activity_horizontal_margin"
+                android:paddingRight="@dimen/activity_horizontal_margin"
+                android:paddingTop="@dimen/activity_vertical_margin"
+                tools:context=".MainActivity">
 
-            <ImageButton
-                android:id="@+id/svabCheck"
-                android:src="@mipmap/german"
-                android:background="@drawable/buttonselectormain"
-                android:padding="10dp"
-                android:layout_margin="5dp"
+                <Button
+                    android:id="@+id/buttonShowDropDown"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:layout_centerVertical="true"
+                    android:text="Select a place" />
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/buttonShowDropDown"
+                    android:id="@+id/popupRelative"
+                    android:orientation="horizontal" />
+
+            </RelativeLayout>
+
+            <LinearLayout
+                xmlns:android="http://schemas.android.com/apk/res/android"
+                android:orientation="vertical"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="fill_parent">
 
-            <ImageButton
-                android:id="@+id/franciaCheck"
-                android:src="@mipmap/french"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/buttonselectormain"
-                android:padding="10dp"
-                android:layout_margin="5dp"/>
-
-            <ImageButton
-                android:id="@+id/rokaCheck"
-                android:src="@mipmap/fox"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/buttonselectormain"
-                android:padding="10dp"
-                android:layout_margin="5dp"/>
-
-            <ImageButton
-                android:id="@+id/kecskeCheck"
-                android:src="@mipmap/goat"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/buttonselectormain"
-                android:padding="10dp"
-                android:layout_margin="5dp"/>
-
+                <ListView
+                    android:id="@android:id/list"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+                <!-- REMOVED TEXT VIEW, AND KEEPING BACKGROUND WHITE -->
             </LinearLayout>
+
         </LinearLayout>
 
         <TextView

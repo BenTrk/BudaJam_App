@@ -151,14 +151,12 @@ public class MainActivity extends AppCompatActivity {
             popup.show();
         });
 
-        //Set up the dropdown spinner
-        //Just leave spinner, it sucks ass. Create your own with ListView
+        //Just leave spinner, it sucks ass. Create your own with ListView -> which is this
         getPlacesFromDB(places);
 
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null) {
             getNamesFromDatabase(user.getUid());
-            //populateRouteListAtStart() -> rewrite to use the climbSpinner
         } else {
             startActivity(new Intent(MainActivity.this, LoginActivity.class));
             finish();
