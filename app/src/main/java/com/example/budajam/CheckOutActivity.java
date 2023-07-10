@@ -80,7 +80,6 @@ public class CheckOutActivity extends AppCompatActivity {
 
     List<String> places = new ArrayList<>();
     String[] popUpContents;
-    PopupWindow popupWindowPlaces;
     Button buttonShowDropDown;
 
     String selectedName;
@@ -104,7 +103,7 @@ public class CheckOutActivity extends AppCompatActivity {
         pointsView = (TextView) findViewById(R.id.teamPointsView);
 
         backButton = (Button) findViewById(R.id.backButton);
-        linearLayout = (LinearLayout) findViewById(R.id.linearLayout);
+        linearLayout = (LinearLayout) findViewById(R.id.linearLayoutDropDown);
 
         allTheClimbs = (Button) findViewById(R.id.allClimbs);
 
@@ -182,96 +181,57 @@ public class CheckOutActivity extends AppCompatActivity {
             }
         });
     }
+    private void addCustomDropDown(String[] places) {
+        linearLayout.removeAllViews();
+
+        for (String place : places) {
+            final View customRoutesView = LayoutInflater.from(this).inflate(
+                    R.layout.custom_dropdown_layout, linearLayout, false
+            );
+            LinearLayout.LayoutParams customViewParams = new LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+            );
+            customRoutesView.setLayoutParams(customViewParams);
+
+            RelativeLayout relContainer = customRoutesView.findViewById(R.id.routeDropDownRelativeLayout);
+            TextView placeNameView = customRoutesView.findViewById(R.id.routeNameTextView);
+
+            placeNameView.setText(place);
+            relContainer.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int selectedId = radioGroup.getCheckedRadioButtonId();
+                    radioButton = (RadioButton) findViewById(selectedId);
+                    selectedName = (String) radioButton.getText();
+                    linearLayout.removeAllViews();
+                    populateClimbedRoutesList(selectedName, place);
+                }
+            });
+            linearLayout.addView(customRoutesView);
+        }
+    }
 
     private void setCustomSpinner(){
         popUpContents = new String[places.size()];
         places.toArray(popUpContents);
-        popupWindowPlaces = popupWindowPlaces();
         buttonShowDropDown = (Button) findViewById(R.id.buttonShowDropDown);
-        LinearLayout popupLinear = findViewById(R.id.popupLinear);
         View.OnClickListener handler = v -> {
             if (v.getId() == R.id.buttonShowDropDown) {
-                // show the list view as dropdown
-                pointsView.setVisibility(GONE);
-                Rect locationToShow = locateView(popupLinear);
-                popupWindowPlaces.showAtLocation(popupLinear, Gravity.TOP, locationToShow.left,locationToShow.bottom);
-                //popupWindowPlaces.showAsDropDown(v, -5, 0);
+                addCustomDropDown(popUpContents);
             }
         };
         buttonShowDropDown.setOnClickListener(handler);
-    }
-    public static Rect locateView(View v){
-        int[] loc_int = new int[2];
-        if (v == null) return null;
-        try
-        {
-            v.getLocationOnScreen(loc_int);
-        } catch (NullPointerException npe)
-        {
-            //Happens when the view doesn't exist on screen anymore.
-            return null;
-        }
-        Rect location = new Rect();
-        location.left = loc_int[0];
-        location.top = loc_int[1];
-        location.right = location.left + v.getWidth();
-        location.bottom = location.top + v.getHeight();
-        return location;
-    }
-
-    public PopupWindow popupWindowPlaces() {
-        // initialize a pop up window type
-        PopupWindow popupWindow = new PopupWindow(this);
-        popupWindow.setBackgroundDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.popup_background, getTheme()));
-        // the drop down list is a list view
-        ListView listViewPlaces;
-        // set our adapter and pass our pop up window contents
-        listViewPlaces = placesAdapter(popUpContents);
-        // set the item click listener
-        listViewPlaces.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                String name = adapterView.getAdapter().getItem(i).toString();
-                //routeLayout.removeAllViews();
-                int selectedId = radioGroup.getCheckedRadioButtonId();
-                radioButton = (RadioButton) findViewById(selectedId);
-                selectedName = (String) radioButton.getText();
-                CheckOutActivity.linearLayout.removeAllViews();
-                populateClimbedRoutesList(selectedName, name);
-                popupWindow.dismiss();
-            }
-        });
-        popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
-            @Override
-            public void onDismiss() {
-                pointsView.setVisibility(View.VISIBLE);
-            }
-        });
-        // some other visual settings
-        popupWindow.setFocusable(true);// set the list view as pop up window content
-        popupWindow.setContentView(listViewPlaces);
-        popupWindow.setWidth(300);
-        return popupWindow;
-    }
-
-    private ListView placesAdapter(String[] placesArray) {
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(getApplicationContext(), R.layout.popup_layout, R.id.list_content,
-                placesArray);
-        ListView listViewSort = new ListView(getApplicationContext());
-        listViewSort.setAdapter(adapter);
-        return listViewSort;
     }
 
     private void populateClimbedRoutesList(String name, String place){
         buttonID = 0;
 
-        //ScrollView routesClimbed = new ScrollView(CheckOutActivity.this);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.MATCH_PARENT
         );
         params.height = 600;
-        //routesClimbed.setLayoutParams(params);
 
         LinearLayout scrollLinear = new LinearLayout(CheckOutActivity.this);
         scrollLinear.setLayoutParams(params);

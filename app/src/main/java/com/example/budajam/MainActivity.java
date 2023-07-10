@@ -63,6 +63,8 @@ import java.util.Objects;
 
 import static android.view.View.GONE;
 
+import org.w3c.dom.Text;
+
 //Now it is synched - SQLite is not really needed
 //Use it for a save as xml activity - let the user add the days when the app should save the climbed routes
 //to an xml as a backup.
@@ -153,6 +155,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         //Just leave spinner, it sucks ass. Create your own with ListView -> which is this
+        //But why not the same as the list of routes? That would be more user friendly.
         getPlacesFromDB(places);
 
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
@@ -168,67 +171,13 @@ public class MainActivity extends AppCompatActivity {
     private void setCustomSpinner(){
         popUpContents = new String[places.size()];
         places.toArray(popUpContents);
-        popupWindowPlaces = popupWindowPlaces();
         buttonShowDropDown = (Button) findViewById(R.id.buttonShowDropDown);
-        RelativeLayout popupRelative = findViewById(R.id.popupRelative);
         View.OnClickListener handler = v -> {
             if (v.getId() == R.id.buttonShowDropDown) {
-                // show the list view as dropdown
-                Rect locationToShow = locateView(popupRelative);
-                popupWindowPlaces.showAtLocation(popupRelative, Gravity.TOP, 0,locationToShow.bottom);
-                //popupWindowPlaces.showAsDropDown(v, -5, 0);
+                addCustomDropDown(popUpContents);
             }
         };
         buttonShowDropDown.setOnClickListener(handler);
-    }
-    public static Rect locateView(View v){
-        int[] loc_int = new int[2];
-        if (v == null) return null;
-        try
-        {
-            v.getLocationOnScreen(loc_int);
-        } catch (NullPointerException npe)
-        {
-            //Happens when the view doesn't exist on screen anymore.
-            return null;
-        }
-        Rect location = new Rect();
-        location.left = loc_int[0];
-        location.top = loc_int[1];
-        location.right = location.left + v.getWidth();
-        location.bottom = location.top + v.getHeight();
-        return location;
-    }
-    public PopupWindow popupWindowPlaces() {
-        // initialize a pop up window type
-        PopupWindow popupWindow = new PopupWindow(this);
-        popupWindow.setBackgroundDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.popup_background, getTheme()));
-        // the drop down list is a list view
-        ListView listViewPlaces;
-        // set our adapter and pass our pop up window contents
-        listViewPlaces = placesAdapter(popUpContents);
-        // set the item click listener
-        listViewPlaces.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                String name = adapterView.getAdapter().getItem(i).toString();
-                routeLayout.removeAllViews();
-                populateRoutesListAtStart(name, routes);
-                popupWindow.dismiss();
-            }
-        });
-        // some other visual settings
-        popupWindow.setFocusable(true);// set the list view as pop up window content
-        popupWindow.setContentView(listViewPlaces);
-        popupWindow.setWidth(300);
-        return popupWindow;
-    }
-    private ListView placesAdapter(String[] placesArray) {
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(getApplicationContext(), R.layout.popup_layout, R.id.list_content,
-                placesArray);
-        ListView listViewSort = new ListView(getApplicationContext());
-        listViewSort.setAdapter(adapter);
-        return listViewSort;
     }
 
     private void getPlacesFromDB(List<String> places) {
@@ -505,6 +454,34 @@ public class MainActivity extends AppCompatActivity {
         routeLayout.addView(customRoutesView);
     }
 
+    private void addCustomDropDown(String[] places) {
+
+        routeLayout.removeAllViews();
+        for (String place : places) {
+            final View customRoutesView = LayoutInflater.from(this).inflate(
+                    R.layout.custom_dropdown_layout, routeLayout, false
+            );
+            LinearLayout.LayoutParams customViewParams = new LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+            );
+            customRoutesView.setLayoutParams(customViewParams);
+
+            RelativeLayout relContainer = customRoutesView.findViewById(R.id.routeDropDownRelativeLayout);
+            TextView placeNameView = customRoutesView.findViewById(R.id.routeNameTextView);
+
+            placeNameView.setText(place);
+            relContainer.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    routeLayout.removeAllViews();
+                    populateRoutesListAtStart(place, routes);
+                }
+            });
+            routeLayout.addView(customRoutesView);
+        }
+    }
+
     private void dateChecker(ImageButton roka, ImageButton kecske, ImageButton francia, ImageButton svab){
         Calendar currentDateCalendar = Calendar.getInstance();
         Calendar startFirstDateCalendar = Calendar.getInstance();
@@ -530,22 +507,6 @@ public class MainActivity extends AppCompatActivity {
         } else {
             kecske.setEnabled(true);
             roka.setEnabled(true);
-        }
-    }
-
-    public void climbPlaceButtonHandler(List<Routes> routes, String placeName){
-        MainActivity.routeLayout.removeAllViews();
-        emptyScreenLinear.setVisibility(GONE);
-
-        if (routes == null) {
-            Toast.makeText(getApplicationContext(), "Sorry, still fetching data from database. Check your internet connection!", Toast.LENGTH_LONG).show();
-        } else if (routes.isEmpty()) {
-            Toast.makeText(getApplicationContext(), "Sorry, there are no routes in the database for this place!", Toast.LENGTH_LONG).show();
-        } else {
-            for(int i = 0; i < routes.size(); i++) {
-                Toast.makeText(getApplicationContext(), "Someting", Toast.LENGTH_LONG).show();
-                addCustomSpinner(routes.get(i), placeName);
-            }
         }
     }
 

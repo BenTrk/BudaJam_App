@@ -136,6 +136,11 @@
         <item name="android:textColor">@color/icons</item>
         <item name="android:textSize">15sp</item>
     </style>
+    <style name="routeNameStyle">
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/icons</item>
+        <item name="android:textSize">25sp</item>
+    </style>
 
     <style name="removeDetailsStyle">
         <item name="android:textStyle">bold</item>
