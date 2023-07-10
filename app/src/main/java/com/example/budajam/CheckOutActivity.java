@@ -62,6 +62,7 @@ public class CheckOutActivity extends AppCompatActivity {
 
     RadioGroup toggle;
     RadioButton climber1OnSwitch, climber2OnSwitch;
+    static String styleMost = "";
 
     List<Routes> routes = new ArrayList<>();
 
@@ -135,7 +136,10 @@ public class CheckOutActivity extends AppCompatActivity {
             finish();
         }
 
-        pointsView.setText("Your Team's Points: " + teamPointsCheckOut);
+        int selectedId = radioGroup.getCheckedRadioButtonId();
+        radioButton = (RadioButton) findViewById(selectedId);
+        selectedName = (String) radioButton.getText();
+        pointsView.setText("Your Team's Points: " + teamPointsCheckOut + "\nClimber: " + selectedName);
 
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -152,6 +156,7 @@ public class CheckOutActivity extends AppCompatActivity {
                 int selectedId = radioGroup.getCheckedRadioButtonId();
                 radioButton = (RadioButton) findViewById(selectedId);
                 selectedName = (String) radioButton.getText();
+                pointsView.setText("Your Team's Points: " + teamPointsCheckOut + "\nClimber: " + selectedName);
 
                 CheckOutActivity.linearLayout.removeAllViews();
                 for (String place : places) {
@@ -196,6 +201,7 @@ public class CheckOutActivity extends AppCompatActivity {
 
             RelativeLayout relContainer = customRoutesView.findViewById(R.id.routeDropDownRelativeLayout);
             TextView placeNameView = customRoutesView.findViewById(R.id.routeNameTextView);
+            TextView mostPointsView = findViewById(R.id.mostPointsStyle);
 
             placeNameView.setText(place);
             relContainer.setOnClickListener(new View.OnClickListener() {
@@ -204,6 +210,7 @@ public class CheckOutActivity extends AppCompatActivity {
                     int selectedId = radioGroup.getCheckedRadioButtonId();
                     radioButton = (RadioButton) findViewById(selectedId);
                     selectedName = (String) radioButton.getText();
+                    pointsView.setText("Your Team's Points: " + teamPointsCheckOut + "\nClimber: " + selectedName);
                     linearLayout.removeAllViews();
                     populateClimbedRoutesList(selectedName, place);
                 }
@@ -366,6 +373,7 @@ public class CheckOutActivity extends AppCompatActivity {
                 TextView climbedRouteName = customRemoveView.findViewById(R.id.climbedRouteName);
                 TextView climbedRoutePointsAndClass = customRemoveView.findViewById(R.id.climbedRoutePointsAndClass);
                 TextView climbedRouteStyle = customRemoveView.findViewById(R.id.climbedRouteStyle);
+                TextView climbedBestStyle = customRemoveView.findViewById(R.id.mostPointsStyle);
                 ImageButton removeButtonImageButton = customRemoveView.findViewById(R.id.removeButtonImageButton);
 
                 String routeName = mRouteItemsToAdd.get(i).name;
@@ -374,6 +382,8 @@ public class CheckOutActivity extends AppCompatActivity {
                 climbedRouteName.setText(routeName);
                 climbedRoutePointsAndClass.setText("Points: " + routePoints + " Class: " + mRouteItemsToAdd.get(i).difficulty);
                 climbedRouteStyle.setText("Last climbed in: " + mRouteItemsToAdd.get(i).climbStyle + " style");
+                climbedBestStyle.setText("Most points earned: " + mRouteItemsToAdd.get(i).best);
+                //would be great to see the style the points are now given.
 
                 removeButtonImageButton.setOnClickListener(new View.OnClickListener() {
                     @Override

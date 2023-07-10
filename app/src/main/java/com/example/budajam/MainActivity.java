@@ -21,6 +21,7 @@ import android.view.ContextThemeWrapper;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -33,6 +34,7 @@ import android.widget.LinearLayout;
 import android.widget.ListPopupWindow;
 import android.widget.ListView;
 import android.widget.PopupWindow;
+import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
@@ -90,9 +92,9 @@ public class MainActivity extends AppCompatActivity {
 
     boolean exist;
     String[] popUpContents;
-    PopupWindow popupWindowPlaces;
     Button buttonShowDropDown;
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -120,6 +122,25 @@ public class MainActivity extends AppCompatActivity {
         }
 
         routeLayout = (LinearLayout) findViewById(R.id.routeLayout);
+        //Refreshing screen to default when clicked outside of routeLayout
+        LinearLayout linearLayout = findViewById(R.id.linearLayout);
+        linearLayout.setOnTouchListener((v, event) -> {
+            switch (event.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    //some code....
+                    break;
+                case MotionEvent.ACTION_UP:
+                    routeLayout.removeAllViews();
+                    emptyScreenLinear.setVisibility(View.VISIBLE);
+                    routeLayout.addView(emptyScreenLinear);
+                    v.performClick();
+                    break;
+                default:
+                    break;
+            }
+            return true;
+        });
+
         menuButton = (ImageView) findViewById(R.id.menuButton);
 
         //Show the menu, upper left corner
@@ -256,9 +277,9 @@ public class MainActivity extends AppCompatActivity {
                                 Dialog dialog = dialogBuilderFunc(true, true);
                                 dialog.show();
                                 myRef3.child(placeName).child(routeName).child("points").setValue(pointsToAdd);
+                                myRef3.child(placeName).child(routeName).child("best").setValue(climbStyle);
                                 DatabaseReference myRefPoints = database.getReference(userID + "/teamPoints");
                                 myRefPoints.setValue((teamPoints - routePoints) + pointsToAdd);
-
                             } else {
                                 Dialog dialog = dialogBuilderFunc(true, false);
                                 dialog.show();
@@ -280,6 +301,7 @@ public class MainActivity extends AppCompatActivity {
                     myRef3.child(placeName).child(routeName).child("difficulty").setValue(route.difficulty);
                     myRef3.child(placeName).child(routeName).child("climbStyle").setValue(climbStyle);
                     myRef3.child(placeName).child(routeName).child("points").setValue(pointsToAddNotExist);
+                    myRef3.child(placeName).child(routeName).child("best").setValue(climbStyle);
 
                     DatabaseReference myRefPoints = database.getReference(userID + "/teamPoints");
                     myRefPoints.setValue(teamPoints + pointsToAddNotExist);
@@ -352,6 +374,12 @@ public class MainActivity extends AppCompatActivity {
         database = FirebaseDatabase.getInstance("https://budajam-ea659-default-rtdb.firebaseio.com/");
         DatabaseReference myRef = database.getReference("Routes/" + name);
 
+        ProgressBar progressBar;
+        progressBar = findViewById(R.id.progressBarPlaces);
+        LinearLayout progressLayout = findViewById(R.id.progressLinear);
+        progressLayout.setVisibility(View.VISIBLE);
+        progressBar.setVisibility(View.VISIBLE);
+
         myRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -360,11 +388,24 @@ public class MainActivity extends AppCompatActivity {
                     assert routes != null;
                     routes.addItem(name, routesDetails);
                 }
-                //Remove default background and its finally working!
+
+                //progressbar!
                 emptyScreenLinear.setVisibility(GONE);
+                int totalViews = routes.size(); // Set the total number of views to create
+                int createdViews = 0; // Counter for created view
+                progressBar.setMax(totalViews);
+                progressBar.setProgress(createdViews);
+
                 for (Routes routesIn : routes.getItems(name)) {
+                    createdViews++;
+                    progressBar.setProgress(createdViews);
                     addCustomSpinner(routesIn, name);
+                    if (routes.size()-1 == createdViews){
+                        progressLayout.setVisibility(View.GONE);
+                        progressBar.setVisibility(View.GONE);
+                    }
                 }
+                progressBar.setVisibility(View.GONE);
             }
 
             @Override
@@ -447,6 +488,7 @@ public class MainActivity extends AppCompatActivity {
 
                 addClimbToDatabase(user.getUid(), checkedName, mRouteItemToAdd, placeName, checkedStyle);
                 routeLayout.removeAllViews();
+                emptyScreenLinear.setVisibility(View.VISIBLE);
                 routeLayout.addView(emptyScreenLinear);
             }
         });

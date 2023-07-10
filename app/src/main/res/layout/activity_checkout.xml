@@ -159,12 +159,15 @@
             android:textStyle="bold"
             android:textColor="@color/accent"
             android:layout_margin="5dp"
+            android:gravity="center_horizontal"
             android:id="@+id/teamPointsView" />
 
         <ScrollView
             android:id="@+id/scrollViewRoutes"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
             android:visibility="visible"
             android:fastScrollEnabled="false"
             android:scrollbars="vertical">

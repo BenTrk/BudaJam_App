@@ -45,4 +45,14 @@ public class DataStorage {
     public Set<String> getCategory(){
         return dataMap.keySet();
     }
+
+    public int size() {
+        int size = 0;
+        for (String key : dataMap.keySet()){
+            for (Routes route : dataMap.get(key)){
+                size++;
+            }
+        }
+    return size;
+    }
 }
