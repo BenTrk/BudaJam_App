@@ -161,10 +161,16 @@ public class MainActivity extends AppCompatActivity {
                 if (R.id.one == item.getItemId()) {
                     startActivity(new Intent(MainActivity.this, CheckOutActivity.class));
                     finish();
-                } else if (R.id.two == item.getItemId()) {
+                }
+                else if (R.id.two == item.getItemId()) {
                     startActivity(new Intent(MainActivity.this, OptionsActivity.class));
                     finish();
-                } else if (R.id.three == item.getItemId()) {
+                }
+                else if (R.id.four == item.getItemId()) {
+                    startActivity(new Intent(MainActivity.this, ExtraPointsActivity.class));
+                    finish();
+                }
+                else if (R.id.three == item.getItemId()) {
                     auth.signOut();
                     startActivity(new Intent(MainActivity.this, LoginActivity.class));
                     finish();
@@ -179,6 +185,7 @@ public class MainActivity extends AppCompatActivity {
         //But why not the same as the list of routes? That would be more user friendly.
         getPlacesFromDB(places);
 
+        //Why is this duplicated?
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null) {
             getNamesFromDatabase(user.getUid());

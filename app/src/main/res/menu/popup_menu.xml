@@ -11,6 +11,10 @@
         android:title="Options"/>
 
     <item
+        android:id="@+id/four"
+        android:title="Extra Points"/>
+
+    <item
         android:id="@+id/three"
         android:title="Sign out"/>
 
