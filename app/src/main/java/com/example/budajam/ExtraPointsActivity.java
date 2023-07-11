@@ -48,13 +48,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+//ToDo: Handle extra activities for teams or for climbers.
 public class ExtraPointsActivity extends AppCompatActivity {
     FirebaseUser user;
     FirebaseAuth auth;
     FirebaseAuth.AuthStateListener authListener;
     FirebaseDatabase database;
     String climberName1, climberName2;
-    HashMap<String, List<Pair<String, Integer>>> qualityMap = new HashMap<>();
+    HashMap<String, HashMap<String, Pair<String, Integer>>> qualityMap = new HashMap<>();
     private AnimatedVectorDrawable animArrowAnim;
     Double teamPoints;
 
@@ -121,7 +122,6 @@ public class ExtraPointsActivity extends AppCompatActivity {
                     for (DataSnapshot qualitiesSnapshot : postSnapshot.getChildren()) {
                         String activityString = qualitiesSnapshot.getValue(String.class);
                         Activity activity = new Activity(activityString);
-                        assert activity != null;
                         qualityMap.put(postSnapshot.getKey(), activity.getQualityPairs());
                     }
                 }
@@ -141,8 +141,7 @@ public class ExtraPointsActivity extends AppCompatActivity {
         showActivities.setOnClickListener(handler);
     }
 
-    private void addCustomDropDown(HashMap<String, List<Pair<String, Integer>>> qualityMap) {
-        //ToDo: Show current points for an activity and provide functionality to remove it.
+    private void addCustomDropDown(HashMap<String, HashMap<String, Pair<String, Integer>>> qualityMap) {
         LinearLayout popupLinear = findViewById(R.id.popupLinear);
         popupLinear.removeAllViews();
 
@@ -184,8 +183,8 @@ public class ExtraPointsActivity extends AppCompatActivity {
                             animArrowAnim = (AnimatedVectorDrawable) d;
                             animArrowAnim.start();
                         }
-                        for (Pair qualityPair : qualityMap.get(activityName)){
-                            spinnerHelper.add((String) qualityPair.first);
+                        for (Pair<String, Integer> pair : qualityMap.get(activityName).values()){
+                            spinnerHelper.add((String) pair.first);
                         }
                         String[] spinnerArray = new String[spinnerHelper.size()];
                         spinnerHelper.toArray(spinnerArray);
@@ -214,9 +213,9 @@ public class ExtraPointsActivity extends AppCompatActivity {
                 public void onClick(View v) {
                     String selected = (String) qualitySpinner.getSelectedItem();
                     int points = 0;
-                    for (Pair pair : qualityMap.get(activityName)){
+                    for (Pair<String, Integer> pair : qualityMap.get(activityName).values()) {
                         String first = (String) pair.first;
-                        if (first.equals(selected)){
+                        if (first.equals(selected)) {
                             points = (int) pair.second;
                         }
                     }
@@ -280,8 +279,6 @@ public class ExtraPointsActivity extends AppCompatActivity {
         database = FirebaseDatabase.getInstance("https://budajam-ea659-default-rtdb.firebaseio.com/");
         DatabaseReference myRefPoints = database.getReference(user.getUid() +"/teamPoints");
         DatabaseReference myRef = database.getReference(user.getUid() + "/Activities/");
-        //myRefPoints.setValue((teamPoints - routePoints) + pointsToAdd);
-        Toast.makeText(ExtraPointsActivity.this, "Points for this: " + points, Toast.LENGTH_LONG).show();
 
         myRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override

@@ -3,19 +3,27 @@ package com.example.budajam;
 import android.util.Pair;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class Activity {
     String qualities;
-    List<Pair<String, Integer>> qualityPairs = new ArrayList<>();
+    HashMap<String, Pair<String, Integer>> qualityPairs = new HashMap<>();
 
     public Activity(String qualities) {
         this.qualities = qualities;
         String[] separatedString = qualities.split(";");
+        int counter = 0;
+        String group = "";
         for (String string : separatedString){
+            counter++;
+            if (counter == 1){
+                group = string;
+                continue;
+            }
             String[] separatedArray = string.split(":");
             Pair<String, Integer> qualitypair = new Pair<>(separatedArray[0], Integer.valueOf(separatedArray[1]));
-            qualityPairs.add(qualitypair);
+            qualityPairs.put(group, qualitypair);
         }
     }
 
@@ -27,11 +35,11 @@ public class Activity {
         this.qualities = qualities;
     }
 
-    public List<Pair<String, Integer>> getQualityPairs() {
+    public HashMap<String, Pair<String, Integer>> getQualityPairs() {
         return qualityPairs;
     }
 
-    public void setQualityPairs(List<Pair<String, Integer>> qualityPairs) {
+    public void setQualityPairs(HashMap<String, Pair<String, Integer>> qualityPairs) {
         this.qualityPairs = qualityPairs;
     }
 }
