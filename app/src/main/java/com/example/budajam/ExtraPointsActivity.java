@@ -3,6 +3,8 @@ package com.example.budajam;
 import static android.view.View.GONE;
 
 import android.annotation.SuppressLint;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.drawable.AnimatedVectorDrawable;
@@ -26,6 +28,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.content.res.AppCompatResources;
 
@@ -134,6 +137,7 @@ public class ExtraPointsActivity extends AppCompatActivity {
     }
 
     private void addCustomDropDown(HashMap<String, List<Pair<String, Integer>>> qualityMap) {
+        //ToDo: Show current points for an activity and provide functionality to remove it.
         LinearLayout popupLinear = findViewById(R.id.popupLinear);
         popupLinear.removeAllViews();
 
@@ -210,18 +214,103 @@ public class ExtraPointsActivity extends AppCompatActivity {
                             points = (int) pair.second;
                         }
                     }
-                    addPointsToDatabase(points);
+                    addPointsToDatabase(points, activityName);
                 }
             });
             popupLinear.addView(customRoutesView);
         }
     }
 
-    private void addPointsToDatabase(int points) {
+    private void addPointsToDatabase(int points, String activityName) {
         database = FirebaseDatabase.getInstance("https://budajam-ea659-default-rtdb.firebaseio.com/");
         DatabaseReference myRefPoints = database.getReference(user.getUid() +"/teamPoints");
+        DatabaseReference myRef = database.getReference(user.getUid() + "/Activities/");
         //myRefPoints.setValue((teamPoints - routePoints) + pointsToAdd);
         Toast.makeText(ExtraPointsActivity.this, "Points for this: " + points, Toast.LENGTH_LONG).show();
+
+        myRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.hasChild(activityName)) {
+                    Query activityQuery = myRef.child(activityName);
+                    activityQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            double pointsInDB = dataSnapshot.getValue(Integer.class);
+
+                            int isMoreOrLess = Double.compare(pointsInDB, points);
+
+                            if (isMoreOrLess < 0) {
+                                Dialog dialog = dialogBuilderFunc(true, true);
+                                dialog.show();
+                                myRef.child(activityName).setValue(points);
+                                myRefPoints.setValue((teamPoints - pointsInDB) + points);
+                            } else {
+                                Dialog dialog = dialogBuilderFunc(true, false);
+                                dialog.show();
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+                            //
+                        }
+                    });
+                } else {
+                    Dialog dialog = dialogBuilderFunc(false, false);
+                    dialog.show();
+
+                    myRef.child(activityName).setValue(points);
+                    myRefPoints.setValue(teamPoints + points);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+    }
+
+    public Dialog dialogBuilderFunc(boolean exists, boolean isMore){
+        AlertDialog dialog;
+        if (!exists) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(ExtraPointsActivity.this);
+            builder.setMessage("Well done, doing extra work!")
+                    .setTitle(R.string.dialog_climbed_title);
+            builder.setNeutralButton(R.string.dialog_climbed_neutral, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    dialog.dismiss();
+                }
+            });
+            dialog = builder.create();
+        }
+        else {
+            if (isMore){
+                AlertDialog.Builder builder = new AlertDialog.Builder(ExtraPointsActivity.this);
+                builder.setMessage("Wow, even extra above the extra! More points earned!")
+                        .setTitle(R.string.dialog_climbed_title);
+                builder.setNeutralButton(R.string.dialog_climbed_neutral, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.dismiss();
+                    }
+                });
+                dialog = builder.create();
+            }
+            else {
+                AlertDialog.Builder builder = new AlertDialog.Builder(ExtraPointsActivity.this);
+                builder.setMessage("It was fun, wasn't it? But team had already more points for this.")
+                        .setTitle(R.string.dialog_climbed_title);
+                builder.setNeutralButton(R.string.dialog_climbed_neutral, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.dismiss();
+                    }
+                });
+                dialog = builder.create();
+            }
+        }
+        return dialog;
     }
 
     @Override
