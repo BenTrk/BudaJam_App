@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="10dp"
+    android:background="@drawable/route_spinner_background">
+
+    <RelativeLayout
+        android:id="@+id/routeDropDownRelativeLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="5dp"
+        android:paddingTop="5dp">
+
+        <ImageView
+            android:id="@+id/routeDiffImageView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@mipmap/muscle"
+            android:paddingEnd="5dp"
+            android:layout_centerVertical="true"
+            tools:ignore="RtlSymmetry" />
+
+        <LinearLayout
+            android:id="@+id/textContainerLinearLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toEndOf="@+id/routeDiffImageView"
+            android:orientation="vertical"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp">
+
+            <TextView
+                android:id="@+id/routeNameTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:theme="@style/routeNameStyle"
+                android:text="Test"/>
+        </LinearLayout>
+        <ImageButton
+            android:id="@+id/activityDropDownButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignTop="@+id/routeDiffImageView"
+            android:layout_alignBottom="@+id/routeDiffImageView"
+            style="@style/menu_button"
+            android:src="@drawable/avd_anim_arrow_blue_back" />
+
+    </RelativeLayout>
+    <RelativeLayout
+        android:id="@+id/routeWhoActivityRelativeLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:layout_below="@+id/routeDropDownRelativeLayout">
+
+        <RadioGroup
+            android:id="@+id/climberNameRadioGroup"
+            android:layout_centerInParent="true"
+            android:layout_alignParentTop="true"
+            android:checkedButton="@id/climberNameOne"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/route_switch_background_border"
+            android:orientation="horizontal"
+            android:elevation="25dp"
+            android:layout_marginBottom="5dp"
+            >
+
+            <RadioButton
+                android:id="@+id/climberNameOne"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginTop="3dp"
+                android:layout_marginBottom="3dp"
+                android:layout_marginStart="3dp"
+                android:background="@drawable/route_switch_background_selector"
+                android:button="@null"
+                android:gravity="center"
+                android:textStyle="bold"
+                android:textColor="@drawable/route_switch_color_selector">
+            </RadioButton>
+
+            <RadioButton
+                android:id="@+id/climberNameTwo"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginTop="3dp"
+                android:layout_marginBottom="3dp"
+                android:layout_marginStart="3dp"
+                android:background="@drawable/route_switch_background_selector"
+                android:button="@null"
+                android:gravity="center"
+                android:textStyle="bold"
+                android:textColor="@drawable/route_switch_color_selector">
+            </RadioButton>
+
+        </RadioGroup>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:id="@+id/linearForSelector"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:layout_below="@+id/climberNameRadioGroup">
+
+        <Spinner
+            android:id="@+id/category"
+            android:layout_width="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:gravity="center"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:backgroundTint="@color/white"/>
+
+        <Button
+            android:id="@+id/climbed_it_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/accent"
+            android:backgroundTint="@color/icons"
+            android:text="Did that!" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/activities"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/linearForSelector"
+            android:layout_centerHorizontal="true"
+            android:visibility="gone">
+
+            <ImageButton
+                android:id="@+id/removeButtonImageButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/buttonselectorremove"
+                android:contentDescription="@string/contentDescRemoveButton"
+                android:src="@mipmap/trash" />
+
+            <TextView
+                android:id="@+id/mostPointsTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:gravity="center_vertical"
+                android:textColor="@color/white"
+                android:textSize="15sp" />
+
+        </LinearLayout>
+
+    </RelativeLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height= "10dp"
+        android:layout_below="@+id/routeWhoActivityRelativeLayout"
+        android:background="@android:color/white" />
+
+</RelativeLayout>
