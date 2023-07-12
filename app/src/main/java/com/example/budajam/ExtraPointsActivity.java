@@ -159,14 +159,23 @@ public class ExtraPointsActivity extends AppCompatActivity {
             RadioButton climberNameTwo = customRoutesView.findViewById(R.id.climberNameTwo);
             Button climbedItButton = customRoutesView.findViewById(R.id.climbed_it_button);
             RelativeLayout routeWhoClimbed = customRoutesView.findViewById(R.id.routeWhoActivityRelativeLayout);
+            TextView activityText = customRoutesView.findViewById(R.id.mostPointsTextView);
 
             //teams - climbers
             for (HashMap<String, Pair<String, Integer>> map : qualityMap.get(activityName)){
                 if (map.containsKey("teams")) {
-                    climberNameRadioGroup.setVisibility(GONE);
+                    climberNameRadioGroup.clearCheck();
+                    for (View v : climberNameRadioGroup.getTouchables()){
+                        v.setEnabled(false);
+                    }
                     break;
-                } else climberNameRadioGroup.setVisibility(View.VISIBLE);
-            }
+                } else {
+                    climberNameRadioGroup.clearCheck();
+                    for (View v : climberNameRadioGroup.getTouchables()){
+                            v.setEnabled(true);
+                    }
+                }
+            };
 
             View.OnClickListener radioButtonClickListener = new View.OnClickListener() {
                 @Override
@@ -176,7 +185,6 @@ public class ExtraPointsActivity extends AppCompatActivity {
                     String checkedName = (String) checkedNameRadioButton.getText();
                     ImageButton removeButton = customRoutesView.findViewById(R.id.removeButtonImageButton);
                     //Do smthng
-                    TextView activityText = customRoutesView.findViewById(R.id.mostPointsTextView);
                     //int points = getClimberPointsActivity(activityName, checkedName, activityText);
 
                     database = FirebaseDatabase.getInstance("https://budajam-ea659-default-rtdb.firebaseio.com/");
@@ -284,8 +292,8 @@ public class ExtraPointsActivity extends AppCompatActivity {
                             int checkedNameButton = climberNameRadioGroup.getCheckedRadioButtonId();
                             RadioButton checkedNameRadioButton = (RadioButton) findViewById(checkedNameButton);
                             String checkedName = (String) checkedNameRadioButton.getText();
-                            addPointsToDatabaseClimbers(points, activityName, checkedName);
-                        } else addPointsToDatabase(points, activityName);
+                            addPointsToDatabaseClimbers(points, activityName, checkedName, activityText);
+                        } else addPointsToDatabase(points, activityName, activityText);
                     }
                 }
             });
@@ -293,7 +301,7 @@ public class ExtraPointsActivity extends AppCompatActivity {
         }
     }
 
-    private void addPointsToDatabaseClimbers(int points, String activityName, String checkedName) {
+    private void addPointsToDatabaseClimbers(int points, String activityName, String checkedName, TextView textView) {
         database = FirebaseDatabase.getInstance("https://budajam-ea659-default-rtdb.firebaseio.com/");
         DatabaseReference myRefPoints = database.getReference(user.getUid() +"/teamPoints");
         DatabaseReference myRef = database.getReference(user.getUid() + "/Activities/" + activityName);
@@ -315,6 +323,7 @@ public class ExtraPointsActivity extends AppCompatActivity {
                                 dialog.show();
                                 myRef.child(checkedName).setValue(points);
                                 myRefPoints.setValue((teamPoints - pointsInDB) + points);
+                                textView.setText("Currently, " + checkedName + " earned: " + points + " points.");
                             } else {
                                 Dialog dialog = dialogBuilderFunc(true, false);
                                 dialog.show();
@@ -332,6 +341,7 @@ public class ExtraPointsActivity extends AppCompatActivity {
 
                     myRef.child(checkedName).setValue(points);
                     myRefPoints.setValue(teamPoints + points);
+                    textView.setText("Currently, " + checkedName + " earned: " + points + " points.");
                 }
             }
 
@@ -421,13 +431,20 @@ public class ExtraPointsActivity extends AppCompatActivity {
                     if (group.equals("climbers")) {
                         RadioGroup climberNameRadioGroup = customRoutesView.findViewById(R.id.climberNameRadioGroup);
                         climberNameRadioGroup.clearCheck();
-                        climberNameRadioGroup.setVisibility(View.VISIBLE);
+                        climberNameRadioGroup.clearCheck();
+                        for (View v : climberNameRadioGroup.getTouchables()){
+                            v.setEnabled(true);
+                        }
                         TextView activityText = customRoutesView.findViewById(R.id.mostPointsTextView);
                         activityText.setText("Select a climber!");
                         removeButton.setVisibility(GONE);
                     } else {
                         RadioGroup climberNameRadioGroup = customRoutesView.findViewById(R.id.climberNameRadioGroup);
-                        climberNameRadioGroup.setVisibility(GONE);
+                        //climberNameRadioGroup.setVisibility(GONE);
+                        climberNameRadioGroup.clearCheck();
+                        for (View v : climberNameRadioGroup.getTouchables()){
+                            v.setEnabled(false);
+                        }
                         TextView activityText = customRoutesView.findViewById(R.id.mostPointsTextView);
                         //ToDo: Somethings wrong with the trashcan imagebutton.
                         activityText.setText("Team did not do this activity yet!");
@@ -443,7 +460,7 @@ public class ExtraPointsActivity extends AppCompatActivity {
         });
     }
 
-    private void addPointsToDatabase(int points, String activityName) {
+    private void addPointsToDatabase(int points, String activityName, TextView textView) {
         database = FirebaseDatabase.getInstance("https://budajam-ea659-default-rtdb.firebaseio.com/");
         DatabaseReference myRefPoints = database.getReference(user.getUid() +"/teamPoints");
         DatabaseReference myRef = database.getReference(user.getUid() + "/Activities/");
@@ -465,6 +482,7 @@ public class ExtraPointsActivity extends AppCompatActivity {
                                 dialog.show();
                                 myRef.child(activityName).setValue(points);
                                 myRefPoints.setValue((teamPoints - pointsInDB) + points);
+                                textView.setText("Currently, your team earned: " + points + " points.");
                             } else {
                                 Dialog dialog = dialogBuilderFunc(true, false);
                                 dialog.show();
@@ -482,6 +500,7 @@ public class ExtraPointsActivity extends AppCompatActivity {
 
                     myRef.child(activityName).setValue(points);
                     myRefPoints.setValue(teamPoints + points);
+                    textView.setText("Currently, your team earned: " + points + " points.");
                 }
             }
 
