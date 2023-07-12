@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
@@ -160,16 +161,20 @@ public class ExtraPointsActivity extends AppCompatActivity {
             Button climbedItButton = customRoutesView.findViewById(R.id.climbed_it_button);
             RelativeLayout routeWhoClimbed = customRoutesView.findViewById(R.id.routeWhoActivityRelativeLayout);
             TextView activityText = customRoutesView.findViewById(R.id.mostPointsTextView);
+            EditText editText = customRoutesView.findViewById(R.id.pointsEarned);
 
             //teams - climbers
             for (HashMap<String, Pair<String, Integer>> map : qualityMap.get(activityName)){
                 if (map.containsKey("teams")) {
+                    editText.setVisibility(View.VISIBLE);
+                    qualitySpinner.setVisibility(GONE);
                     climberNameRadioGroup.clearCheck();
                     for (View v : climberNameRadioGroup.getTouchables()){
                         v.setEnabled(false);
                     }
                     break;
                 } else {
+                    editText.setVisibility(View.GONE);
                     climberNameRadioGroup.clearCheck();
                     for (View v : climberNameRadioGroup.getTouchables()){
                             v.setEnabled(true);
@@ -280,20 +285,30 @@ public class ExtraPointsActivity extends AppCompatActivity {
                     String selected = (String) qualitySpinner.getSelectedItem();
                     int points = 0;
                     for (HashMap<String, Pair<String, Integer>> map : qualityMap.get(activityName)) {
-                        for (Pair<String, Integer> pair : map.values()) {
-                            String first = (String) pair.first;
-                            if (first.equals(selected)) {
-                                points = (int) pair.second;
-                            }
-                        }
-                    }
-                    for (HashMap<String, Pair<String, Integer>> map : qualityMap.get(activityName)) {
                         if (map.containsKey("climbers")) {
+                            for (Pair<String, Integer> pair : map.values()) {
+                                String first = (String) pair.first;
+                                if (first.equals(selected)) {
+                                    points = (int) pair.second;
+                                }
+                            }
+
                             int checkedNameButton = climberNameRadioGroup.getCheckedRadioButtonId();
-                            RadioButton checkedNameRadioButton = (RadioButton) findViewById(checkedNameButton);
-                            String checkedName = (String) checkedNameRadioButton.getText();
-                            addPointsToDatabaseClimbers(points, activityName, checkedName, activityText);
-                        } else addPointsToDatabase(points, activityName, activityText);
+                            if (checkedNameButton != -1) {
+                                RadioButton checkedNameRadioButton = (RadioButton) findViewById(checkedNameButton);
+                                String checkedName = (String) checkedNameRadioButton.getText();
+                                addPointsToDatabaseClimbers(points, activityName, checkedName, activityText);
+                            }
+                            else Toast.makeText(ExtraPointsActivity.this, "Select a climber!", Toast.LENGTH_LONG).show();
+                        } else {
+                            String pointsText = editText.getText().toString();
+                            if (pointsText.matches("\\d+")) {
+                                points = Integer.parseInt(pointsText);
+                                addPointsToDatabase(points, activityName, activityText);
+                                editText.setEnabled(false);
+                                climbedItButton.setEnabled(false);
+                            } else Toast.makeText(ExtraPointsActivity.this, "This is not a number, Bro!", Toast.LENGTH_LONG).show();
+                        }
                     }
                 }
             });
@@ -386,6 +401,8 @@ public class ExtraPointsActivity extends AppCompatActivity {
                     LinearLayout activities = customRoutesView.findViewById(R.id.activities);
                     activities.setVisibility(View.VISIBLE);
                     ImageButton removeButton = customRoutesView.findViewById(R.id.removeButtonImageButton);
+                    TextView editText = customRoutesView.findViewById(R.id.pointsEarned);
+                    Button climbedItButton = customRoutesView.findViewById(R.id.climbed_it_button);
 
                     Query activityQuery = myRef.child(activityName);
                     if (group.equals("climbers")) {
@@ -403,6 +420,8 @@ public class ExtraPointsActivity extends AppCompatActivity {
                                 pointsInDB = dataSnapshot.getValue(Integer.class);
                                 TextView activityText = customRoutesView.findViewById(R.id.mostPointsTextView);
                                 activityText.setText("Currently, your team earned: " + pointsInDB + " points.");
+                                editText.setEnabled(false);
+                                climbedItButton.setEnabled(false);
                                 removeButton.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View view) {
@@ -411,6 +430,9 @@ public class ExtraPointsActivity extends AppCompatActivity {
                                         myRefPoints.child("teamPoints").setValue(teamPoints - pointsInDB);
                                         activityText.setText("Team did not do this activity yet!");
                                         removeButton.setVisibility(GONE);
+                                        editText.setEnabled(true);
+                                        climbedItButton.setEnabled(true);
+                                        Toast.makeText(ExtraPointsActivity.this, "Points removed!", Toast.LENGTH_LONG).show();
                                     }
                                 });
                             }
@@ -428,10 +450,12 @@ public class ExtraPointsActivity extends AppCompatActivity {
                     LinearLayout activities = customRoutesView.findViewById(R.id.activities);
                     activities.setVisibility(View.VISIBLE);
                     ImageButton removeButton = customRoutesView.findViewById(R.id.removeButtonImageButton);
+                    TextView editText = customRoutesView.findViewById(R.id.pointsEarned);
+                    Spinner qualitySpinner = customRoutesView.findViewById(R.id.category);
                     if (group.equals("climbers")) {
                         RadioGroup climberNameRadioGroup = customRoutesView.findViewById(R.id.climberNameRadioGroup);
                         climberNameRadioGroup.clearCheck();
-                        climberNameRadioGroup.clearCheck();
+                        editText.setVisibility(View.GONE);
                         for (View v : climberNameRadioGroup.getTouchables()){
                             v.setEnabled(true);
                         }
@@ -440,8 +464,9 @@ public class ExtraPointsActivity extends AppCompatActivity {
                         removeButton.setVisibility(GONE);
                     } else {
                         RadioGroup climberNameRadioGroup = customRoutesView.findViewById(R.id.climberNameRadioGroup);
-                        //climberNameRadioGroup.setVisibility(GONE);
                         climberNameRadioGroup.clearCheck();
+                        editText.setVisibility(View.VISIBLE);
+                        qualitySpinner.setVisibility(GONE);
                         for (View v : climberNameRadioGroup.getTouchables()){
                             v.setEnabled(false);
                         }
@@ -539,7 +564,7 @@ public class ExtraPointsActivity extends AppCompatActivity {
             }
             else {
                 AlertDialog.Builder builder = new AlertDialog.Builder(ExtraPointsActivity.this);
-                builder.setMessage("It was fun, wasn't it? But team had already more points for this.")
+                builder.setMessage("It was fun, wasn't it? But you had already more points for this.")
                         .setTitle(R.string.dialog_climbed_title);
                 builder.setNeutralButton(R.string.dialog_climbed_neutral, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
