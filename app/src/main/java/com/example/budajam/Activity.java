@@ -8,7 +8,7 @@ import java.util.List;
 
 public class Activity {
     String qualities;
-    HashMap<String, Pair<String, Integer>> qualityPairs = new HashMap<>();
+    List<HashMap<String, Pair<String, Integer>>> qualityPairs = new ArrayList<>();
 
     public Activity(String qualities) {
         this.qualities = qualities;
@@ -23,7 +23,9 @@ public class Activity {
             }
             String[] separatedArray = string.split(":");
             Pair<String, Integer> qualitypair = new Pair<>(separatedArray[0], Integer.valueOf(separatedArray[1]));
-            qualityPairs.put(group, qualitypair);
+            HashMap<String, Pair<String, Integer>> qualityMap = new HashMap<>();
+            qualityMap.put(group, qualitypair);
+            qualityPairs.add(qualityMap);
         }
     }
 
@@ -35,11 +37,11 @@ public class Activity {
         this.qualities = qualities;
     }
 
-    public HashMap<String, Pair<String, Integer>> getQualityPairs() {
+    public List<HashMap<String, Pair<String, Integer>>> getQualityPairs() {
         return qualityPairs;
     }
 
-    public void setQualityPairs(HashMap<String, Pair<String, Integer>> qualityPairs) {
+    public void setQualityPairs(List<HashMap<String, Pair<String, Integer>>> qualityPairs) {
         this.qualityPairs = qualityPairs;
     }
 }
