@@ -39,10 +39,10 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        //Get Firebase auth instance
+        //Authenticate if already signed in
         auth = loginController.authenticate(LoginActivity.this);
 
-        // set the view now
+        //Set the view now
         setContentView(R.layout.activity_login);
 
         inputEmail = findViewById(R.id.email);
@@ -60,10 +60,7 @@ public class LoginActivity extends AppCompatActivity {
         //  Start login process when login is selected -> authenticate, check if entry fee was paid, login, start mainactivity
         btnLogin.setOnClickListener(v -> {
             //Check if email and password fields are empty
-            //ToDo: Create functionality to handle not correct email address
-            if (!loginController.checkFields(LoginActivity.this, inputEmail, inputPassword)) {
-                return;
-            } else {
+            if (loginController.checkFields(LoginActivity.this, inputEmail, inputPassword)) {
                 progressBar.setVisibility(View.VISIBLE);
                 //authenticate user
                 auth.signInWithEmailAndPassword(inputEmail.getText().toString(), inputPassword.getText().toString())
