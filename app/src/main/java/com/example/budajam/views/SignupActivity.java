@@ -1,4 +1,4 @@
-package com.example.budajam;
+package com.example.budajam.views;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,6 +11,9 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.budajam.MainActivity;
+import com.example.budajam.R;
+import com.example.budajam.ResetPasswordActivity;
 import com.example.budajam.controllers.SignupController;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.firebase.auth.FirebaseAuth;
