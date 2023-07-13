@@ -11,7 +11,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.budajam.MainActivity;
 import com.example.budajam.R;
 import com.example.budajam.controllers.LoginController;
 import com.google.firebase.auth.FirebaseAuth;

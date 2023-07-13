@@ -1,12 +1,9 @@
 package com.example.budajam.controllers;
 
 import android.content.Context;
-import android.widget.Button;
-import android.widget.LinearLayout;
 
 import com.example.budajam.classes.Routes;
 import com.example.budajam.models.MainModel;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import java.util.List;
@@ -16,16 +13,16 @@ public class MainController {
     public static void init(){
         MainModel.init();
     }
-    public static boolean setUserAndRouteSynced(FirebaseAuth auth, FirebaseUser user) {
-        return MainModel.setUserAndRouteSynced(auth, user);
+    public static boolean setUserAndRouteSynced(FirebaseUser user) {
+        return MainModel.setUserAndRouteSynced(user);
     }
 
     public static void getNamesFromDatabase(String uid) {
         MainModel.getNamesFromDatabase(uid);
     }
 
-    public static Set<String> getPlacesFromDatabase(Context context, LinearLayout routeLayout, Button buttonShowDropDown){
-        return MainModel.getPlacesFromDatabase(context, routeLayout, buttonShowDropDown);
+    public static Set<String> getPlacesFromDatabase(){
+        return MainModel.getPlacesFromDatabase();
     }
 
     public static List<Routes> getRoutes(String name) {
@@ -33,5 +30,10 @@ public class MainController {
     }
     public static String[] getNames() {
         return MainModel.getNames();
+    }
+
+    public static void addClimbToDatabase(String uid, String checkedName, String checkedStyle,
+                                          String placeName, Routes mRouteItemToAdd, Context context) {
+        MainModel.addClimbToTheDatabase(uid, checkedName, checkedStyle, placeName, mRouteItemToAdd, context);
     }
 }
