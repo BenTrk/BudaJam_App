@@ -35,6 +35,7 @@ import androidx.appcompat.widget.PopupMenu;
 import com.example.budajam.classes.ClimberNames;
 import com.example.budajam.classes.DataStorage;
 import com.example.budajam.classes.Routes;
+import com.example.budajam.controllers.MainController;
 import com.example.budajam.sqlhelper.RoutesSQLiteDBHelper;
 import com.example.budajam.views.LoginActivity;
 import com.google.firebase.auth.FirebaseAuth;
@@ -69,14 +70,11 @@ public class MainActivity extends AppCompatActivity {
     public static String climberName2;
     public static double teamPoints;
     public DataStorage routes = new DataStorage();
-    public List<String> places = new ArrayList<>();
 
     private FirebaseAuth.AuthStateListener authListener;
     private FirebaseAuth auth;
     private FirebaseDatabase database;
     private FirebaseUser user;
-
-    boolean exist;
     String[] popUpContents;
     Button buttonShowDropDown;
 
@@ -84,13 +82,16 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //Set the view
         setContentView(R.layout.activity_main);
 
-        exist = false;
+        //Initialize routes in MainModel. WARNING: timeing issue, if it takes longer to grab the data,
+        // it could happen that the screen shows empty.
+        MainController.init();
+
+        //Get the user.
         auth = FirebaseAuth.getInstance();
-
-        emptyScreenLinear = (LinearLayout) findViewById(R.id.emptyScreenLinear);
-
+        //Check authentication, if none -> LoginActivity
         authListener = firebaseAuth -> {
             user = firebaseAuth.getCurrentUser();
             if (user == null) {
@@ -99,17 +100,23 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
-        if (user != null) {
-            DatabaseReference myKeepSync = FirebaseDatabase.getInstance().getReference(user.getUid() + "/");
-            myKeepSync.keepSynced(true);
-
-            DatabaseReference myKeepSyncRoutes = FirebaseDatabase.getInstance().getReference("Routes/");
-            myKeepSyncRoutes.keepSynced(true);
+        //Set User details and Route details synced.
+        FirebaseUser user = auth.getCurrentUser();
+        if (MainController.setUserAndRouteSynced(auth, user)) {
+            MainController.getNamesFromDatabase(user.getUid());
+        } else {
+            startActivity(new Intent(MainActivity.this, LoginActivity.class));
+            finish();
         }
 
+        //Setting up the view items
+        emptyScreenLinear = (LinearLayout) findViewById(R.id.emptyScreenLinear);
         routeLayout = (LinearLayout) findViewById(R.id.routeLayout);
-        //Refreshing screen to default when clicked outside of routeLayout
         LinearLayout linearLayout = findViewById(R.id.linearLayout);
+        menuButton = (ImageView) findViewById(R.id.menuButton);
+        buttonShowDropDown = (Button) findViewById(R.id.buttonShowDropDown);
+
+        //Refreshing screen to default when clicked outside of routeLayout
         linearLayout.setOnTouchListener((v, event) -> {
             switch (event.getAction()) {
                 case MotionEvent.ACTION_DOWN:
@@ -127,8 +134,6 @@ public class MainActivity extends AppCompatActivity {
             return true;
         });
 
-        menuButton = (ImageView) findViewById(R.id.menuButton);
-
         //Show the menu, upper left corner
         menuButton.setOnClickListener(v -> {
             Drawable d = menuButton.getDrawable();
@@ -137,12 +142,12 @@ public class MainActivity extends AppCompatActivity {
                 animMenu.start();
             }
 
+            //Create the dropdown
             Context wrapper = new ContextThemeWrapper(MainActivity.this, R.style.MyMenu);
             PopupMenu popup = new PopupMenu(wrapper, menuButton);
+            popup.getMenuInflater().inflate(R.menu.popup_menu, popup.getMenu());
 
-            popup.getMenuInflater()
-                    .inflate(R.menu.popup_menu, popup.getMenu());
-
+            //Set what happens when items are selected in menu
             popup.setOnMenuItemClickListener(item -> {
                 if (R.id.one == item.getItemId()) {
                     startActivity(new Intent(MainActivity.this, CheckOutActivity.class));
@@ -163,32 +168,51 @@ public class MainActivity extends AppCompatActivity {
                 }
                 return true;
             });
-
             popup.show();
         });
 
-        //Just leave spinner, it sucks ass. Create your own with ListView -> which is this
-        //But why not the same as the list of routes? That would be more user friendly.
-        getPlacesFromDB(places);
+        //Set the onclicklistener on dropdown button to
+        // show the list of places when the dropdown button is selected.
+        buttonShowDropDown.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                routeLayout.removeAllViews();
+                if (MainController.getPlacesFromDatabase(MainActivity.this, routeLayout, buttonShowDropDown).isEmpty()){
+                    Toast.makeText(MainActivity.this, "Could not grab the routes yet. Try again the button in 5 seconds!", Toast.LENGTH_SHORT).show();
+                }
+                for (String place : MainController.getPlacesFromDatabase(MainActivity.this, routeLayout, buttonShowDropDown)) {
+                    //For every place create the custom dropdown
+                    final View customRoutesView = LayoutInflater.from(MainActivity.this).inflate(
+                            R.layout.custom_dropdown_layout, routeLayout, false
+                    );
+                    LinearLayout.LayoutParams customViewParams = new LinearLayout.LayoutParams(
+                            ViewGroup.LayoutParams.WRAP_CONTENT,
+                            ViewGroup.LayoutParams.WRAP_CONTENT
+                    );
+                    customRoutesView.setLayoutParams(customViewParams);
 
-        //Why is this duplicated?
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user != null) {
-            getNamesFromDatabase(user.getUid());
-        } else {
-            startActivity(new Intent(MainActivity.this, LoginActivity.class));
-            finish();
-        }
+                    RelativeLayout relContainer = customRoutesView.findViewById(R.id.routeDropDownRelativeLayout);
+                    TextView placeNameView = customRoutesView.findViewById(R.id.routeNameTextView);
+                    placeNameView.setText(place);
 
+                    relContainer.setOnClickListener(v -> {
+                        routeLayout.removeAllViews();
+                        //On click, populate the route list - create custom view for them and set the behavior
+                        populateRouteList(place);
+                    });
+                    routeLayout.addView(customRoutesView);
+                }
+            }
+        });
         //dateChecker(roka, kecske, francia, svab); - if necessary
     }
     private void setCustomSpinner(){
-        popUpContents = new String[places.size()];
-        places.toArray(popUpContents);
+        //popUpContents = new String[places.size()];
+        //places.toArray(popUpContents);
         buttonShowDropDown = (Button) findViewById(R.id.buttonShowDropDown);
         View.OnClickListener handler = v -> {
             if (v.getId() == R.id.buttonShowDropDown) {
-                addCustomDropDown(popUpContents);
+                //addCustomDropDown(popUpContents);
             }
         };
         buttonShowDropDown.setOnClickListener(handler);
@@ -204,7 +228,7 @@ public class MainActivity extends AppCompatActivity {
                     String routeName = postSnapshot.getKey();
                     places.add(routeName);
                 }
-                setCustomSpinner();
+                //setCustomSpinner();
             }
 
             @Override
@@ -363,54 +387,26 @@ public class MainActivity extends AppCompatActivity {
         return points;
     }
 
-    private void populateRoutesListAtStart(String name, DataStorage routes) {
-        database = FirebaseDatabase.getInstance("https://budajam-ea659-default-rtdb.firebaseio.com/");
-        DatabaseReference myRef = database.getReference("Routes/" + name);
-
-        ProgressBar progressBar;
-        progressBar = findViewById(R.id.progressBarPlaces);
+    private void populateRouteList(String name) {
+        //Set the visuals
+        ProgressBar progressBar = findViewById(R.id.progressBarPlaces);
         LinearLayout progressLayout = findViewById(R.id.progressLinear);
         progressLayout.setVisibility(View.VISIBLE);
         progressBar.setVisibility(View.VISIBLE);
+        emptyScreenLinear.setVisibility(GONE);
 
-        myRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-                    Routes routesDetails = postSnapshot.getValue(Routes.class);
-                    assert routes != null;
-                    routes.addItem(name, routesDetails);
-                }
-
-                //progressbar!
-                emptyScreenLinear.setVisibility(GONE);
-                int totalViews = routes.size(); // Set the total number of views to create
-                int createdViews = 0; // Counter for created view
-                progressBar.setMax(totalViews);
-                progressBar.setProgress(createdViews);
-
-                for (Routes routesIn : routes.getItems(name)) {
-                    createdViews++;
-                    progressBar.setProgress(createdViews);
-                    addCustomSpinner(routesIn, name);
-                    if (routes.size()-1 == createdViews){
-                        progressLayout.setVisibility(View.GONE);
-                        progressBar.setVisibility(View.GONE);
-                    }
-                }
-                progressBar.setVisibility(View.GONE);
-            }
-
-            @Override
-            public void onCancelled(DatabaseError error) {
-
-            }
-        });
+        //For each route, create a custom spinner
+        for (Routes routesIn : MainController.getRoutes(name)) {
+            addCustomSpinner(routesIn, name);
+        }
+        //When done, remove progressbar
+        progressBar.setVisibility(View.GONE);
     }
 
     @SuppressLint("SetTextI18n")
     private void addCustomSpinner(Routes mRouteItemToAdd, String placeName) {
 
+        //Inflate the custom routeview
         final View customRoutesView = LayoutInflater.from(this).inflate(
                 R.layout.custom_view_layout, routeLayout, false
         );
@@ -420,7 +416,7 @@ public class MainActivity extends AppCompatActivity {
         );
         customRoutesView.setLayoutParams(customViewParams);
 
-        ImageView imageViewDiffImage = customRoutesView.findViewById(R.id.routeDiffImageView);
+        //Set up the views
         TextView textViewRouteName = customRoutesView.findViewById(R.id.routeNameTextView);
         TextView textViewRouteDiff = customRoutesView.findViewById(R.id.routeDiffTextView);
         ImageButton customButton = customRoutesView.findViewById(R.id.customButton);
@@ -431,39 +427,36 @@ public class MainActivity extends AppCompatActivity {
         RadioGroup climbingStyleRadioGroup = customRoutesView.findViewById(R.id.styleNameRadioGroup);
         RelativeLayout routeWhoClimbed = customRoutesView.findViewById(R.id.routeWhoClimbedRelativeLayout);
 
-        imageViewDiffImage.setImageResource(R.mipmap.muscle);
+        //Set up route details
         textViewRouteName.setText(mRouteItemToAdd.name);
         textViewRouteDiff.setText("Difficulty: " + (int) mRouteItemToAdd.difficulty);
+        //Set up climber names in radiogroup
+        climberNameOne.setText(MainController.getNames()[0]);
+        climberNameTwo.setText(MainController.getNames()[1]);
 
-        climberNameOne.setText(climberName1);
-        climberNameTwo.setText(climberName2);
-
+        //At first, don't show the part where you can select who climbed
         routeWhoClimbed.setVisibility(GONE);
 
+        //Set onclicklistener to show the part where you can select who climbed.
         customButton.setImageResource(R.drawable.arrow_anim_start);
         customButton.setOnClickListener(new View.OnClickListener() {
-            boolean isCustomButtonClicked = true;
 
             @Override
             public void onClick(View v) {
-                if (isCustomButtonClicked) {
+                if (routeWhoClimbed.getVisibility() == GONE) {
                     customButton.setImageResource(R.drawable.avd_anim_arrow_blue_back);
-                    Drawable d = customButton.getDrawable();
-                    if (d instanceof AnimatedVectorDrawable) {
-                        animArrowAnim = (AnimatedVectorDrawable) d;
+                    if (customButton.getDrawable() instanceof AnimatedVectorDrawable) {
+                        animArrowAnim = (AnimatedVectorDrawable) customButton.getDrawable();
                         animArrowAnim.start();
                     }
                     routeWhoClimbed.setVisibility(View.VISIBLE);
-                    isCustomButtonClicked = false;
                 } else {
                     customButton.setImageResource(R.drawable.avd_anim_arrow_blue);
-                    Drawable d = customButton.getDrawable();
-                    if (d instanceof AnimatedVectorDrawable) {
-                        animArrowAnim = (AnimatedVectorDrawable) d;
+                    if (customButton.getDrawable() instanceof AnimatedVectorDrawable) {
+                        animArrowAnim = (AnimatedVectorDrawable) customButton.getDrawable();
                         animArrowAnim.start();
                     }
                     routeWhoClimbed.setVisibility(GONE);
-                    isCustomButtonClicked = true;
                 }
             }
         });
@@ -472,14 +465,14 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                int checkedNameButton = climberNameRadioGroup.getCheckedRadioButtonId();
-                int checkedStyleButton = climbingStyleRadioGroup.getCheckedRadioButtonId();
-                RadioButton checkedNameRadioButton = (RadioButton) findViewById(checkedNameButton);
-                RadioButton checkedStyleRadioButton = (RadioButton) findViewById(checkedStyleButton);
+                RadioButton checkedNameRadioButton = (RadioButton) findViewById(climberNameRadioGroup.getCheckedRadioButtonId());
+                RadioButton checkedStyleRadioButton = (RadioButton) findViewById(climbingStyleRadioGroup.getCheckedRadioButtonId());
+
+                //ToDo: Continue from here
                 String checkedName = (String) checkedNameRadioButton.getText();
                 String checkedStyle = (String) checkedStyleRadioButton.getText();
-
                 addClimbToDatabase(user.getUid(), checkedName, mRouteItemToAdd, placeName, checkedStyle);
+
                 routeLayout.removeAllViews();
                 emptyScreenLinear.setVisibility(View.VISIBLE);
                 routeLayout.addView(emptyScreenLinear);
@@ -510,7 +503,7 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View v) {
                     routeLayout.removeAllViews();
-                    populateRoutesListAtStart(place, routes);
+                    populateRouteList(place);
                 }
             });
             routeLayout.addView(customRoutesView);

@@ -1,33 +1,19 @@
 package com.example.budajam.models;
 
 import android.content.Context;
-import android.content.Intent;
 import android.text.TextUtils;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.budajam.MainActivity;
 import com.example.budajam.R;
 import com.example.budajam.classes.ClimberNames;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 
 public class LoginModel extends AppCompatActivity {
     //ToDo: get the strings out of here. :)
-
-    //Authenticate the user
-    public FirebaseAuth authenticator(Context context){
-        FirebaseAuth auth = FirebaseAuth.getInstance();
-
-        if (auth.getCurrentUser() != null) {
-            startActivity(new Intent(context, MainActivity.class));
-            finish();
-        }
-        return auth;
-    }
 
     //Check if there's something in the fields
     public boolean checkFieldsEditText(Context context, EditText inputEmail, EditText inputPassword) {

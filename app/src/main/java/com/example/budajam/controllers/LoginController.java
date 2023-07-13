@@ -11,11 +11,6 @@ import com.google.firebase.database.DataSnapshot;
 public class LoginController {
     LoginModel loginModel = new LoginModel();
 
-    //Get the authentication data
-    public FirebaseAuth authenticate(Context context) {
-        return loginModel.authenticator(context);
-    }
-
     public boolean checkFields(Context context, EditText inputEmail, EditText inputPassword) {
         return loginModel.checkFieldsEditText(context, inputEmail, inputPassword);
     }

@@ -56,7 +56,7 @@
             android:layout_alignTop="@+id/textContainerLinearLayout"
             android:layout_alignBottom="@+id/textContainerLinearLayout"
             style="@style/menu_button"
-            android:src="@drawable/avd_anim_arrow_blue_back" />
+            />
 
     </RelativeLayout>
 

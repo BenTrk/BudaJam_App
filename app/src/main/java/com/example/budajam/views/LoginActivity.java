@@ -38,7 +38,7 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         //Authenticate if already signed in
-        auth = loginController.authenticate(LoginActivity.this);
+        auth = FirebaseAuth.getInstance();
 
         //Set the view now
         setContentView(R.layout.activity_login);
