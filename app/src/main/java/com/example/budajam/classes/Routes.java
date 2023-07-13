@@ -1,4 +1,4 @@
-package com.example.budajam;
+package com.example.budajam.classes;
 
 public class Routes {
     public String name;

@@ -2,7 +2,6 @@ package com.example.budajam;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -12,6 +11,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.budajam.controllers.LoginController;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -20,24 +20,23 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.Objects;
+
 public class LoginActivity extends AppCompatActivity {
 
-    private EditText inputEmail, inputPassword;
+    public EditText inputEmail;
+    public EditText inputPassword;
     private FirebaseAuth auth;
     private ProgressBar progressBar;
-    boolean isPaid;
+
+    LoginController loginController = new LoginController();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         //Get Firebase auth instance
-        auth = FirebaseAuth.getInstance();
-
-        if (auth.getCurrentUser() != null) {
-            startActivity(new Intent(LoginActivity.this, MainActivity.class));
-            finish();
-        }
+        auth = loginController.authenticate(LoginActivity.this);
 
         // set the view now
         setContentView(R.layout.activity_login);
@@ -49,52 +48,34 @@ public class LoginActivity extends AppCompatActivity {
         Button btnLogin = findViewById(R.id.btn_login);
         Button btnReset = findViewById(R.id.btn_reset_password);
 
-        //Get Firebase auth instance
-        //It is a duplicate? Have to check.
-        auth = FirebaseAuth.getInstance();
-
         //Setting up Buttons with functions
-        btnSignup.setOnClickListener(v -> startActivity(new Intent(LoginActivity.this, SignupActivity.class)));
-
-        btnReset.setOnClickListener(v -> startActivity(new Intent(LoginActivity.this, ResetPasswordActivity.class)));
-
+        //  Start signupactivity when signup is selected
+        btnSignup.setOnClickListener(view -> startActivity(new Intent(LoginActivity.this, SignupActivity.class)));
+        //  Start resetactivity when reset is selected
+        btnReset.setOnClickListener(view -> startActivity(new Intent(LoginActivity.this, ResetPasswordActivity.class)));
+        //  Start login process when login is selected -> authenticate, check if entry fee was paid, login, start mainactivity
         btnLogin.setOnClickListener(v -> {
-            String email = inputEmail.getText().toString();
-            final String password = inputPassword.getText().toString();
-
-            if (TextUtils.isEmpty(email)) {
-                Toast.makeText(getApplicationContext(), "Enter email address!", Toast.LENGTH_SHORT).show();
+            //Check if email and password fields are empty
+            //ToDo: Create functionality to handle not correct email address
+            if (!loginController.checkFields(LoginActivity.this, inputEmail, inputPassword)) {
                 return;
-            }
-
-            if (TextUtils.isEmpty(password)) {
-                Toast.makeText(getApplicationContext(), "Enter password!", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            progressBar.setVisibility(View.VISIBLE);
-
-            //authenticate user
-            auth.signInWithEmailAndPassword(email, password)
-                    .addOnCompleteListener(LoginActivity.this, task -> {
-                        // If sign in fails, display a message to the user. If sign in succeeds
-                        // the auth state listener will be notified and logic to handle the
-                        // signed in user can be handled in the listener.
-                        progressBar.setVisibility(View.GONE);
-                        if (!task.isSuccessful()) {
-                            // there was an error
-                            if (password.length() < 6) {
-                                inputPassword.setError(getString(R.string.minimum_password));
+            } else {
+                progressBar.setVisibility(View.VISIBLE);
+                //authenticate user
+                auth.signInWithEmailAndPassword(inputEmail.getText().toString(), inputPassword.getText().toString())
+                        .addOnCompleteListener(LoginActivity.this, task -> {
+                            progressBar.setVisibility(View.GONE);
+                            if (!task.isSuccessful()) {
+                                //There was an error
+                                loginController.signInError(LoginActivity.this, inputPassword);
                             } else {
-                                Toast.makeText(LoginActivity.this, getString(R.string.auth_failed), Toast.LENGTH_LONG).show();
+                                //No error, signing in, if team paid the entry fee
+                                checkIfPaid(Objects.requireNonNull(auth.getCurrentUser()));
                             }
-                        } else {
-                            FirebaseUser user = auth.getCurrentUser();
-                            assert user != null;
-                            checkIfPaid(user);
-                        }
-                    });
-        });
+                        });
+                }
+            });
+
     }
     //Check if team paid the entry fee
     private void checkIfPaid(FirebaseUser user){
@@ -103,23 +84,13 @@ public class LoginActivity extends AppCompatActivity {
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                ClimberNames team = dataSnapshot.getValue(ClimberNames.class);
-                assert team != null;
-                isPaid = team.Paid;
-                if (user.isEmailVerified() && isPaid) {
-                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                    startActivity(intent);
+                if (loginController.checkIfPaid(dataSnapshot, user, LoginActivity.this)){
+                    startActivity(new Intent(LoginActivity.this, MainActivity.class));
                     finish();
-                } else if (!user.isEmailVerified()) {
-                    Toast.makeText(LoginActivity.this, "Please verify your email!", Toast.LENGTH_LONG).show();
-                } else if (!isPaid) {
-                    Toast.makeText(LoginActivity.this, "Looks like you did not pay the entry fee.", Toast.LENGTH_LONG).show();
                 }
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-                isPaid = false;
                 Toast.makeText(LoginActivity.this, "Something went wrong. Try again later!", Toast.LENGTH_LONG).show();
             }
         });
