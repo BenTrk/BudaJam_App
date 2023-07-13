@@ -11,9 +11,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.budajam.MainActivity;
 import com.example.budajam.R;
-import com.example.budajam.ResetPasswordActivity;
 import com.example.budajam.controllers.SignupController;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -80,7 +78,8 @@ public class SignupActivity extends AppCompatActivity {
                     //Set onclicklistener to verify_email_button
                     verify_email_button.setOnClickListener(v -> {
                         if (SignupController.checkIfEmailVerified(SignupActivity.this, auth)){
-                            startActivity(new Intent(SignupActivity.this, MainActivity.class));
+                            Toast.makeText(SignupActivity.this, "You are enrolled!", Toast.LENGTH_SHORT).show();
+                            startActivity(new Intent(SignupActivity.this, LoginActivity.class));
                             finish();
                         }
                     });

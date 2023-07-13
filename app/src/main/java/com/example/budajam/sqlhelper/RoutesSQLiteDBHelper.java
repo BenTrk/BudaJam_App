@@ -1,4 +1,4 @@
-package com.example.budajam;
+package com.example.budajam.sqlhelper;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
