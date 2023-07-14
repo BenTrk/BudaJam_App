@@ -29,11 +29,6 @@ public class CheckOutController {
     public static void removeClimb(Routes route, String climberName, String place){
         CheckOutModel.removeClimb(route, climberName, place);
     }
-
-    public static void climbedRoutesInit(OnGetClimbDataListener dataListener) {
-        CheckOutModel.climbedRoutesInit(dataListener);
-    }
-
     public static List<Routes> getClimbedRoutesPerClimber(String selectedName, String place){
         return CheckOutModel.getClimbedRoutesPerClimber(selectedName, place);
     }

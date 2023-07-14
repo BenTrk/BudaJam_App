@@ -59,7 +59,6 @@ public class CheckOutActivity extends AppCompatActivity {
 
         CheckOutController.init(dataListener);
         CheckOutController.getTeamPoints(pointsListener);
-        CheckOutController.climbedRoutesInit(dataListener);
 
         //Instantiate the items on the screen
         climber1OnSwitch = findViewById(R.id.climber1onswitch);

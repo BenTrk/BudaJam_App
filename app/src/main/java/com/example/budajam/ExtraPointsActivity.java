@@ -30,6 +30,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.budajam.classes.Activity;
 import com.example.budajam.classes.ClimberNames;
+import com.example.budajam.controllers.MainController;
+import com.example.budajam.views.CheckOutActivity;
 import com.example.budajam.views.LoginActivity;
 import com.example.budajam.views.MainActivity;
 import com.google.firebase.auth.FirebaseAuth;
@@ -62,6 +64,7 @@ public class ExtraPointsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //Set layout view
         setContentView(R.layout.activity_extrapoints);
 
         auth = FirebaseAuth.getInstance();
@@ -558,33 +561,44 @@ public class ExtraPointsActivity extends AppCompatActivity {
         }
         return dialog;
     }
+    private void authenticate(){
+        if (MainController.authentication() == null){
+            startActivity(new Intent(ExtraPointsActivity.this, LoginActivity.class));
+            finish();
+        }
+    }
 
     @Override
     public void onStart() {
         super.onStart();
-        auth.addAuthStateListener(authListener);
+        authenticate();
     }
 
     @Override
     public void onRestart() {
         super.onRestart();
+        authenticate();
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        if (authListener != null) {
-            auth.removeAuthStateListener(authListener);
+        if (MainController.authentication() != null) {
+            authenticate();
         }
     }
 
     @Override
     public void onResume() {
         super.onResume();
+        authenticate();
     }
 
     @Override
     public void onPause() {
         super.onPause();
+        if (MainController.authentication() != null) {
+            authenticate();
+        }
     }
 }

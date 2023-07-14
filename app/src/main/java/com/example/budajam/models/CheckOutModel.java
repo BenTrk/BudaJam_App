@@ -45,12 +45,20 @@ public class CheckOutModel {
                         Objects.requireNonNull(placesPerClimbers.get(dataSnapshot.getKey())).clear();
                     }
                     List<String> places = new ArrayList<>();
-                    for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-                        if (postSnapshot.hasChildren()) {
-                            places.add(postSnapshot.getKey());
-                            //It is not removed from the map
-                            placesPerClimbers.put(dataSnapshot.getKey(), places);
+                    if (dataSnapshot.hasChildren()){
+                        HashMap<String, List<Routes>> placesMap = new HashMap<>();
+                        for (DataSnapshot placeSnapshot : dataSnapshot.getChildren()){
+                            List<Routes> climberRoutes = new ArrayList<>();
+                            if (placeSnapshot.hasChildren()) {
+                                places.add(placeSnapshot.getKey());
+                                placesPerClimbers.put(dataSnapshot.getKey(), places);
+                            }
+                            for (DataSnapshot routeSnapshot : placeSnapshot.getChildren()){
+                                climberRoutes.add(routeSnapshot.getValue(Routes.class));
+                            }
+                            placesMap.put(placeSnapshot.getKey(), climberRoutes);
                         }
+                        climberNameClimbs.put(climber, placesMap);
                     }
                     listener.onSuccess();
                 }
@@ -98,34 +106,6 @@ public class CheckOutModel {
             //Since there is no climb on this name, it will be null!
             return placesPerClimber.toArray(new String[0]);
         } else return null;
-    }
-    public static void climbedRoutesInit(OnGetClimbDataListener listener){
-        String[] climberNamesArray = new String[]{climberName1,climberName2};
-        for (String climber : climberNamesArray) {
-            Query climberQuery = database.getReference(user.getUid() + "/" + climber + "/");
-            climberQuery.addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    if (snapshot.hasChildren()){
-                        HashMap<String, List<Routes>> placesMap = new HashMap<>();
-                        for (DataSnapshot placeSnapshot : snapshot.getChildren()){
-                            List<Routes> climberRoutes = new ArrayList<>();
-                            for (DataSnapshot routeSnapshot : placeSnapshot.getChildren()){
-                                climberRoutes.add(routeSnapshot.getValue(Routes.class));
-                            }
-                            placesMap.put(placeSnapshot.getKey(), climberRoutes);
-                        }
-                        climberNameClimbs.put(climber, placesMap);
-                    }
-                    listener.onSuccess();
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-
-                }
-            });
-        }
     }
     public static List<Routes> getClimbedRoutesPerClimber(String selectedName, String place){
         List<Routes> routesPerClimber;
