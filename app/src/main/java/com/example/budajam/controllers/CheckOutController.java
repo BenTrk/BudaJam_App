@@ -1,12 +1,9 @@
 package com.example.budajam.controllers;
 
-import android.app.Dialog;
-import android.content.Context;
-
 import com.example.budajam.classes.Routes;
+import com.example.budajam.interfaces.OnGetClimbDataListener;
+import com.example.budajam.interfaces.OnGetPointsListener;
 import com.example.budajam.models.CheckOutModel;
-import com.example.budajam.models.MainModel;
-import com.google.firebase.auth.FirebaseUser;
 
 import java.util.List;
 
@@ -16,10 +13,10 @@ public class CheckOutController {
         return CheckOutModel.setUserRoutesSynced();
     }
 
-    public static void init(CheckOutModel.OnGetDataListener listener) {
+    public static void init(OnGetClimbDataListener listener) {
         CheckOutModel.init(listener);
     }
-    public static void getTeamPoints(CheckOutModel.OnGetDataListener listener){
+    public static void getTeamPoints(OnGetPointsListener listener){
         CheckOutModel.getTeamPoints(listener);
     }
     public static boolean areTherePlaces(String selectedName){
@@ -29,11 +26,15 @@ public class CheckOutController {
         return CheckOutModel.getClimbPlaces(selectedName);
     }
 
-    public static void getClimbedRoutes(String selectedName, String place, CheckOutModel.OnGetDataListener listener) {
-        CheckOutModel.getClimbedRoutes(selectedName, place, listener);
-    }
-
     public static void removeClimb(Routes route, String climberName, String place){
         CheckOutModel.removeClimb(route, climberName, place);
+    }
+
+    public static void climbedRoutesInit(OnGetClimbDataListener dataListener) {
+        CheckOutModel.climbedRoutesInit(dataListener);
+    }
+
+    public static List<Routes> getClimbedRoutesPerClimber(String selectedName, String place){
+        return CheckOutModel.getClimbedRoutesPerClimber(selectedName, place);
     }
 }

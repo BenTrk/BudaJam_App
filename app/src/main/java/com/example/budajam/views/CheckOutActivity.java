@@ -23,7 +23,8 @@ import com.example.budajam.R;
 import com.example.budajam.classes.Routes;
 import com.example.budajam.controllers.CheckOutController;
 import com.example.budajam.controllers.MainController;
-import com.example.budajam.models.CheckOutModel;
+import com.example.budajam.interfaces.OnGetClimbDataListener;
+import com.example.budajam.interfaces.OnGetPointsListener;
 
 import java.util.List;
 
@@ -47,26 +48,18 @@ public class CheckOutActivity extends AppCompatActivity {
         //Set the view
         setContentView(R.layout.activity_checkout);
 
-        //Initialize the places & points
-        CheckOutModel.OnGetDataListener listener = new CheckOutModel.OnGetDataListener() {
-            @Override
-            public void onSuccess(List<Routes> routes) {
-                //If I could move this piece here too... :)
-            }
-
-            @Override
-            public void onSuccess(double points) {
-                Log.v("Points", "Points changed: " + points);
-                pointsView.setText("Your teams's points: " + points);
-            }
-
-            @Override
-            public void onSuccess() {
-                Log.v("Routes", "Climbed routes changed");
-            }
+        //Initialize the places & points with listeners
+        //Not the best solution I guess, directly getting stuff from Model and doing
+        // some decisionmaking here, but I found no better way. Meh.
+        OnGetClimbDataListener dataListener = () -> Log.v("Routes", "Climbed routes changed");
+        OnGetPointsListener pointsListener = (double points) -> {
+            Log.v("Points", "Points changed " + points);
+            pointsView.setText("Your team's points: " + points);
         };
-        CheckOutController.init(listener);
-        CheckOutController.getTeamPoints(listener);
+
+        CheckOutController.init(dataListener);
+        CheckOutController.getTeamPoints(pointsListener);
+        CheckOutController.climbedRoutesInit(dataListener);
 
         //Instantiate the items on the screen
         climber1OnSwitch = findViewById(R.id.climber1onswitch);
@@ -139,7 +132,7 @@ public class CheckOutActivity extends AppCompatActivity {
 
             placeNameView.setText(place);
             relContainer.setOnClickListener(v -> {
-                //Change name in text to the selected one and populate the list of climbed routes.
+                //Populate the list of climbed routes.
                 linearLayout.removeAllViews();
                 populateClimbedRoutesList(selectedName, place);
             });
@@ -160,16 +153,7 @@ public class CheckOutActivity extends AppCompatActivity {
         scrollLinear.setOrientation(LinearLayout.VERTICAL);
 
         //Get the routes climbed from the database
-        //A bit weird here, could be with the others, maybe?
-        CheckOutController.getClimbedRoutes(selectedName, place, new CheckOutModel.OnGetDataListener() {
-            @Override
-            public void onSuccess(List<Routes> routes) {
-                addCustomRemove(routes, place, name);
-            }
-            public void onSuccess(double point){}
-            @Override
-            public void onSuccess() {}
-        });
+        addCustomRemove((CheckOutController.getClimbedRoutesPerClimber(selectedName, place)), place, name);
     }
 
     public void showAlertDialogButtonClicked(Routes route, String climberName, String place) {
@@ -226,10 +210,7 @@ public class CheckOutActivity extends AppCompatActivity {
             //would be great to see the style the points are now given.
 
             //Set up the remove button to show the dialog and handle remove
-            removeButtonImageButton.setOnClickListener(v -> {
-                //ToDo:
-                showAlertDialogButtonClicked(route, climberName, placeName);
-            });
+            removeButtonImageButton.setOnClickListener(v -> showAlertDialogButtonClicked(route, climberName, placeName));
             buttonsDetails.addView(customRemoveView);
             linearLayout.addView(buttonsDetails);
         }

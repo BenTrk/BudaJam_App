@@ -61,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
         MainController.authentication();
         //Initialize routes in MainModel. WARNING: timeing issue, if it takes longer to grab the data,
         // it could happen that the screen shows empty.
+        //ToDo: Make it with a listener interface
         MainController.init();
 
         //Set User details and Route details synced.

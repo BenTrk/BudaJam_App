@@ -45,7 +45,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-//ToDo: Handle extra activities for teams or for climbers.
 public class ExtraPointsActivity extends AppCompatActivity {
     FirebaseUser user;
     FirebaseAuth auth;
@@ -370,27 +369,6 @@ public class ExtraPointsActivity extends AppCompatActivity {
             }
         });
 
-    }
-    private int getClimberPointsActivity(String activity, String climberName, TextView activityText){
-        database = FirebaseDatabase.getInstance("https://budajam-ea659-default-rtdb.firebaseio.com/");
-        DatabaseReference myRef = database.getReference(user.getUid() + "/Activities/" + activity);
-        final int[] points = new int[1];
-        myRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.hasChild(climberName)) {
-                    points[0] = snapshot.getValue(Integer.class);
-                } else {
-                    points[0] = 0;
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                //ToDo:
-            }
-        });
-        return points[0];
     }
 
     private void setCurrentActivityDetails(String activityName, View customRoutesView, String group) {
