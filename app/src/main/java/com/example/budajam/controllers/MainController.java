@@ -13,12 +13,19 @@ public class MainController {
     public static void init(){
         MainModel.init();
     }
-    public static boolean setUserAndRouteSynced(FirebaseUser user) {
-        return MainModel.setUserAndRouteSynced(user);
+    public static FirebaseUser authentication(){
+        return MainModel.authentication();
     }
 
-    public static void getNamesFromDatabase(String uid) {
-        MainModel.getNamesFromDatabase(uid);
+    public static void signOut(){
+        MainModel.signOut();
+    }
+    public static boolean setUserAndRouteSynced() {
+        return MainModel.setUserAndRouteSynced();
+    }
+
+    public static void getNamesFromDatabase() {
+        MainModel.getNamesFromDatabase();
     }
 
     public static Set<String> getPlacesFromDatabase(){
@@ -32,8 +39,8 @@ public class MainController {
         return MainModel.getNames();
     }
 
-    public static void addClimbToDatabase(String uid, String checkedName, String checkedStyle,
+    public static void addClimbToDatabase(String checkedName, String checkedStyle,
                                           String placeName, Routes mRouteItemToAdd, Context context) {
-        MainModel.addClimbToTheDatabase(uid, checkedName, checkedStyle, placeName, mRouteItemToAdd, context);
+        MainModel.addClimbToTheDatabase(checkedName, checkedStyle, placeName, mRouteItemToAdd, context);
     }
 }

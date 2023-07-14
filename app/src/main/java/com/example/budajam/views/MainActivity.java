@@ -27,14 +27,11 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.PopupMenu;
 
-import com.example.budajam.CheckOutActivity;
 import com.example.budajam.ExtraPointsActivity;
 import com.example.budajam.OptionsActivity;
 import com.example.budajam.R;
 import com.example.budajam.classes.Routes;
 import com.example.budajam.controllers.MainController;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 
 //Now it is synched - SQLite is not really needed
 //Use it for a save as xml activity - let the user add the days when the app should save the climbed routes
@@ -51,10 +48,6 @@ public class MainActivity extends AppCompatActivity {
     public static String climberName1;
     public static String climberName2;
     public static double teamPoints;
-
-    private FirebaseAuth.AuthStateListener authListener;
-    private FirebaseAuth auth;
-    private FirebaseUser user;
     Button buttonShowDropDown;
 
     @SuppressLint("ClickableViewAccessibility")
@@ -64,25 +57,15 @@ public class MainActivity extends AppCompatActivity {
         //Set the view
         setContentView(R.layout.activity_main);
 
+        //Authenticate
+        MainController.authentication();
         //Initialize routes in MainModel. WARNING: timeing issue, if it takes longer to grab the data,
         // it could happen that the screen shows empty.
         MainController.init();
 
-        //Get the user.
-        auth = FirebaseAuth.getInstance();
-        //Check authentication, if none -> LoginActivity
-        authListener = firebaseAuth -> {
-            user = firebaseAuth.getCurrentUser();
-            if (user == null) {
-                startActivity(new Intent(MainActivity.this, LoginActivity.class));
-                finish();
-            }
-        };
-
         //Set User details and Route details synced.
-        FirebaseUser user = auth.getCurrentUser();
-        if (MainController.setUserAndRouteSynced(user)) {
-            MainController.getNamesFromDatabase(user.getUid());
+        if (MainController.setUserAndRouteSynced()) {
+            MainController.getNamesFromDatabase();
         } else {
             startActivity(new Intent(MainActivity.this, LoginActivity.class));
             finish();
@@ -141,7 +124,7 @@ public class MainActivity extends AppCompatActivity {
                     finish();
                 }
                 else if (R.id.three == item.getItemId()) {
-                    auth.signOut();
+                    MainController.signOut();
                     startActivity(new Intent(MainActivity.this, LoginActivity.class));
                     finish();
                 }
@@ -259,8 +242,7 @@ public class MainActivity extends AppCompatActivity {
 
             String checkedName = (String) checkedNameRadioButton.getText();
             String checkedStyle = (String) checkedStyleRadioButton.getText();
-            MainController.addClimbToDatabase(user.getUid(), checkedName, checkedStyle,
-                    placeName, mRouteItemToAdd, MainActivity.this);
+            MainController.addClimbToDatabase(checkedName, checkedStyle, placeName, mRouteItemToAdd, MainActivity.this);
 
             routeLayout.removeAllViews();
             emptyScreenLinear.setVisibility(View.VISIBLE);
@@ -270,33 +252,45 @@ public class MainActivity extends AppCompatActivity {
         routeLayout.addView(customRoutesView);
     }
 
+    private void authenticate(){
+        if (MainController.authentication() == null){
+            startActivity(new Intent(MainActivity.this, LoginActivity.class));
+            finish();
+        }
+    }
+
     @Override
     public void onStart() {
         super.onStart();
-        auth.addAuthStateListener(authListener);
+        authenticate();
     }
 
     @Override
     public void onRestart() {
         super.onRestart();
+        authenticate();
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        if (authListener != null) {
-            auth.removeAuthStateListener(authListener);
+        if (MainController.authentication() != null) {
+            authenticate();
         }
     }
 
     @Override
     public void onResume() {
         super.onResume();
+        authenticate();
     }
 
     @Override
     public void onPause() {
         super.onPause();
+        if (MainController.authentication() != null) {
+            authenticate();
+        }
     }
 }
 

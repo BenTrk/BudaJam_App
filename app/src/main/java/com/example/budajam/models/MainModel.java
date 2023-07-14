@@ -8,6 +8,7 @@ import androidx.appcompat.app.AlertDialog;
 
 import com.example.budajam.classes.ClimberNames;
 import com.example.budajam.classes.Routes;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -26,6 +27,9 @@ public class MainModel {
     static String climberName1, climberName2;
     static double teamPoints;
     static HashMap<String, List<Routes>> placesWithRoutes = new HashMap<>();
+    static FirebaseAuth auth = FirebaseAuth.getInstance();
+    static FirebaseAuth.AuthStateListener authListener;
+    public static FirebaseUser user = auth.getCurrentUser();
 
     public static void init(){
         Query routesQuery = database.getReference("Routes/");
@@ -54,7 +58,18 @@ public class MainModel {
             }
         });
     }
-    public static boolean setUserAndRouteSynced(FirebaseUser user) {
+    public static FirebaseUser authentication(){
+        //If something is wrong with authentication, search here. :)
+        authListener = firebaseAuth -> {
+            user = firebaseAuth.getCurrentUser();
+        };
+        auth.addAuthStateListener(authListener);
+        return user;
+    }
+    public static void signOut(){
+        auth.signOut();
+    }
+    public static boolean setUserAndRouteSynced() {
         if (user != null) {
             FirebaseDatabase.getInstance().getReference(user.getUid() + "/").keepSynced(true);
             FirebaseDatabase.getInstance().getReference("Routes/").keepSynced(true);
@@ -63,8 +78,8 @@ public class MainModel {
             return false;
         }
     }
-    public static void getNamesFromDatabase(String userID) {
-        Query routesQuery = database.getReference(userID + "/");
+    public static void getNamesFromDatabase() {
+        Query routesQuery = database.getReference(user.getUid() + "/");
         routesQuery.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -90,9 +105,9 @@ public class MainModel {
     public static String[] getNames(){
         return new String[]{climberName1, climberName2};
     }
-    public static void addClimbToTheDatabase(String userID, String climberName, String styleName,
+    public static void addClimbToTheDatabase(String climberName, String styleName,
                                              String placeName, Routes route, Context context){
-        String reference = userID + "/" + climberName + "/" + placeName + "/" + route.name;
+        String reference = user.getUid() + "/" + climberName + "/" + placeName + "/" + route.name;
         DatabaseReference climbsOfUser = database.getReference(reference);
         Query climbsOfUserQuery = database.getReference(reference);
         double pointsToAdd = pointsCounter(styleName, route);
@@ -118,7 +133,7 @@ public class MainModel {
                     dialog.show();
                     climbsOfUser.child("points").setValue(pointsToAdd);
                     climbsOfUser.child("best").setValue(styleName);
-                    DatabaseReference myRefPoints = database.getReference(userID + "/teamPoints");
+                    DatabaseReference myRefPoints = database.getReference(user.getUid() + "/teamPoints");
                     myRefPoints.setValue((teamPoints - pointsFromDatabase) + pointsToAdd);
                 } else {
                     Dialog dialog = dialogBuilderFunc(context, true, false);

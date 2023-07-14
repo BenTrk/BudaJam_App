@@ -2,6 +2,7 @@ package com.example.budajam.models;
 
 import android.content.Context;
 import android.text.TextUtils;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -9,8 +10,11 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.budajam.R;
 import com.example.budajam.classes.ClimberNames;
+import com.example.budajam.views.LoginActivity;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
+
+import java.util.Objects;
 
 public class LoginModel extends AppCompatActivity {
     //ToDo: get the strings out of here. :)
