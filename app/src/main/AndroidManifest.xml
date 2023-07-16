@@ -12,7 +12,8 @@
         android:roundIcon="@mipmap/kisgeri24_logo"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".views.MainActivity">
+        <activity android:name=".views.MainActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -20,7 +21,8 @@
         </activity>
         <activity android:name=".OptionsActivity">
         </activity>
-        <activity android:name=".views.LoginActivity">
+        <activity android:name=".views.LoginActivity"
+            android:exported="true">
             <intent-filter>
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
@@ -32,6 +34,7 @@
         <activity android:name=".views.CheckOutActivity">
         </activity>
         <activity android:name=".ExtraPointsActivity" />
+        <activity android:name=".models.LoginModel" />
 
     </application>
 

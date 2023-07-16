@@ -5,6 +5,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 
+import com.example.budajam.models.LoginModel;
 import com.example.budajam.models.SignupModel;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -13,6 +14,7 @@ import com.google.firebase.auth.FirebaseUser;
 
 public class SignupController {
     SignupModel signupModel = new SignupModel();
+    LoginModel loginModel = new LoginModel();
 
     public static boolean checkRegisterData(Context context, EditText inputEmail, EditText inputPassword, EditText teamName,
                                          Spinner category, EditText climber1Name, EditText climber2Name) {
@@ -20,9 +22,9 @@ public class SignupController {
                 climber1Name, climber2Name);
     }
 
-    public static void createUser(Task<AuthResult> task, EditText teamName, Spinner category,
+    public static void createUser(Context context, Task<AuthResult> task, EditText teamName, Spinner category,
                                   EditText climber1Name, EditText climber2Name) {
-        SignupModel.createUser(task, teamName, category, climber1Name, climber2Name);
+        SignupModel.createUser(context, task, teamName, category, climber1Name, climber2Name);
     }
 
     public static boolean validateUser(Context context, Task<Void> task, FirebaseUser user,

@@ -5,7 +5,7 @@ import android.text.TextUtils;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class ResetPasswordModel {
     public static boolean checkIfEmailIsProvided(Context context, EditText inputEmail) {
@@ -16,13 +16,16 @@ public class ResetPasswordModel {
         } else return true;
     }
 
-    public static boolean sendPasswordResetEmail(Context context, Task<Void> task) {
-        if (task.isSuccessful()) {
-            Toast.makeText(context, "We have sent you instructions to reset your password!", Toast.LENGTH_SHORT).show();
-            return true;
-        } else {
-            Toast.makeText(context, "Failed to send reset email!", Toast.LENGTH_SHORT).show();
-            return false;
-        }
+    public static void sendPasswordResetEmail(Context context, EditText inputEmail, FirebaseAuth auth) {
+        //Check if email is provided or not
+        //ToDo: check what happens for an email not registered or corrupt
+            //Send password reset emails
+        auth.sendPasswordResetEmail(inputEmail.getText().toString()).addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                Toast.makeText(context, "We have sent you instructions to reset your password!", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(context, "Failed to send reset email!", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }

@@ -1,6 +1,6 @@
 package com.example.budajam.classes;
 
-public class Routes {
+public class Route {
     public String name;
     public long difficulty;
     public long length;
@@ -10,9 +10,9 @@ public class Routes {
     public String climbStyle;
     public String best;
 
-    public Routes(){}
+    public Route(){}
 
-    public Routes(String name, long difficulty, long length, String diffchanger, int key, double points, String climbStyle, String best) {
+    public Route(String name, long difficulty, long length, String diffchanger, int key, double points, String climbStyle, String best) {
         this.name = name;
         this.difficulty = difficulty;
         this.length = length;

@@ -2,7 +2,8 @@ package com.example.budajam.models;
 
 import androidx.annotation.NonNull;
 
-import com.example.budajam.classes.Routes;
+import com.example.budajam.classes.PlaceWithRoutes;
+import com.example.budajam.classes.Route;
 import com.example.budajam.controllers.MainController;
 import com.example.budajam.interfaces.OnGetClimbDataListener;
 import com.example.budajam.interfaces.OnGetPointsListener;
@@ -22,103 +23,51 @@ import java.util.List;
 import java.util.Objects;
 
 public class CheckOutModel {
-    static HashMap<String, HashMap<String, List<Routes>>> climberNameClimbs = new HashMap<>();
-    static FirebaseDatabase database = FirebaseDatabase.getInstance("https://budajam-ea659-default-rtdb.firebaseio.com/");
     static FirebaseUser user;
-    static String climberName1, climberName2;
-    static HashMap<String, List<String>> placesPerClimbers = new HashMap<>();
     static double points;
-    static List<String> placesPerClimber = new ArrayList<>();
-    public static void init(OnGetClimbDataListener listener) {
-        climberName1 = MainModel.climberName1;
-        climberName2 = MainModel.climberName2;
-        String[] climbers = MainController.getNames();
-        user = FirebaseAuth.getInstance().getCurrentUser();
 
-        for (String climber : climbers) {
-            assert user != null;
-            Query routesQuery = database.getReference(user.getUid() + "/" + climber + "/");
-            routesQuery.addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    if (placesPerClimbers.get(dataSnapshot.getKey()) != null) {
-                        Objects.requireNonNull(placesPerClimbers.get(dataSnapshot.getKey())).clear();
-                    }
-                    List<String> places = new ArrayList<>();
-                    if (dataSnapshot.hasChildren()){
-                        HashMap<String, List<Routes>> placesMap = new HashMap<>();
-                        for (DataSnapshot placeSnapshot : dataSnapshot.getChildren()){
-                            List<Routes> climberRoutes = new ArrayList<>();
-                            if (placeSnapshot.hasChildren()) {
-                                places.add(placeSnapshot.getKey());
-                                placesPerClimbers.put(dataSnapshot.getKey(), places);
-                            }
-                            for (DataSnapshot routeSnapshot : placeSnapshot.getChildren()){
-                                climberRoutes.add(routeSnapshot.getValue(Routes.class));
-                            }
-                            placesMap.put(placeSnapshot.getKey(), climberRoutes);
-                        }
-                        climberNameClimbs.put(climber, placesMap);
-                    }
-                    listener.onSuccess();
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-                    //ToDo
-                }
-            });
-        }
-    }
-    public static boolean setUserRoutesSynced() {
-        if (user != null) {
-            DatabaseReference myKeepSyncClimberOne = FirebaseDatabase.getInstance().getReference(user.getUid() + "/" + MainActivity.climberName1);
-            myKeepSyncClimberOne.keepSynced(true);
-
-            DatabaseReference myKeepSyncClimberTwo = FirebaseDatabase.getInstance().getReference(user.getUid() + "/" + MainActivity.climberName2);
-            myKeepSyncClimberTwo.keepSynced(true);
-
-            return true;
-        }
-        return false;
-    }
     public static boolean areTherePlaces(String selectedName){
-        return placesPerClimbers.containsKey(selectedName) && Objects.requireNonNull(placesPerClimbers.get(selectedName)).size() > 0;
+        return initModel.getTeamData().getClimbersClimbsMap().get(selectedName) != null;
     }
-    public static void getTeamPoints(OnGetPointsListener listener){
-        Query teamPointsQuery = database.getReference(user.getUid() + "/teamPoints");
-        teamPointsQuery.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                points = dataSnapshot.getValue(double.class);
-                listener.onSuccess(points);
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                //ToDo
-            }
-        });
+    public static double getTeamPoints(){
+        return initModel.getTeamData().getTeamPoints();
     }
     public static String[] getClimbPlaces(String selectedName){
-        placesPerClimber = placesPerClimbers.get(selectedName);
-        if (placesPerClimber != null) {
-            //Since there is no climb on this name, it will be null!
-            return placesPerClimber.toArray(new String[0]);
+        List<PlaceWithRoutes> listOfClimbs = initModel.getTeamData().getClimbersClimbsMap().get(selectedName);
+        List<String> placesList = new ArrayList<>();
+        if (listOfClimbs != null) {
+            for (PlaceWithRoutes place : listOfClimbs) {
+                placesList.add(place.getPlaceName());
+            }
+            String[] placesArray = new String[placesList.size()];
+            return placesList.toArray(placesArray);
         } else return null;
     }
-    public static List<Routes> getClimbedRoutesPerClimber(String selectedName, String place){
-        List<Routes> routesPerClimber;
-        if (climberNameClimbs.containsKey(selectedName)) {
-            routesPerClimber = Objects.requireNonNull(climberNameClimbs.get(selectedName)).get(place);
-            return routesPerClimber;
-        } else return null;
-    }
-    public static void removeClimb(Routes route, String climberName, String place){
-        DatabaseReference climbersRoutes = database.getReference(user.getUid() + "/" + climberName + "/" + place);
-        DatabaseReference teamPointsReference = database.getReference(user.getUid() + "/teamPoints");
+    public static List<Route> getClimbedRoutesPerClimber(String selectedName, String place){
+        List<Route> routesPerClimber = new ArrayList<>();
+        List<PlaceWithRoutes> listOfClimbs = initModel.getTeamData().getClimbersClimbsMap().get(selectedName);
 
+        for (PlaceWithRoutes placeInList : listOfClimbs){
+            if (placeInList.getPlaceName().equals(place)) {
+                routesPerClimber = placeInList.getRouteList();
+                break;
+            }
+        }
+        return routesPerClimber;
+    }
+    public static double removeClimb(Route route, String climberName, String place){
+        DatabaseReference climbersRoutes = initModel.database.getReference(initModel.getUser().getUid() + "/Climbs/" + climberName + "/" + place);
+        DatabaseReference teamPointsReference = initModel.database.getReference(initModel.getUser().getUid() + "/teamPoints");
+
+        points = initModel.getTeamData().teamPoints;
         climbersRoutes.child(route.name).removeValue();
         teamPointsReference.setValue(points - route.points);
+        return points - route.points;
+    }
+
+    public static double pointSetter(double teamPointsPast) {
+        while (teamPointsPast == initModel.getTeamData().teamPoints){
+            return -1;
+        } return initModel.getTeamData().teamPoints;
     }
 }

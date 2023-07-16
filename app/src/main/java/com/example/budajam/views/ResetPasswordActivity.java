@@ -15,7 +15,6 @@ import com.google.firebase.auth.FirebaseAuth;
 public class ResetPasswordActivity extends AppCompatActivity {
 
     private EditText inputEmail;
-    private FirebaseAuth auth;
     private ProgressBar progressBar;
 
     @Override
@@ -33,17 +32,12 @@ public class ResetPasswordActivity extends AppCompatActivity {
         //Set onclicklisteners
         btnBack.setOnClickListener(v -> finish());
         btnReset.setOnClickListener(v -> {
-            auth = FirebaseAuth.getInstance();
             //Check if email is provided or not
             //ToDo: check what happens for an email not registered or corrupt
             if (ResetPasswordController.checkIfEmailIsProvided(ResetPasswordActivity.this, inputEmail)) {
                 progressBar.setVisibility(View.VISIBLE);
                 //Send password reset emails
-                auth.sendPasswordResetEmail(inputEmail.getText().toString()).addOnCompleteListener(task -> {
-                            if (ResetPasswordController.sendPasswordResetEmail(ResetPasswordActivity.this ,task)){
-                                progressBar.setVisibility(View.GONE);
-                            }
-                });
+                ResetPasswordController.sendPasswordResetEmail(ResetPasswordActivity.this, inputEmail);
             }
         });
     }

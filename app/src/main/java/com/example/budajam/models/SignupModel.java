@@ -100,7 +100,7 @@ public class SignupModel {
         }
     }
 
-    public static void createUser(Task<AuthResult> task, EditText teamName,
+    public static void createUser(Context context, Task<AuthResult> task, EditText teamName,
                                   Spinner category, EditText climber1Name, EditText climber2Name) {
         if (!task.isSuccessful()) {
             //ToDo: team already exists message

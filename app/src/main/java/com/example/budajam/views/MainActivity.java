@@ -30,7 +30,8 @@ import androidx.appcompat.widget.PopupMenu;
 import com.example.budajam.ExtraPointsActivity;
 import com.example.budajam.OptionsActivity;
 import com.example.budajam.R;
-import com.example.budajam.classes.Routes;
+import com.example.budajam.classes.PlaceWithRoutes;
+import com.example.budajam.classes.Route;
 import com.example.budajam.controllers.MainController;
 
 //Now it is synched - SQLite is not really needed
@@ -44,10 +45,6 @@ public class MainActivity extends AppCompatActivity {
     private AnimatedVectorDrawable animMenu, animArrowAnim;
     @SuppressLint("StaticFieldLeak")
     private static LinearLayout routeLayout, emptyScreenLinear;
-
-    public static String climberName1;
-    public static String climberName2;
-    public static double teamPoints;
     Button buttonShowDropDown;
 
     @SuppressLint("ClickableViewAccessibility")
@@ -56,18 +53,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         //Set the view
         setContentView(R.layout.activity_main);
-
         //Authenticate
-        MainController.authentication();
-        //Initialize routes in MainModel. WARNING: timeing issue, if it takes longer to grab the data,
-        // it could happen that the screen shows empty.
-        //ToDo: Make it with a listener interface
-        MainController.init();
-
-        //Set User details and Route details synced.
-        if (MainController.setUserAndRouteSynced()) {
-            MainController.getNamesFromDatabase();
-        } else {
+        //MainController.authentication();
+        //Initialize the stuff for the app from initModel. If user is not authenticated, finish.
+        if (!MainController.init()){
             startActivity(new Intent(MainActivity.this, LoginActivity.class));
             finish();
         }
@@ -141,7 +130,7 @@ public class MainActivity extends AppCompatActivity {
             if (MainController.getPlacesFromDatabase().isEmpty()){
                 Toast.makeText(MainActivity.this, "Could not grab the routes yet. Try again the button in 5 seconds!", Toast.LENGTH_SHORT).show();
             }
-            for (String place : MainController.getPlacesFromDatabase()) {
+            for (PlaceWithRoutes place : MainController.getPlacesFromDatabase()) {
                 //For every place create the custom dropdown
                 final View customRoutesView = LayoutInflater.from(MainActivity.this).inflate(
                         R.layout.custom_dropdown_layout, routeLayout, false
@@ -154,12 +143,12 @@ public class MainActivity extends AppCompatActivity {
 
                 RelativeLayout relContainer = customRoutesView.findViewById(R.id.routeDropDownRelativeLayout);
                 TextView placeNameView = customRoutesView.findViewById(R.id.routeNameTextView);
-                placeNameView.setText(place);
+                placeNameView.setText(place.getPlaceName());
 
                 relContainer.setOnClickListener(v -> {
                     routeLayout.removeAllViews();
                     //On click, populate the route list - create custom view for them and set the behavior
-                    populateRouteList(place);
+                    populateRouteList(place.getPlaceName());
                 });
                 routeLayout.addView(customRoutesView);
             }
@@ -175,7 +164,7 @@ public class MainActivity extends AppCompatActivity {
         emptyScreenLinear.setVisibility(GONE);
 
         //For each route, create a custom spinner
-        for (Routes routesIn : MainController.getRoutes(name)) {
+        for (Route routesIn : MainController.getRoutes(name)) {
             addCustomSpinner(routesIn, name);
         }
         //When done, remove progressbar
@@ -183,7 +172,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @SuppressLint("SetTextI18n")
-    private void addCustomSpinner(Routes mRouteItemToAdd, String placeName) {
+    private void addCustomSpinner(Route mRouteItemToAdd, String placeName) {
 
         //Inflate the custom routeview
         final View customRoutesView = LayoutInflater.from(this).inflate(
@@ -236,6 +225,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        //Set up onClickListener for the climbed it button
         climbedItButton.setOnClickListener(v -> {
 
             RadioButton checkedNameRadioButton = findViewById(climberNameRadioGroup.getCheckedRadioButtonId());
@@ -275,9 +265,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onStop() {
         super.onStop();
-        if (MainController.authentication() != null) {
-            authenticate();
-        }
+        authenticate();
     }
 
     @Override
@@ -289,9 +277,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onPause() {
         super.onPause();
-        if (MainController.authentication() != null) {
-            authenticate();
-        }
+        authenticate();
     }
 }
 

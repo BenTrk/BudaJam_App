@@ -2,37 +2,28 @@ package com.example.budajam.controllers;
 
 import android.content.Context;
 
-import com.example.budajam.classes.Routes;
+import com.example.budajam.classes.PlaceWithRoutes;
+import com.example.budajam.classes.Route;
 import com.example.budajam.models.MainModel;
+import com.example.budajam.models.initModel;
 import com.google.firebase.auth.FirebaseUser;
 
 import java.util.List;
 import java.util.Set;
 
 public class MainController {
-    public static void init(){
-        MainModel.init();
+    public static boolean init(){
+        return initModel.onCreate();
     }
-    public static FirebaseUser authentication(){
-        return MainModel.authentication();
-    }
-
     public static void signOut(){
         MainModel.signOut();
     }
-    public static boolean setUserAndRouteSynced() {
-        return MainModel.setUserAndRouteSynced();
+
+    public static List<PlaceWithRoutes> getPlacesFromDatabase(){
+        return initModel.getPlacesWithRoutes();
     }
 
-    public static void getNamesFromDatabase() {
-        MainModel.getNamesFromDatabase();
-    }
-
-    public static Set<String> getPlacesFromDatabase(){
-        return MainModel.getPlacesFromDatabase();
-    }
-
-    public static List<Routes> getRoutes(String name) {
+    public static List<Route> getRoutes(String name) {
         return MainModel.getRoutes(name);
     }
     public static String[] getNames() {
@@ -40,7 +31,13 @@ public class MainController {
     }
 
     public static void addClimbToDatabase(String checkedName, String checkedStyle,
-                                          String placeName, Routes mRouteItemToAdd, Context context) {
-        MainModel.addClimbToTheDatabase(checkedName, checkedStyle, placeName, mRouteItemToAdd, context);
+                                          String placeName, Route mRouteItemToAdd, Context context) {
+        double teamPoints = initModel.getTeamData().teamPoints;
+        MainModel.addClimbToTheDatabase(checkedName, checkedStyle, placeName, mRouteItemToAdd, context, teamPoints);
+    }
+
+    public static FirebaseUser authentication() {
+        initModel.initAuthentication();
+        return initModel.getUser();
     }
 }

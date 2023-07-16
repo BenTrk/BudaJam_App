@@ -20,7 +20,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.budajam.R;
-import com.example.budajam.classes.Routes;
+import com.example.budajam.classes.Route;
 import com.example.budajam.controllers.CheckOutController;
 import com.example.budajam.controllers.MainController;
 import com.example.budajam.interfaces.OnGetClimbDataListener;
@@ -48,18 +48,6 @@ public class CheckOutActivity extends AppCompatActivity {
         //Set the view
         setContentView(R.layout.activity_checkout);
 
-        //Initialize the places & points with listeners
-        //Not the best solution I guess, directly getting stuff from Model and doing
-        // some decisionmaking here, but I found no better way. Meh.
-        OnGetClimbDataListener dataListener = () -> Log.v("Routes", "Climbed routes changed");
-        OnGetPointsListener pointsListener = (double points) -> {
-            Log.v("Points", "Points changed " + points);
-            pointsView.setText("Your team's points: " + points);
-        };
-
-        CheckOutController.init(dataListener);
-        CheckOutController.getTeamPoints(pointsListener);
-
         //Instantiate the items on the screen
         climber1OnSwitch = findViewById(R.id.climber1onswitch);
         climber2OnSwitch = findViewById(R.id.climber2onswitch);
@@ -73,7 +61,8 @@ public class CheckOutActivity extends AppCompatActivity {
 
         removeClimbBool = false;
 
-        if (!CheckOutController.setUserRoutesSynced()) {
+        //If not authenticated, kick out :)
+        if (CheckOutController.authenticate() == null) {
             startActivity(new Intent(CheckOutActivity.this, LoginActivity.class));
             finish();
         }
@@ -81,6 +70,7 @@ public class CheckOutActivity extends AppCompatActivity {
         //Set the radiobutton so it shows which climber is selected
         climber1OnSwitch.setText(MainController.getNames()[0]);
         climber2OnSwitch.setText(MainController.getNames()[1]);
+        pointsView.setText("Your team's points: " + CheckOutController.getTeamPoints());
         selectedClimberView.setText("\nClimber: " + getSelectedName());
 
         //Set up backbutton to go back to the main screen
@@ -155,7 +145,7 @@ public class CheckOutActivity extends AppCompatActivity {
         addCustomRemove((CheckOutController.getClimbedRoutesPerClimber(selectedName, place)), place, name);
     }
 
-    public void showAlertDialogButtonClicked(Routes route, String climberName, String place) {
+    public void showAlertDialogButtonClicked(Route route, String climberName, String place) {
 
         // setup the alert builder
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -164,8 +154,9 @@ public class CheckOutActivity extends AppCompatActivity {
 
         // add the buttons
         builder.setPositiveButton("Yes, remove", (dialog, which) -> {
-            CheckOutController.removeClimb(route, climberName, place);
+            double points = CheckOutController.removeClimb(route, climberName, place);
             linearLayout.removeAllViews();
+            pointsView.setText("Your team's points: " + points);
         });
         builder.setNegativeButton("No, abort remove", (dialog, which) -> dialog.dismiss());
         // create and show the alert dialog
@@ -174,7 +165,7 @@ public class CheckOutActivity extends AppCompatActivity {
     }
 
     @SuppressLint("SetTextI18n")
-    private void addCustomRemove(List<Routes> mRouteItemsToAdd, String placeName, String climberName) {
+    private void addCustomRemove(List<Route> mRouteItemsToAdd, String placeName, String climberName) {
         //Create the view to see route details and if necessary, remove.
         //Create params for the views
         LinearLayout.LayoutParams customViewParams = new LinearLayout.LayoutParams(
@@ -183,7 +174,7 @@ public class CheckOutActivity extends AppCompatActivity {
         );
 
         //Create a view for each route
-        for (Routes route : mRouteItemsToAdd) {
+        for (Route route : mRouteItemsToAdd) {
             LinearLayout buttonsDetails = new LinearLayout(CheckOutActivity.this);
             View customRemoveView = new View(CheckOutActivity.this);
 
@@ -209,7 +200,9 @@ public class CheckOutActivity extends AppCompatActivity {
             //would be great to see the style the points are now given.
 
             //Set up the remove button to show the dialog and handle remove
-            removeButtonImageButton.setOnClickListener(v -> showAlertDialogButtonClicked(route, climberName, placeName));
+            removeButtonImageButton.setOnClickListener(v -> {
+                showAlertDialogButtonClicked(route, climberName, placeName);
+            });
             buttonsDetails.addView(customRemoveView);
             linearLayout.addView(buttonsDetails);
         }

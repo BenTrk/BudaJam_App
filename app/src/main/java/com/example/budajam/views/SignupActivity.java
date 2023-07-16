@@ -93,7 +93,7 @@ public class SignupActivity extends AppCompatActivity {
                 .addOnCompleteListener(SignupActivity.this, task -> {
                     Toast.makeText(SignupActivity.this, "createUserWithEmail:onComplete:" + task.isSuccessful(), Toast.LENGTH_SHORT).show();
                     progressBar.setVisibility(View.GONE);
-                    SignupController.createUser(task, teamName, category, climber1Name, climber2Name);
+                    SignupController.createUser(SignupActivity.this, task, teamName, category, climber1Name, climber2Name);
                     user = auth.getCurrentUser();
                     validateUser();
                 });

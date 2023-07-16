@@ -7,14 +7,14 @@ import java.util.Map;
 import java.util.Set;
 
 public class DataStorage {
-    private Map<String, List<Routes>> dataMap;
+    private Map<String, List<Route>> dataMap;
 
     public DataStorage() {
         dataMap = new LinkedHashMap<>();
     }
 
-    public void addItem(String category, Routes item) {
-        List<Routes> items = dataMap.get(category);
+    public void addItem(String category, Route item) {
+        List<Route> items = dataMap.get(category);
         boolean isThere = false;
         if (items == null) {
             items = new ArrayList<>();
@@ -22,7 +22,7 @@ public class DataStorage {
             dataMap.put(category, items);
         }
         else {
-            for (Routes route : items) {
+            for (Route route : items) {
                 if (route.key == item.key) {
                     isThere = true;
                     break;
@@ -34,7 +34,7 @@ public class DataStorage {
         }
     }
 
-    public List<Routes> getItems(String category) {
+    public List<Route> getItems(String category) {
         return dataMap.get(category);
     }
 
@@ -49,7 +49,7 @@ public class DataStorage {
     public int size() {
         int size = 0;
         for (String key : dataMap.keySet()){
-            for (Routes route : dataMap.get(key)){
+            for (Route route : dataMap.get(key)){
                 size++;
             }
         }
