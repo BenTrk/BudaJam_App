@@ -18,7 +18,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".OptionsActivity">
+        <activity android:name=".views.OptionsActivity">
         </activity>
         <activity android:name=".views.LoginActivity"
             android:exported="true">

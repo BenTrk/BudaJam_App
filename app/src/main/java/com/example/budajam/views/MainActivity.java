@@ -27,7 +27,6 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.PopupMenu;
 
-import com.example.budajam.OptionsActivity;
 import com.example.budajam.R;
 import com.example.budajam.classes.PlaceWithRoutes;
 import com.example.budajam.classes.Route;
@@ -208,14 +207,14 @@ public class MainActivity extends AppCompatActivity {
         customButton.setImageResource(R.drawable.arrow_anim_start);
         customButton.setOnClickListener(v -> {
             if (routeWhoClimbed.getVisibility() == GONE) {
-                customButton.setImageResource(R.drawable.avd_anim_arrow_blue_back);
+                customButton.setImageResource(R.drawable.avd_anim_arrow_back);
                 if (customButton.getDrawable() instanceof AnimatedVectorDrawable) {
                     animArrowAnim = (AnimatedVectorDrawable) customButton.getDrawable();
                     animArrowAnim.start();
                 }
                 routeWhoClimbed.setVisibility(View.VISIBLE);
             } else {
-                customButton.setImageResource(R.drawable.avd_anim_arrow_blue);
+                customButton.setImageResource(R.drawable.avd_anim_arrow);
                 if (customButton.getDrawable() instanceof AnimatedVectorDrawable) {
                     animArrowAnim = (AnimatedVectorDrawable) customButton.getDrawable();
                     animArrowAnim.start();

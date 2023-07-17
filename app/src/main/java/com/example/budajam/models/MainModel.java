@@ -7,8 +7,6 @@ import androidx.appcompat.app.AlertDialog;
 
 import com.example.budajam.classes.PlaceWithRoutes;
 import com.example.budajam.classes.Route;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -17,11 +15,9 @@ import java.util.List;
 public class MainModel {
     static FirebaseDatabase database = FirebaseDatabase.getInstance("https://budajam-ea659-default-rtdb.firebaseio.com/");
     static double teamPoints;
-    static FirebaseAuth auth = FirebaseAuth.getInstance();
-    public static FirebaseUser user = auth.getCurrentUser();
 
     public static void signOut(){
-        auth.signOut();
+        initModel.getAuth().signOut();
     }
     public static List<Route> getRoutes(String name) {
         for (PlaceWithRoutes place : initModel.getPlacesWithRoutes()){
@@ -35,7 +31,7 @@ public class MainModel {
     }
     public static void addClimbToTheDatabase(String climberName, String styleName,
                                              String placeName, Route route, Context context, double teamPoints){
-        String reference = user.getUid() + "/Climbs/" + climberName + "/" + placeName + "/" + route.name;
+        String reference = initModel.getUser().getUid() + "/Climbs/" + climberName + "/" + placeName + "/" + route.name;
 
         List<PlaceWithRoutes> routesClimbed = initModel.getTeamData().getClimbersClimbsMap().get(climberName);
         double pointsFromDatabase;
@@ -78,7 +74,7 @@ public class MainModel {
             dialog.show();
             climbsOfUser.child("points").setValue(pointsToAdd);
             climbsOfUser.child("best").setValue(styleName);
-            DatabaseReference myRefPoints = database.getReference(user.getUid() + "/teamPoints");
+            DatabaseReference myRefPoints = database.getReference(initModel.getUser().getUid() + "/teamPoints");
             myRefPoints.setValue((teamPoints - pointsFromDatabase) + pointsToAdd);
         } else {
             Dialog dialog = dialogBuilderFunc(context, true, false);

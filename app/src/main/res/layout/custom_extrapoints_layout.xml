@@ -47,7 +47,7 @@
             android:layout_alignTop="@+id/routeDiffImageView"
             android:layout_alignBottom="@+id/routeDiffImageView"
             style="@style/menu_button"
-            android:src="@drawable/avd_anim_arrow_blue_back" />
+            android:src="@drawable/avd_anim_arrow_back" />
 
     </RelativeLayout>
     <RelativeLayout

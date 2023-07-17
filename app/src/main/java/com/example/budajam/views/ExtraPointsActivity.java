@@ -99,10 +99,19 @@ public class ExtraPointsActivity extends AppCompatActivity {
                     if (ExtraPointsController.getActivityPointsFromSaved(activity.getName(), "Team") > 0) {
                         removeButton.setVisibility(View.VISIBLE);
                         checkedName = "Team";
-                    } else removeButton.setVisibility(GONE);
+                        editText.setEnabled(false);
+                        climbedItButton.setEnabled(false);
+                    } else {
+                        activityText.setText("Currently, your team earned: 0 points.");
+                        removeButton.setVisibility(GONE);
+                        editText.setEnabled(true);
+                        climbedItButton.setEnabled(true);
+                    }
                 } else {
                     activityText.setText("Currently, your team earned: 0 points.");
                     removeButton.setVisibility(GONE);
+                    editText.setEnabled(true);
+                    climbedItButton.setEnabled(true);
                 }
             } else {
                 editText.setVisibility(View.GONE);
@@ -142,7 +151,7 @@ public class ExtraPointsActivity extends AppCompatActivity {
                 ExtraPointsController.removeActivity(checkedName, activity);
                 activityText.setText("Currently, " + checkedName + " did not do this activity.");
                 removeButton.setVisibility(GONE);
-                if (checkedName == null){
+                if (checkedName == null || activity.getGroup().equals("teams")){
                     activityText.setText("Currently, your team earned: 0 points.");
                     editText.setEnabled(true);
                     climbedItButton.setEnabled(true);
@@ -160,7 +169,7 @@ public class ExtraPointsActivity extends AppCompatActivity {
                     LinearLayout activities = customRoutesView.findViewById(R.id.activities);
                     if (isCustomButtonClicked) {
                         activities.setVisibility(View.VISIBLE);
-                        customButton.setImageResource(R.drawable.avd_anim_arrow_blue_back);
+                        customButton.setImageResource(R.drawable.avd_anim_arrow_back);
                         Drawable d = customButton.getDrawable();
                         if (d instanceof AnimatedVectorDrawable) {
                             animArrowAnim = (AnimatedVectorDrawable) d;
@@ -174,7 +183,7 @@ public class ExtraPointsActivity extends AppCompatActivity {
                         isCustomButtonClicked = false;
                     } else {
                         activities.setVisibility(GONE);
-                        customButton.setImageResource(R.drawable.avd_anim_arrow_blue);
+                        customButton.setImageResource(R.drawable.avd_anim_arrow);
                         Drawable d = customButton.getDrawable();
                         if (d instanceof AnimatedVectorDrawable) {
                             animArrowAnim = (AnimatedVectorDrawable) d;
