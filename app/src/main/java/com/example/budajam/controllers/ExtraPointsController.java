@@ -7,8 +7,6 @@ import com.example.budajam.models.ExtraPointsModel;
 import com.example.budajam.models.initModel;
 import com.google.firebase.auth.FirebaseUser;
 
-import java.util.List;
-
 public class ExtraPointsController {
     public static FirebaseUser authenticate(){
         initModel.initAuthentication();
@@ -34,5 +32,13 @@ public class ExtraPointsController {
     public static double pointsForActivity(Context context, ExtraActivity activity, String selectedSpinner,
                                            String pointsText){
         return ExtraPointsModel.pointsForActivity(context, activity, selectedSpinner, pointsText);
+    }
+
+    public static void saveToDatabaseClimbers(Context context, ExtraActivity activity, String checkedName, int points) {
+        ExtraPointsModel.saveToDatabaseClimbers(context, activity, checkedName, points);
+    }
+
+    public static void saveToDatabaseTeams(Context context, ExtraActivity activity, int points) {
+        ExtraPointsModel.saveToDatabaseTeams(context, activity, points);
     }
 }

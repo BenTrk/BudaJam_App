@@ -27,7 +27,6 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.PopupMenu;
 
-import com.example.budajam.ExtraPointsActivity;
 import com.example.budajam.OptionsActivity;
 import com.example.budajam.R;
 import com.example.budajam.classes.PlaceWithRoutes;

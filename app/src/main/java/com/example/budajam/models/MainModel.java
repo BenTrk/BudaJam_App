@@ -16,7 +16,6 @@ import java.util.List;
 
 public class MainModel {
     static FirebaseDatabase database = FirebaseDatabase.getInstance("https://budajam-ea659-default-rtdb.firebaseio.com/");
-    static String climberName1, climberName2;
     static double teamPoints;
     static FirebaseAuth auth = FirebaseAuth.getInstance();
     public static FirebaseUser user = auth.getCurrentUser();
