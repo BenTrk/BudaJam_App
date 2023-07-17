@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.graphics.drawable.AnimatedVectorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.DeadObjectException;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,7 +31,12 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.budajam.classes.Activity;
 import com.example.budajam.classes.ClimberNames;
+import com.example.budajam.classes.ExtraActivity;
+import com.example.budajam.controllers.ExtraPointsController;
+import com.example.budajam.controllers.CheckOutController;
 import com.example.budajam.controllers.MainController;
+import com.example.budajam.models.ExtraPointsModel;
+import com.example.budajam.models.initModel;
 import com.example.budajam.views.CheckOutActivity;
 import com.example.budajam.views.LoginActivity;
 import com.example.budajam.views.MainActivity;
@@ -49,8 +55,6 @@ import java.util.List;
 
 public class ExtraPointsActivity extends AppCompatActivity {
     FirebaseUser user;
-    FirebaseAuth auth;
-    FirebaseAuth.AuthStateListener authListener;
     FirebaseDatabase database;
     String climberName1, climberName2;
     HashMap<String, List<HashMap<String, Pair<String, Integer>>>> qualityMap = new HashMap<>();
@@ -58,8 +62,10 @@ public class ExtraPointsActivity extends AppCompatActivity {
     Double teamPoints;
 
     Integer pointsInDB;
-    int points;
-    Button backButton;
+    LinearLayout popupLinear;
+    double points;
+    Button backButton, showDropDown;
+    String checkedName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,206 +73,149 @@ public class ExtraPointsActivity extends AppCompatActivity {
         //Set layout view
         setContentView(R.layout.activity_extrapoints);
 
-        auth = FirebaseAuth.getInstance();
-        authListener = firebaseAuth -> {
-            user = firebaseAuth.getCurrentUser();
-            if (user != null) {
-                getNamesFromDatabase(user.getUid());
-            }
-            else {
-                startActivity(new Intent(ExtraPointsActivity.this, LoginActivity.class));
-                finish();
-            }
-        };
+        //Check authentication
+        if (ExtraPointsController.authenticate() == null) {
+            startActivity(new Intent(ExtraPointsActivity.this, LoginActivity.class));
+            finish();
+        }
 
-        setCustomSpinner();
+        popupLinear = findViewById(R.id.popupLinear);
+        showDropDown = findViewById(R.id.buttonShowDropDown);
+        showDropDown.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                addCustomDropDown(initModel.getListOfActivities());
+            }
+        });
 
         backButton = findViewById(R.id.backButton);
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                popupLinear.removeAllViews();
                 startActivity(new Intent(ExtraPointsActivity.this, MainActivity.class));
                 finish();
             }
         });
     }
-    public void getNamesFromDatabase(String userID) {
-        database = FirebaseDatabase.getInstance("https://budajam-ea659-default-rtdb.firebaseio.com/");
-        Query routesQuery = database.getReference(userID + "/");
-        routesQuery.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                ClimberNames climberNamesInside = dataSnapshot.getValue(ClimberNames.class);
-                assert climberNamesInside != null;
-                climberName1 = climberNamesInside.ClimberOne;
-                climberName2 = climberNamesInside.ClimberTwo;
-                teamPoints = climberNamesInside.teamPoints;
-            }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                //
-            }
-        });
-    }
-    //ToDo: add points to teams activities. No Spinner, but textfield.
-    private void setCustomSpinner(){
-        database = FirebaseDatabase.getInstance("https://budajam-ea659-default-rtdb.firebaseio.com/");
-        Query activitiesQuery = database.getReference("Activities/");
-        Button showActivities = (Button) findViewById(R.id.buttonShowDropDown);
-
-        //Go through the Activities, collect stuff in qualityMap, do listing and stuff.
-        activitiesQuery.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-                    for (DataSnapshot qualitiesSnapshot : postSnapshot.getChildren()) {
-                        String activityString = qualitiesSnapshot.getValue(String.class);
-                        Activity activity = new Activity(activityString);
-                        qualityMap.put(postSnapshot.getKey(), activity.getQualityPairs());
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(getApplicationContext(), "DB Error", Toast.LENGTH_LONG).show();
-            }
-        });
-
-        View.OnClickListener handler = v -> {
-            if (v.getId() == R.id.buttonShowDropDown) {
-                addCustomDropDown(qualityMap);
-            }
-        };
-        showActivities.setOnClickListener(handler);
-    }
-
-    private void addCustomDropDown(HashMap<String, List<HashMap<String, Pair<String, Integer>>>> qualityMap) {
-        LinearLayout popupLinear = findViewById(R.id.popupLinear);
+    private void addCustomDropDown(List<ExtraActivity> activityList) {
         popupLinear.removeAllViews();
-        database = FirebaseDatabase.getInstance("https://budajam-ea659-default-rtdb.firebaseio.com/");
-        DatabaseReference myRef = database.getReference(user.getUid() + "/Activities/");
 
-        for (String activityName : qualityMap.keySet()) {
-            final View customRoutesView = LayoutInflater.from(this).inflate(
-                    R.layout.custom_extrapoints_layout, popupLinear, false
-            );
-            LinearLayout.LayoutParams customViewParams = new LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-            );
-            customRoutesView.setLayoutParams(customViewParams);
+        for (ExtraActivity activity : activityList) {
+            View customRoutesView = createCustomView(popupLinear);
 
-            TextView ActivityNameView = customRoutesView.findViewById(R.id.routeNameTextView);
+            TextView activityNameView = customRoutesView.findViewById(R.id.routeNameTextView);
             ImageButton customButton = customRoutesView.findViewById(R.id.activityDropDownButton);
             Spinner qualitySpinner = customRoutesView.findViewById(R.id.category);
             RadioGroup climberNameRadioGroup = customRoutesView.findViewById(R.id.climberNameRadioGroup);
             RadioButton climberNameOne = customRoutesView.findViewById(R.id.climberNameOne);
             RadioButton climberNameTwo = customRoutesView.findViewById(R.id.climberNameTwo);
+            ImageButton removeButton = customRoutesView.findViewById(R.id.removeButtonImageButton);
             Button climbedItButton = customRoutesView.findViewById(R.id.climbed_it_button);
             RelativeLayout routeWhoClimbed = customRoutesView.findViewById(R.id.routeWhoActivityRelativeLayout);
             TextView activityText = customRoutesView.findViewById(R.id.mostPointsTextView);
             EditText editText = customRoutesView.findViewById(R.id.pointsEarned);
 
-            //teams - climbers
-            for (HashMap<String, Pair<String, Integer>> map : qualityMap.get(activityName)){
-                if (map.containsKey("teams")) {
-                    editText.setVisibility(View.VISIBLE);
-                    qualitySpinner.setVisibility(GONE);
-                    climberNameRadioGroup.clearCheck();
-                    for (View v : climberNameRadioGroup.getTouchables()){
-                        v.setEnabled(false);
-                    }
-                    break;
-                } else {
-                    editText.setVisibility(View.GONE);
-                    climberNameRadioGroup.clearCheck();
-                    for (View v : climberNameRadioGroup.getTouchables()){
-                            v.setEnabled(true);
-                    }
-                }
-            };
-
-            View.OnClickListener radioButtonClickListener = new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    int checkedNameButton = climberNameRadioGroup.getCheckedRadioButtonId();
-                    RadioButton checkedNameRadioButton = (RadioButton) findViewById(checkedNameButton);
-                    String checkedName = (String) checkedNameRadioButton.getText();
-                    ImageButton removeButton = customRoutesView.findViewById(R.id.removeButtonImageButton);
-                    //Do smthng
-                    //int points = getClimberPointsActivity(activityName, checkedName, activityText);
-
-                    database = FirebaseDatabase.getInstance("https://budajam-ea659-default-rtdb.firebaseio.com/");
-                    DatabaseReference myRef = database.getReference(user.getUid() + "/Activities/" + activityName);
-                    myRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot snapshot) {
-                            if (snapshot.hasChild(checkedName)) {
-                                points = snapshot.child(checkedName).getValue(Integer.class);
-                                activityText.setText("Currently, " + checkedName + " earned: " + points + " points.");
-                                removeButton.setVisibility(View.VISIBLE);
-                                removeButton.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View view) {
-                                        myRef.child(checkedName).removeValue();
-                                        DatabaseReference myRefPoints = database.getReference(user.getUid());
-                                        myRefPoints.child("teamPoints").setValue(teamPoints - points);
-                                        activityText.setText("Currently, " + checkedName + " did not do this activity.");
-                                        removeButton.setVisibility(GONE);
-                                    }
-                                });
-                            } else {
-                                points = 0;
-                                activityText.setText("Currently, " + checkedName + " did not do this activity.");
-                                removeButton.setVisibility(View.GONE);
-                            }
-                        }
-
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError error) {
-                            //ToDo:
-                        }
-                    });
-                }
-            };
-
+            climberName1 = MainController.getNames()[0];
+            climberName2 = MainController.getNames()[1];
             climberNameOne.setText(climberName1);
             climberNameTwo.setText(climberName2);
+
+            //teams - climbers difference in visuals
+            if (activity.getGroup().equals("teams")) {
+                editText.setVisibility(View.VISIBLE);
+                qualitySpinner.setVisibility(GONE);
+                climberNameRadioGroup.clearCheck();
+                for (View v : climberNameRadioGroup.getTouchables()){
+                    v.setEnabled(false);
+                }
+                if (ExtraPointsController.getTeamsActivities(activity.getName(), "Team")) {
+                    activityText.setText("Currently, your team earned: " + ExtraPointsController.getActivityPointsFromSaved(activity.getName(), "Team") + " points.");
+                    if (ExtraPointsController.getActivityPointsFromSaved(activity.getName(), "Team") > 0) {
+                        removeButton.setVisibility(View.VISIBLE);
+                        checkedName = "Team";
+                    } else removeButton.setVisibility(GONE);
+                } else {
+                    activityText.setText("Currently, your team earned: 0 points.");
+                    removeButton.setVisibility(GONE);
+                }
+            } else {
+                editText.setVisibility(View.GONE);
+                climberNameRadioGroup.clearCheck();
+                for (View v : climberNameRadioGroup.getTouchables()){
+                    v.setEnabled(true);
+                }
+                activityText.setText("Select a climber!");
+                removeButton.setVisibility(GONE);
+            }
+            activityNameView.setText(activity.getName());
+
+            //Set radiobutton to show the correct data and removebutton as necessary based on the selection
+
+            View.OnClickListener radioButtonClickListener = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        int checkedNameButton = climberNameRadioGroup.getCheckedRadioButtonId();
+                        RadioButton checkedNameRadioButton = findViewById(checkedNameButton);
+                        checkedName = (String) checkedNameRadioButton.getText();
+
+                        if (ExtraPointsController.getTeamsActivities(activity.getName(), checkedName)) {
+                            activityText.setText("Currently, " + checkedName + " earned: " +
+                                    ExtraPointsController.getActivityPointsFromSaved(activity.getName(), checkedName) + " points.");
+                            removeButton.setVisibility(View.VISIBLE);
+                        } else {
+                            points = 0;
+                            activityText.setText("Currently, " + checkedName + " did not do this activity.");
+                            removeButton.setVisibility(View.GONE);
+                        }
+                    }
+                };
+
             climberNameOne.setOnClickListener(radioButtonClickListener);
             climberNameTwo.setOnClickListener(radioButtonClickListener);
 
+            //Set remove button functionality
+            removeButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    //ToDo
+                    ExtraPointsController.removeActivity(checkedName, activity);
+                    activityText.setText("Currently, " + checkedName + " did not do this activity.");
+                    removeButton.setVisibility(GONE);
+                    if (checkedName == null){
+                        activityText.setText("Currently, your team earned: 0 points.");
+                        editText.setEnabled(true);
+                        climbedItButton.setEnabled(true);
+                    }
+                }
+            });
+
             routeWhoClimbed.setVisibility(GONE);
 
+            //Animation onclick
             customButton.setImageResource(R.drawable.arrow_anim_start);
             customButton.setOnClickListener(new View.OnClickListener() {
                 boolean isCustomButtonClicked = true;
-
                 @Override
                 public void onClick(View v) {
-                    List<String> spinnerHelper = new ArrayList<>();
+                    LinearLayout activities = customRoutesView.findViewById(R.id.activities);
                     if (isCustomButtonClicked) {
+                        activities.setVisibility(View.VISIBLE);
                         customButton.setImageResource(R.drawable.avd_anim_arrow_blue_back);
                         Drawable d = customButton.getDrawable();
                         if (d instanceof AnimatedVectorDrawable) {
                             animArrowAnim = (AnimatedVectorDrawable) d;
                             animArrowAnim.start();
                         }
-
-                        for (HashMap<String, Pair<String, Integer>> map : qualityMap.get(activityName)) {
-                            for (Pair<String, Integer> pair : map.values()) {
-                                spinnerHelper.add((String) pair.first);
-                            }
-                        }
-                        String[] spinnerArray = new String[spinnerHelper.size()];
-                        spinnerHelper.toArray(spinnerArray);
-                        ArrayAdapter<String> adapter = new ArrayAdapter<>(getApplicationContext(), R.layout.activity_spinner_item, spinnerArray);
+                        ArrayAdapter<String> adapter = new ArrayAdapter<>(getApplicationContext(), R.layout.activity_spinner_item,
+                                ExtraPointsController.adapterHelper(activity));
                         adapter.setDropDownViewResource(R.layout.activity_spinner_dropdown_item);
                         qualitySpinner.setAdapter(adapter);
                         routeWhoClimbed.setVisibility(View.VISIBLE);
                         isCustomButtonClicked = false;
                     } else {
+                        activities.setVisibility(GONE);
                         customButton.setImageResource(R.drawable.avd_anim_arrow_blue);
                         Drawable d = customButton.getDrawable();
                         if (d instanceof AnimatedVectorDrawable) {
@@ -278,43 +227,24 @@ public class ExtraPointsActivity extends AppCompatActivity {
                     }
                 }
             });
-            for (HashMap<String, Pair<String, Integer>> map : qualityMap.get(activityName)) {
-                if (map.containsKey("teams")) {
-                    setCurrentActivityDetails(activityName, customRoutesView, "teams");
-                    break;
-                } else setCurrentActivityDetails(activityName, customRoutesView, "climbers");
-            }
-            ActivityNameView.setText(activityName);
             climbedItButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     String selected = (String) qualitySpinner.getSelectedItem();
-                    int points = 0;
-                    for (HashMap<String, Pair<String, Integer>> map : qualityMap.get(activityName)) {
-                        if (map.containsKey("climbers")) {
-                            for (Pair<String, Integer> pair : map.values()) {
-                                String first = (String) pair.first;
-                                if (first.equals(selected)) {
-                                    points = (int) pair.second;
-                                }
-                            }
+                    String pointsText = editText.getText().toString();
+                    double pointsHere = ExtraPointsController.pointsForActivity(ExtraPointsActivity.this,
+                            activity, selected, pointsText);
 
-                            int checkedNameButton = climberNameRadioGroup.getCheckedRadioButtonId();
-                            if (checkedNameButton != -1) {
-                                RadioButton checkedNameRadioButton = (RadioButton) findViewById(checkedNameButton);
-                                String checkedName = (String) checkedNameRadioButton.getText();
-                                addPointsToDatabaseClimbers(points, activityName, checkedName, activityText);
-                            }
-                            else Toast.makeText(ExtraPointsActivity.this, "Select a climber!", Toast.LENGTH_LONG).show();
-                        } else {
-                            String pointsText = editText.getText().toString();
-                            if (pointsText.matches("\\d+")) {
-                                points = Integer.parseInt(pointsText);
-                                addPointsToDatabase(points, activityName, activityText);
-                                editText.setEnabled(false);
-                                climbedItButton.setEnabled(false);
-                            } else Toast.makeText(ExtraPointsActivity.this, "This is not a number, Bro!", Toast.LENGTH_LONG).show();
-                        }
+                    if (activity.getGroup().equals("climbers")){
+                        if (climberNameRadioGroup.getCheckedRadioButtonId() != -1){
+                            addPointsToDatabaseClimbers((int) pointsHere, activity.getName(), checkedName, activityText);
+                            removeButton.setVisibility(View.VISIBLE);
+                        } else Toast.makeText(ExtraPointsActivity.this, "Select a climber!", Toast.LENGTH_LONG).show();
+                    } else {
+                        addPointsToDatabase((int) pointsHere, activity.getName(), activityText);
+                        editText.setEnabled(false);
+                        climbedItButton.setEnabled(false);
+                        removeButton.setVisibility(View.VISIBLE);
                     }
                 }
             });
@@ -322,11 +252,24 @@ public class ExtraPointsActivity extends AppCompatActivity {
         }
     }
 
+    private View createCustomView(LinearLayout popupLinear){
+        View customRoutesView = LayoutInflater.from(this).inflate(
+                R.layout.custom_extrapoints_layout, popupLinear, false
+        );
+        LinearLayout.LayoutParams customViewParams = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+        );
+        customRoutesView.setLayoutParams(customViewParams);
+        return customRoutesView;
+    }
+
+    //ToDo
     private void addPointsToDatabaseClimbers(int points, String activityName, String checkedName, TextView textView) {
         database = FirebaseDatabase.getInstance("https://budajam-ea659-default-rtdb.firebaseio.com/");
-        DatabaseReference myRefPoints = database.getReference(user.getUid() +"/teamPoints");
-        DatabaseReference myRef = database.getReference(user.getUid() + "/Activities/" + activityName);
-
+        DatabaseReference myRefPoints = database.getReference(initModel.getUser().getUid() +"/teamPoints");
+        DatabaseReference myRef = database.getReference(initModel.getUser().getUid() + "/Activities/" + activityName);
+        teamPoints = initModel.getTeamData().teamPoints;
         myRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -374,112 +317,18 @@ public class ExtraPointsActivity extends AppCompatActivity {
 
     }
 
-    private void setCurrentActivityDetails(String activityName, View customRoutesView, String group) {
-        //ToDO: refresh the point-display after an activity is documented.
-        database = FirebaseDatabase.getInstance("https://budajam-ea659-default-rtdb.firebaseio.com/");
-        DatabaseReference myRef = database.getReference(user.getUid() + "/Activities/");
-
-        myRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.hasChild(activityName)) {
-                    LinearLayout activities = customRoutesView.findViewById(R.id.activities);
-                    activities.setVisibility(View.VISIBLE);
-                    ImageButton removeButton = customRoutesView.findViewById(R.id.removeButtonImageButton);
-                    TextView editText = customRoutesView.findViewById(R.id.pointsEarned);
-                    Button climbedItButton = customRoutesView.findViewById(R.id.climbed_it_button);
-
-                    Query activityQuery = myRef.child(activityName);
-                    if (group.equals("climbers")) {
-                        RadioGroup climberNameRadioGroup = customRoutesView.findViewById(R.id.climberNameRadioGroup);
-                        climberNameRadioGroup.clearCheck();
-                        TextView activityText = customRoutesView.findViewById(R.id.mostPointsTextView);
-                        activityText.setText("Select a climber!");
-                        removeButton.setVisibility(GONE);
-                    }
-                    else {
-                        removeButton.setVisibility(View.VISIBLE);
-                        activityQuery.addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                pointsInDB = dataSnapshot.getValue(Integer.class);
-                                TextView activityText = customRoutesView.findViewById(R.id.mostPointsTextView);
-                                activityText.setText("Currently, your team earned: " + pointsInDB + " points.");
-                                editText.setEnabled(false);
-                                climbedItButton.setEnabled(false);
-                                removeButton.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View view) {
-                                        myRef.child(activityName).removeValue();
-                                        DatabaseReference myRefPoints = database.getReference(user.getUid());
-                                        myRefPoints.child("teamPoints").setValue(teamPoints - pointsInDB);
-                                        activityText.setText("Team did not do this activity yet!");
-                                        removeButton.setVisibility(GONE);
-                                        editText.setEnabled(true);
-                                        climbedItButton.setEnabled(true);
-                                        Toast.makeText(ExtraPointsActivity.this, "Points removed!", Toast.LENGTH_LONG).show();
-                                    }
-                                });
-                            }
-
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError error) {
-
-                            }
-                        });
-                    }
-
-                    //Somehow this is the devil and makes the DB cry. :) If sh*t hits the fan, use DBexport and import it.
-                    //Update - its alive!
-                } else {
-                    LinearLayout activities = customRoutesView.findViewById(R.id.activities);
-                    activities.setVisibility(View.VISIBLE);
-                    ImageButton removeButton = customRoutesView.findViewById(R.id.removeButtonImageButton);
-                    TextView editText = customRoutesView.findViewById(R.id.pointsEarned);
-                    Spinner qualitySpinner = customRoutesView.findViewById(R.id.category);
-                    if (group.equals("climbers")) {
-                        RadioGroup climberNameRadioGroup = customRoutesView.findViewById(R.id.climberNameRadioGroup);
-                        climberNameRadioGroup.clearCheck();
-                        editText.setVisibility(View.GONE);
-                        for (View v : climberNameRadioGroup.getTouchables()){
-                            v.setEnabled(true);
-                        }
-                        TextView activityText = customRoutesView.findViewById(R.id.mostPointsTextView);
-                        activityText.setText("Select a climber!");
-                        removeButton.setVisibility(GONE);
-                    } else {
-                        RadioGroup climberNameRadioGroup = customRoutesView.findViewById(R.id.climberNameRadioGroup);
-                        climberNameRadioGroup.clearCheck();
-                        editText.setVisibility(View.VISIBLE);
-                        qualitySpinner.setVisibility(GONE);
-                        for (View v : climberNameRadioGroup.getTouchables()){
-                            v.setEnabled(false);
-                        }
-                        TextView activityText = customRoutesView.findViewById(R.id.mostPointsTextView);
-                        //ToDo: Somethings wrong with the trashcan imagebutton.
-                        activityText.setText("Team did not do this activity yet!");
-                        removeButton.setVisibility(GONE);
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                //
-            }
-        });
-    }
-
+    //ToDo
     private void addPointsToDatabase(int points, String activityName, TextView textView) {
         database = FirebaseDatabase.getInstance("https://budajam-ea659-default-rtdb.firebaseio.com/");
-        DatabaseReference myRefPoints = database.getReference(user.getUid() +"/teamPoints");
-        DatabaseReference myRef = database.getReference(user.getUid() + "/Activities/");
+        DatabaseReference myRefPoints = database.getReference(initModel.getUser().getUid() +"/teamPoints");
+        DatabaseReference myRef = database.getReference(initModel.getUser().getUid() + "/Activities/");
+        teamPoints = initModel.getTeamData().teamPoints;
 
         myRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.hasChild(activityName)) {
-                    Query activityQuery = myRef.child(activityName);
+                    Query activityQuery = myRef.child(activityName + "/Team");
                     activityQuery.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -490,7 +339,7 @@ public class ExtraPointsActivity extends AppCompatActivity {
                             if (isMoreOrLess < 0) {
                                 Dialog dialog = dialogBuilderFunc(true, true);
                                 dialog.show();
-                                myRef.child(activityName).setValue(points);
+                                myRef.child(activityName + "/Team").setValue(points);
                                 myRefPoints.setValue((teamPoints - pointsInDB) + points);
                                 textView.setText("Currently, your team earned: " + points + " points.");
                             } else {

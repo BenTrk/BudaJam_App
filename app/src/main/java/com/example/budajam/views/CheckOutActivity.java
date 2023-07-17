@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,8 +22,6 @@ import com.example.budajam.R;
 import com.example.budajam.classes.Route;
 import com.example.budajam.controllers.CheckOutController;
 import com.example.budajam.controllers.MainController;
-import com.example.budajam.interfaces.OnGetClimbDataListener;
-import com.example.budajam.interfaces.OnGetPointsListener;
 
 import java.util.List;
 
@@ -45,6 +42,7 @@ public class CheckOutActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
+        MainController.init();
         //Set the view
         setContentView(R.layout.activity_checkout);
 

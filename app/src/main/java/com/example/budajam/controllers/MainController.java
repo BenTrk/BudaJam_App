@@ -9,7 +9,6 @@ import com.example.budajam.models.initModel;
 import com.google.firebase.auth.FirebaseUser;
 
 import java.util.List;
-import java.util.Set;
 
 public class MainController {
     public static boolean init(){

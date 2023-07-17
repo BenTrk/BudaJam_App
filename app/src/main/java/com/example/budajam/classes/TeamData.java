@@ -16,8 +16,20 @@ public class TeamData {
     public boolean Paid;
     public String Category;
     HashMap<String, List<PlaceWithRoutes>> climbersClimbsMap;
+    HashMap<String, List<ExtraActivity>> activitiesMap;
 
     public TeamData() {
+    }
+
+    public TeamData(String teamName, String climberOne, String climberTwo, double teamPoints, boolean paid, String category, HashMap<String, List<PlaceWithRoutes>> climbersClimbsMap, HashMap<String, List<ExtraActivity>> activitiesMap) {
+        TeamName = teamName;
+        ClimberOne = climberOne;
+        ClimberTwo = climberTwo;
+        this.teamPoints = teamPoints;
+        Paid = paid;
+        Category = category;
+        this.climbersClimbsMap = climbersClimbsMap;
+        this.activitiesMap = activitiesMap;
     }
 
     public TeamData(String teamName, String climberOne, String climberTwo, double teamPoints, boolean paid, String category,
@@ -29,6 +41,7 @@ public class TeamData {
         this.Paid = paid;
         this.Category = category;
         this.climbersClimbsMap = climbersClimbsMap;
+        this.activitiesMap = new HashMap<>();
     }
 
     public TeamData(String teamName, String climberOne, String climberTwo, double teamPoints, boolean paid, String category) {
@@ -39,6 +52,7 @@ public class TeamData {
         this.Paid = paid;
         this.Category = category;
         this.climbersClimbsMap = new HashMap<>();
+        this.activitiesMap = new HashMap<>();
     }
 
     public String getTeamName() {
@@ -95,5 +109,12 @@ public class TeamData {
 
     public void setClimbersClimbsMap(HashMap<String, List<PlaceWithRoutes>> climbersClimbsMap) {
         this.climbersClimbsMap = climbersClimbsMap;
+    }
+    public HashMap<String, List<ExtraActivity>> getActivitiesMap() {
+        return activitiesMap;
+    }
+
+    public void setActivitiesMap(HashMap<String, List<ExtraActivity>> activitiesMap) {
+        this.activitiesMap = activitiesMap;
     }
 }

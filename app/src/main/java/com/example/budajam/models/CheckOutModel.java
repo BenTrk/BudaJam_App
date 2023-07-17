@@ -1,29 +1,13 @@
 package com.example.budajam.models;
 
-import androidx.annotation.NonNull;
-
 import com.example.budajam.classes.PlaceWithRoutes;
 import com.example.budajam.classes.Route;
-import com.example.budajam.controllers.MainController;
-import com.example.budajam.interfaces.OnGetClimbDataListener;
-import com.example.budajam.interfaces.OnGetPointsListener;
-import com.example.budajam.views.MainActivity;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
-import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
 
 public class CheckOutModel {
-    static FirebaseUser user;
     static double points;
 
     public static boolean areTherePlaces(String selectedName){
@@ -63,11 +47,5 @@ public class CheckOutModel {
         climbersRoutes.child(route.name).removeValue();
         teamPointsReference.setValue(points - route.points);
         return points - route.points;
-    }
-
-    public static double pointSetter(double teamPointsPast) {
-        while (teamPointsPast == initModel.getTeamData().teamPoints){
-            return -1;
-        } return initModel.getTeamData().teamPoints;
     }
 }

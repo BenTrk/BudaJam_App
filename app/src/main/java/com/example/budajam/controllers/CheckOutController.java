@@ -1,8 +1,6 @@
 package com.example.budajam.controllers;
 
 import com.example.budajam.classes.Route;
-import com.example.budajam.interfaces.OnGetClimbDataListener;
-import com.example.budajam.interfaces.OnGetPointsListener;
 import com.example.budajam.models.CheckOutModel;
 import com.example.budajam.models.initModel;
 import com.google.firebase.auth.FirebaseUser;

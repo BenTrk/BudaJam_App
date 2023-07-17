@@ -9,6 +9,14 @@ public class ExtraActivity {
     String name;
     String group;
     List<Pair<String, Integer>> pointsList;
+    double points;
+
+    public ExtraActivity(String name, String group, List<Pair<String, Integer>> pointsList, double points) {
+        this.name = name;
+        this.group = group;
+        this.pointsList = pointsList;
+        this.points = points;
+    }
 
     public ExtraActivity(String name, String group, List<Pair<String, Integer>> pointsList) {
         this.name = name;
@@ -36,7 +44,24 @@ public class ExtraActivity {
         }
     }
 
+    public ExtraActivity(boolean teamDataFetch, String rawDatabaseDataString){
+        if (teamDataFetch){
+            String[] separatedString = rawDatabaseDataString.split(":");
+            this.name = separatedString[0].substring(1, separatedString[0].length()-1);
+            this.points = Integer.parseInt(separatedString[1]);
+        }
+    }
+
     public ExtraActivity() {
+    }
+
+    public ExtraActivity(String team, Integer valueOf) {
+        this.name = team;
+        this.points = valueOf;
+    }
+
+    public double getPoints() {
+        return points;
     }
 
     public String getName() {

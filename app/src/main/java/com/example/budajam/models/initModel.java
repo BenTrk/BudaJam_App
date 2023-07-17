@@ -104,10 +104,35 @@ public class initModel {
                         }
                         climbersClimbsMap.put(climberNameSnapshot.getKey(), placesForThisClimber);
                     }
+
+                    HashMap<String, List<ExtraActivity>> activitiesMap = new HashMap<>();
+                    DataSnapshot activitiesFolderSnapshot = dataSnapshot.child("Activities");
+                    for (DataSnapshot activityNameSnapshot : activitiesFolderSnapshot.getChildren()) {
+                        List<ExtraActivity> activitiesForThisName = new ArrayList<>();
+
+                        Object object = activityNameSnapshot.getValue(Object.class);
+                        String placeWithRoutesJSON = new Gson().toJson(object);
+                        boolean isThere = placeWithRoutesJSON.contains(":");
+
+                        if (isThere) {
+                            placeWithRoutesJSON = placeWithRoutesJSON.substring(1, placeWithRoutesJSON.length() - 1);
+                            for (String JSONpart : placeWithRoutesJSON.split(",")) {
+                                ExtraActivity activity = new ExtraActivity(true, JSONpart);
+                                activitiesForThisName.add(activity);
+                                activitiesMap.put(activityNameSnapshot.getKey(), activitiesForThisName);
+                            }
+                        } else {
+                            ExtraActivity activity = new ExtraActivity("Team", Integer.valueOf(object.toString()));
+                            activitiesForThisName.add(activity);
+                            activitiesMap.put(activityNameSnapshot.getKey(), activitiesForThisName);
+                        }
+                    }
+
                     teamData = new TeamData(dataSnapshot.child("TeamName").getValue(String.class),
                             dataSnapshot.child("ClimberOne").getValue(String.class), dataSnapshot.child("ClimberTwo").getValue(String.class),
                             dataSnapshot.child("teamPoints").getValue(double.class), dataSnapshot.child("Paid").getValue(boolean.class),
-                            dataSnapshot.child("Category").getValue(String.class), climbersClimbsMap);
+                            dataSnapshot.child("Category").getValue(String.class), climbersClimbsMap, activitiesMap);
+
                 }
                 else {
                     Object object = dataSnapshot.getValue(Object.class);
@@ -130,6 +155,7 @@ public class initModel {
     //Initialize the activities.
     //Set up with one time database call
     public static void initActivities(){
+        listOfActivities.clear();
         Query routesQuery = database.getReference("Activities/");
         routesQuery.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
