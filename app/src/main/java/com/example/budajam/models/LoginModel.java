@@ -8,9 +8,8 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.budajam.R;
-import com.example.budajam.classes.ClimberNames;
+import com.example.budajam.classes.TeamData;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
 
 public class LoginModel extends AppCompatActivity {
     //ToDo: get the strings out of here. :)
@@ -44,10 +43,11 @@ public class LoginModel extends AppCompatActivity {
     }
 
     //Check if the user paid the entry fee so they can sign in
-    public boolean checkIfPaid(DataSnapshot dataSnapshot, FirebaseUser user, Context context) {
-        ClimberNames team = dataSnapshot.getValue(ClimberNames.class);
+    public boolean checkIfPaid(FirebaseUser user, Context context) {
+        initModel.initTeamData();
+        TeamData team = initModel.getTeamData();
         assert team != null;
-        boolean isPaid = team.Paid;
+        boolean isPaid = team.isPaid();
         if (user.isEmailVerified() && isPaid) {
             return true;
         } else if (!user.isEmailVerified()) {

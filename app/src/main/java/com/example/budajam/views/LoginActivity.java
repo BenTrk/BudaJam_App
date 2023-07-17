@@ -82,7 +82,7 @@ public class LoginActivity extends AppCompatActivity {
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (loginController.checkIfPaid(dataSnapshot, user, LoginActivity.this)){
+                if (loginController.checkIfPaid(user, LoginActivity.this)){
                     startActivity(new Intent(LoginActivity.this, MainActivity.class));
                     finish();
                 }
