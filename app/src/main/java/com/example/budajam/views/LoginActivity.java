@@ -85,7 +85,7 @@ public class LoginActivity extends AppCompatActivity {
                 if (loginController.checkIfPaid(user, LoginActivity.this)){
                     startActivity(new Intent(LoginActivity.this, MainActivity.class));
                     finish();
-                }
+                } else Toast.makeText(LoginActivity.this, "Check again a bit later.", Toast.LENGTH_LONG).show();
             }
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {

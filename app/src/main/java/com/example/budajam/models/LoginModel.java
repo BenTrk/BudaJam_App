@@ -11,6 +11,7 @@ import com.example.budajam.R;
 import com.example.budajam.classes.TeamData;
 import com.google.firebase.auth.FirebaseUser;
 
+
 public class LoginModel extends AppCompatActivity {
     //ToDo: get the strings out of here. :)
 
@@ -46,14 +47,15 @@ public class LoginModel extends AppCompatActivity {
     public boolean checkIfPaid(FirebaseUser user, Context context) {
         initModel.initTeamData();
         TeamData team = initModel.getTeamData();
-        assert team != null;
-        boolean isPaid = team.isPaid();
-        if (user.isEmailVerified() && isPaid) {
-            return true;
-        } else if (!user.isEmailVerified()) {
-            Toast.makeText(context, "Please verify your email!", Toast.LENGTH_LONG).show();
-        } else if (!isPaid) {
-            Toast.makeText(context, "Looks like you did not pay the entry fee.", Toast.LENGTH_LONG).show();
+        if (team != null) {
+            boolean isPaid = team.isPaid();
+            if (user.isEmailVerified() && isPaid) {
+                return true;
+            } else if (!user.isEmailVerified()) {
+                Toast.makeText(context, "Please verify your email!", Toast.LENGTH_LONG).show();
+            } else if (!isPaid) {
+                Toast.makeText(context, "Looks like you did not pay the entry fee.", Toast.LENGTH_LONG).show();
+            }
         }
         return false;
     }
